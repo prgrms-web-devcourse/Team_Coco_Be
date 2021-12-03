@@ -1,12 +1,12 @@
 package com.cocodan.triplan.schedule.domain;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,12 +19,19 @@ public class Voting {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id", referencedColumnName = "id")
+    private Schedule schedule;
+
     @OneToMany(mappedBy = "voting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VotingContent> votingContents = new ArrayList<>();
 
-    public Voting(String title, List<VotingContent> votingContents) {
+    @Builder
+    public Voting(String title, Schedule schedule, List<VotingContent> votingContents) {
+        this.schedule = schedule;
         this.title = title;
         this.votingContents = votingContents;
+        this.schedule.getVotingList().add(this);
     }
 
     public void addContent(String content) {
