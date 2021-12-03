@@ -52,10 +52,6 @@ public class Checklist {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getContent() {
         return content;
     }
@@ -66,30 +62,5 @@ public class Checklist {
 
     public int getDay() {
         return day;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Checklist checklist = (Checklist) o;
-
-        return id.equals(checklist.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Checklist.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("content='" + content + "'")
-                .add("checked=" + checked)
-                .add("day=" + day)
-                .toString();
     }
 }
