@@ -1,0 +1,95 @@
+package com.cocodan.triplan.schedule.domain;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Voting {
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @OneToMany(mappedBy = "voting", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VotingContent> votingContents = new ArrayList<>();
+
+    public Voting(String title, List<VotingContent> votingContents) {
+        this.title = title;
+        this.votingContents = votingContents;
+    }
+
+    public void addContent(String content) {
+        VotingContent votingContent = VotingContent.builder()
+                .content(content)
+                .voting(this)
+                .build();
+
+        votingContents.add(votingContent);
+    }
+
+    public void deleteContent(Long contentId) {
+        for (VotingContent votingContent : votingContents) {
+            if (votingContent.getId().equals(contentId)) {
+                votingContents.remove(votingContent);
+                break;
+            }
+        }
+    }
+
+    public void vote(Long contentId, boolean flag){
+        for (VotingContent votingContent : votingContents) {
+            if (votingContent.getId().equals(contentId)) {
+                votingContent.doVoting(flag);
+                break;
+            }
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public List<VotingContent> getVotingContents() {
+        return votingContents;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Voting voting = (Voting) o;
+
+        return id.equals(voting.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Voting.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("title='" + title + "'")
+                .toString();
+    }
+}
