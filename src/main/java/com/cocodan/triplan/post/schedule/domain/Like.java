@@ -1,7 +1,6 @@
 package com.cocodan.triplan.post.schedule.domain;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -12,9 +11,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "schedule_post_comments")
+@Table(name = "schedule_post_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SchedulePostComment {
+public class Like {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -27,14 +26,9 @@ public class SchedulePostComment {
     @JoinColumn(name = "schedule_post_id", referencedColumnName = "id")
     private SchedulePost schedulePost;
 
-    @Column(name = "content", nullable = false)
-    private String content;
-
-    @Builder
-    public SchedulePostComment(Long memberId, SchedulePost schedulePost, String content) {
+    public Like(Long memberId, SchedulePost schedulePost) {
         this.memberId = memberId;
         this.schedulePost = schedulePost;
-        this.content = content;
     }
 
     public Long getId() {
@@ -47,9 +41,5 @@ public class SchedulePostComment {
 
     public SchedulePost getSchedulePost() {
         return schedulePost;
-    }
-
-    public String getContent() {
-        return content;
     }
 }

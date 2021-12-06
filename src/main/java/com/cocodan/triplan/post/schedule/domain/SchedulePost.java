@@ -24,27 +24,27 @@ public class SchedulePost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: 2021.12.05 Teru - 멤버 엔티티 생성 후 연결
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
+    @Column(name = "schedule_id", nullable = false)
+    private Long scheduleId;
 
-    @ManyToOne
-    @JoinColumn(name = "schedule_id", referencedColumnName = "id")
-    private Schedule schedule;
-
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "views")
+    @Column(name = "views", nullable = false)
     private Long views;
 
-    @Column(name = "liked")
+    @Column(name = "liked", nullable = false)
     private Long liked;
 
     @Builder
-    public SchedulePost(Schedule schedule, String title, String content, Long views, Long liked) {
-        this.schedule = schedule;
+    public SchedulePost(Long memberId, Long scheduleId, String title, String content, Long views, Long liked) {
+        this.memberId = memberId;
+        this.scheduleId = scheduleId;
         this.title = title;
         this.content = content;
         this.views = views;
@@ -55,8 +55,12 @@ public class SchedulePost {
         return id;
     }
 
-    public Schedule getSchedule() {
-        return schedule;
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public Long getScheduleId() {
+        return scheduleId;
     }
 
     public String getTitle() {
