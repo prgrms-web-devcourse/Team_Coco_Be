@@ -5,13 +5,17 @@ import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+@DynamicInsert
+@DynamicUpdate
+public class Member extends BaseEntity<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
@@ -50,12 +54,9 @@ public class Member extends BaseEntity {
         this.profileImage = profileImage;
     }
 
-    public void changeValues(String email, String name, String phoneNumber, String birth, String gender, String nickname, String profileImage) {
-        this.email = email.isBlank() ? this.email : email;
+    public void changeValues(String name, String phoneNumber, String nickname, String profileImage) {
         this.name = name.isBlank() ? this.name : name;
         this.phoneNumber = phoneNumber.isBlank() ? this.phoneNumber : phoneNumber;
-        this.birth = birth.isBlank() ? this.birth : birth;
-        this.gender = gender.isBlank() ? this.gender : GenderType.of(gender);
         this.nickname = nickname.isBlank() ? this.nickname : nickname;
         this.profileImage = profileImage.isBlank() ? this.profileImage : profileImage;
     }
