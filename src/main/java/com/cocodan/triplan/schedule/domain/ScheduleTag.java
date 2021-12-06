@@ -21,6 +21,7 @@ public class ScheduleTag {
     private Schedule schedule;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "tag")
     private Tag tag;
 
     @Builder

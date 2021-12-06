@@ -22,8 +22,8 @@ public class DailySchedule {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @ManyToOne
-    @JoinColumn(name = "schedule_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id", referencedColumnName = "id")
     private Schedule schedule;
 
     @OneToMany(mappedBy = "dailySchedule", cascade = CascadeType.ALL, orphanRemoval = true)
