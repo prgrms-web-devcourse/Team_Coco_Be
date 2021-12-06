@@ -1,6 +1,5 @@
 package com.cocodan.triplan.common;
 
-import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -30,9 +29,6 @@ public abstract class BaseEntity<U> {
     @LastModifiedDate
     @Column(name = "last_modified_date")
     private LocalDateTime modifiedDate;
-
-    protected BaseEntity() {
-    }
 
     public void updateLastModifiedMember(U lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
