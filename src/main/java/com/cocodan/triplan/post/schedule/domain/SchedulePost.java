@@ -1,6 +1,6 @@
 package com.cocodan.triplan.post.schedule.domain;
 
-import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -10,14 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "schedule_posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SchedulePost {
+public class SchedulePost extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)

@@ -1,5 +1,6 @@
 package com.cocodan.triplan.post.schedule.domain;
 
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +14,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "schedule_post_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like {
+public class Like extends BaseEntity<Long> {
 
     @Id
     @Column(name = "id", nullable = false)
