@@ -34,18 +34,11 @@ public class Checklist {
         this.schedule = schedule;
         this.content = content;
         this.day = day;
+        schedule.getChecklists().add(this);
     }
 
     public void check(){
         checked = !checked;
-    }
-
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
-    }
-
-    public Schedule getSchedule() {
-        return schedule;
     }
 
     public Long getId() {

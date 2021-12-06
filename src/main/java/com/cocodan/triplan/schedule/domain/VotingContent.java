@@ -28,6 +28,7 @@ public class VotingContent {
     public VotingContent(String content, Voting voting) {
         this.content = content;
         this.voting = voting;
+        this.voting.getVotingContents().add(this);
     }
 
     public void doVoting(boolean flag){
@@ -42,10 +43,6 @@ public class VotingContent {
         count--;
     }
 
-    public void cancelVoting(){
-
-    }
-
     public Long getId() {
         return id;
     }
@@ -56,9 +53,5 @@ public class VotingContent {
 
     public int getCount() {
         return count;
-    }
-
-    public Voting getVoting() {
-        return voting;
     }
 }
