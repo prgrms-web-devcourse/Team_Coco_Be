@@ -1,7 +1,5 @@
 package com.cocodan.triplan.member.domain.vo;
 
-import com.cocodan.triplan.common.error.NotExistsException;
-
 import java.util.Arrays;
 
 public enum GenderType {
@@ -19,7 +17,7 @@ public enum GenderType {
         return Arrays.stream(GenderType.values())
                 .filter(v -> v.typeStr.equals(genderType))
                 .findFirst()
-                .orElseThrow(() -> new NotExistsException("성별 정보를 확인하세요"));
+                .orElseThrow(() -> new RuntimeException("성별 정보를 확인하세요"));
     }
 
     public String getTypeStr() {

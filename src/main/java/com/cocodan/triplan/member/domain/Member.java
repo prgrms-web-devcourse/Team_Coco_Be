@@ -1,15 +1,16 @@
 package com.cocodan.triplan.member.domain;
 
 import com.cocodan.triplan.member.domain.vo.GenderType;
-import com.cocodan.triplan.util.BaseEntity;
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// TODO : 이메일 이름 연락처 나이 성별 닉네임 사진
 public class Member extends BaseEntity<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,7 +39,18 @@ public class Member extends BaseEntity<Long> {
     @Column(name = "profile_image", nullable = true)
     private String profileImage;
 
-    public void changeValues(String email, String name, String phoneNumber, String birth, String gender) {
+    @Builder
+    public Member(String email, String name, String phoneNumber, String birth, GenderType gender, String nickname, String profileImage) {
+        this.email = email;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.birth = birth;
+        this.gender = gender;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+    }
+
+    public void changeValues(String email, String name, String phoneNumber, String birth, String gender, String nickname, String profileImage) {
         this.email = email.isBlank() ? this.email : email;
         this.name = name.isBlank() ? this.name : name;
         this.phoneNumber = phoneNumber.isBlank() ? this.phoneNumber : phoneNumber;

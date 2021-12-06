@@ -1,6 +1,6 @@
-package com.cocodan.triplan.util;
+package com.cocodan.triplan.common;
 
-import lombok.Getter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -32,8 +32,10 @@ public abstract class BaseEntity<U> {
     @Column(name = "last_modified_date")
     private LocalDateTime modifiedDate;
 
+    protected BaseEntity() {
+    }
+
     public void addCreatedAndLastModifiedMember(U id) {
-        this.createdBy = id;
         this.lastModifiedBy = id;
     }
 
