@@ -34,10 +34,6 @@ public abstract class BaseEntity<U> {
     protected BaseEntity() {
     }
 
-    public void addCreatedAndLastModifiedMember(U id) {
-        this.lastModifiedBy = id;
-    }
-
     public void updateLastModifiedMember(U lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
