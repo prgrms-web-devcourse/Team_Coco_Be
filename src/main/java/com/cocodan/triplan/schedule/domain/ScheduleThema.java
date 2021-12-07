@@ -38,4 +38,8 @@ public class ScheduleThema {
     public Thema getThema() {
         return thema;
     }
+
+    public Schedule getSchedule() {
+        return schedule;
+    }
 }
