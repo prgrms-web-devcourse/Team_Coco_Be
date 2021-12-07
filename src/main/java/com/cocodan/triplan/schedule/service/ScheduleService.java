@@ -1,18 +1,17 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
-import com.cocodan.triplan.schedule.domain.Checklist;
-import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
-import com.cocodan.triplan.schedule.domain.Memo;
-import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
 import com.cocodan.triplan.schedule.dto.request.MemoCreation;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
+import com.cocodan.triplan.schedule.dto.request.VotingCreation;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
+import com.cocodan.triplan.schedule.repository.VotingRepository;
 import com.cocodan.triplan.spot.domain.Spot;
 import com.cocodan.triplan.spot.repository.SpotRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +31,7 @@ public class ScheduleService {
 
     private final MemoRepository memoRepository;
     private final ChecklistRepository checklistRepository;
+    private final VotingRepository votingRepository;
 
     @Transactional
     public Long createSchedule(ScheduleCreation scheduleCreation) {
@@ -67,6 +67,7 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
+    // 메모
     @Transactional
     public Long createMemo(Long scheduleId, MemoCreation memoCreation, Long memberId) {
         Memo memo = scheduleRepository.findById(scheduleId)
@@ -84,6 +85,7 @@ public class ScheduleService {
                 .build();
     }
 
+    // 체크리스트
     @Transactional
     public Long createChecklist(Long scheduleId, ChecklistCreation checklistCreation) {
         Checklist checklist = scheduleRepository.findById(scheduleId)
@@ -100,4 +102,31 @@ public class ScheduleService {
                 .date(checklistCreation.getDate())
                 .build();
     }
+
+    // 투표
+    @Transactional
+    public Long createVoting(Long scheduleId, VotingCreation votingCreation, Long memberId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        Voting voting = Voting.builder()
+                .schedule(schedule)
+                .title(votingCreation.getTitle())
+                .memberId(memberId)
+                .build();
+
+        votingCreation.getContents().stream()
+                .map(v -> getVotingContent(voting, v))
+                .collect(Collectors.toList());
+
+        return votingRepository.save(voting).getId();
+    }
+
+    private VotingContent getVotingContent(Voting voting, String v) {
+        return VotingContent.builder()
+                .content(v)
+                .voting(voting)
+                .build();
+    }
+
 }

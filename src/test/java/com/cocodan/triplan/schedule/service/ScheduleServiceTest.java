@@ -1,10 +1,7 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.schedule.domain.vo.Thema;
-import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
-import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreation;
-import com.cocodan.triplan.schedule.dto.request.MemoCreation;
-import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
+import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
@@ -101,5 +98,19 @@ class ScheduleServiceTest {
 
         // Then
         assertThat(checklist).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("투표를 추가한다")
+    public void createVoting() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation());
+        VotingCreation votingCreation = new VotingCreation("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
+
+        // When
+        Long voting = scheduleService.createVoting(schedule, votingCreation, 1L);
+
+        // Then
+        assertThat(voting).isEqualTo(1L);
     }
 }

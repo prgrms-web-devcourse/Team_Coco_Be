@@ -87,6 +87,7 @@ public class Schedule {
     public List<DailyScheduleSpot> getDailyScheduleSpots() {
         return dailyScheduleSpots;
     }
+
     public List<ScheduleMember> getScheduleMembers() {
         return scheduleMembers;
     }

@@ -4,6 +4,7 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
 import com.cocodan.triplan.schedule.dto.request.MemoCreation;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
+import com.cocodan.triplan.schedule.dto.request.VotingCreation;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
 import com.cocodan.triplan.schedule.service.ScheduleService;
@@ -58,6 +59,15 @@ public class ScheduleController {
     @PostMapping("/{scheduleId}/checklists")
     public ResponseEntity<Long> createChecklist(@PathVariable Long scheduleId, @RequestBody @Valid ChecklistCreation checklistCreation) {
         Long savedId = scheduleService.createChecklist(scheduleId, checklistCreation);
+
+        return new ResponseEntity<>(savedId, HttpStatus.CREATED);
+    }
+
+    // 투표
+    @PostMapping("/{scheduleId}/voting")
+    public ResponseEntity<Long> createVoting(@PathVariable Long scheduleId, @RequestBody @Valid VotingCreation votingCreation) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long savedId = scheduleService.createVoting(scheduleId, votingCreation, member.getId());
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }

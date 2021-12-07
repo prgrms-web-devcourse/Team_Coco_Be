@@ -10,8 +10,10 @@ import java.util.StringJoiner;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VotingContent {
+
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "content", nullable = false)
