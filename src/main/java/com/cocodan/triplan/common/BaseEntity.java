@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity<U> {
+public abstract class BaseEntity {
     @CreatedBy
     @Column(name = "created_by")
-    private U createdBy;
+    private Long createdBy;
 
     @LastModifiedBy
     @Column(name = "last_modified_by")
-    private U lastModifiedBy;
+    private Long lastModifiedBy;
 
     @CreatedDate
     @Column(name = "created_date")
@@ -34,15 +34,15 @@ public abstract class BaseEntity<U> {
     protected BaseEntity() {
     }
 
-    public void updateLastModifiedMember(U lastModifiedBy) {
+    public void updateLastModifiedMember(Long lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public U getCreatedBy() {
+    public Long getCreatedBy() {
         return createdBy;
     }
 
-    public U getLastModifiedBy() {
+    public Long getLastModifiedBy() {
         return lastModifiedBy;
     }
 
