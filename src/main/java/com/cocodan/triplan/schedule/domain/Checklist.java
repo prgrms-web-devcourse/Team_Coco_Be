@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.StringJoiner;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,14 +26,14 @@ public class Checklist {
     @Column(name = "checked", columnDefinition = "boolean default false")
     private boolean checked;
 
-    @Column(name = "day", columnDefinition = "tinyint default 0")
-    private int day;
+    @Column(name = "trip_date")
+    private LocalDate date;
 
     @Builder
-    public Checklist(Schedule schedule, String content, int day) {
+    public Checklist(Schedule schedule, String content, LocalDate date) {
         this.schedule = schedule;
         this.content = content;
-        this.day = day;
+        this.date = date;
         schedule.getChecklists().add(this);
     }
 
@@ -53,7 +53,7 @@ public class Checklist {
         return checked;
     }
 
-    public int getDay() {
-        return day;
+    public LocalDate getDate() {
+        return date;
     }
 }

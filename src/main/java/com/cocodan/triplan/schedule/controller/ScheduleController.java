@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
 import com.cocodan.triplan.schedule.dto.request.MemoCreation;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
@@ -49,6 +50,14 @@ public class ScheduleController {
     public ResponseEntity<Long> createMemo(@PathVariable Long scheduleId, @RequestBody @Valid MemoCreation memoCreation) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long savedId = scheduleService.createMemo(scheduleId, memoCreation, member.getId());
+
+        return new ResponseEntity<>(savedId, HttpStatus.CREATED);
+    }
+
+    // 체크리스트
+    @PostMapping("/{scheduleId}/checklists")
+    public ResponseEntity<Long> createChecklist(@PathVariable Long scheduleId, @RequestBody @Valid ChecklistCreation checklistCreation) {
+        Long savedId = scheduleService.createChecklist(scheduleId, checklistCreation);
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }

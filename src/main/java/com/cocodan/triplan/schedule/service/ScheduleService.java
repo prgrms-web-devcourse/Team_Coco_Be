@@ -1,13 +1,16 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
+import com.cocodan.triplan.schedule.domain.Checklist;
 import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
 import com.cocodan.triplan.schedule.domain.Memo;
 import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
 import com.cocodan.triplan.schedule.dto.request.MemoCreation;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
+import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.spot.domain.Spot;
@@ -28,6 +31,7 @@ public class ScheduleService {
     private final ScheduleConverter scheduleConverter;
 
     private final MemoRepository memoRepository;
+    private final ChecklistRepository checklistRepository;
 
     @Transactional
     public Long createSchedule(ScheduleCreation scheduleCreation) {
@@ -77,6 +81,23 @@ public class ScheduleService {
                 .schedule(schedule)
                 .content(memoCreation.getContent())
                 .memberId(memberId)
+                .build();
+    }
+
+    @Transactional
+    public Long createChecklist(Long scheduleId, ChecklistCreation checklistCreation) {
+        Checklist checklist = scheduleRepository.findById(scheduleId)
+                .map(schedule -> getChecklist(checklistCreation, schedule))
+                .orElseThrow(() -> new RuntimeException(""));
+
+        return checklistRepository.save(checklist).getId();
+    }
+
+    private Checklist getChecklist(ChecklistCreation checklistCreation, Schedule schedule) {
+        return Checklist.builder()
+                .content(checklistCreation.getContent())
+                .schedule(schedule)
+                .date(checklistCreation.getDate())
                 .build();
     }
 }

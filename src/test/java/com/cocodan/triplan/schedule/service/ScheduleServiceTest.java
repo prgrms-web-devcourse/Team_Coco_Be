@@ -1,16 +1,13 @@
 package com.cocodan.triplan.schedule.service;
 
-import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreation;
 import com.cocodan.triplan.schedule.dto.request.MemoCreation;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
-import com.cocodan.triplan.spot.dto.response.SpotSimple;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
@@ -30,9 +26,6 @@ class ScheduleServiceTest {
 
     @Autowired
     private ScheduleService scheduleService;
-
-    @Autowired
-    private ScheduleRepository scheduleRepository;
 
     @Test
     @DisplayName("여행 일정을 생성한다.")
@@ -94,5 +87,19 @@ class ScheduleServiceTest {
 
         // Then
         assertThat(memo).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("체크리스트를 추가한다")
+    public void createChecklist() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation());
+        ChecklistCreation checklistCreation = new ChecklistCreation(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+
+        // When
+        Long checklist = scheduleService.createChecklist(schedule, checklistCreation);
+
+        // Then
+        assertThat(checklist).isEqualTo(1L);
     }
 }
