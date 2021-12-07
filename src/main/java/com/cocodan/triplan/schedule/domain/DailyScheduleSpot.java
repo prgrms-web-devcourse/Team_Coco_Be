@@ -17,16 +17,16 @@ public class DailyScheduleSpot {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_schedule_id", referencedColumnName = "id")
+    @JoinColumn(name = "schedule_id", referencedColumnName = "id")
     private Schedule schedule;
 
     @Column(name = "spotId", nullable = false)
     private Long spotId;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "trip_date", nullable = false)
     private LocalDate date;
 
-    @Column(name = "order", nullable = false)
+    @Column(name = "trip_order", nullable = false)
     private int order;
 
     @Builder
