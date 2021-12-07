@@ -2,10 +2,13 @@ package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
+import com.cocodan.triplan.schedule.domain.Memo;
 import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.dto.request.MemoCreation;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
+import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.spot.domain.Spot;
 import com.cocodan.triplan.spot.repository.SpotRepository;
@@ -23,6 +26,8 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final SpotRepository spotRepository;
     private final ScheduleConverter scheduleConverter;
+
+    private final MemoRepository memoRepository;
 
     @Transactional
     public Long createSchedule(ScheduleCreation scheduleCreation) {
@@ -56,5 +61,22 @@ public class ScheduleService {
         return schedule.getDailyScheduleSpots().stream()
                 .map(DailyScheduleSpot::getSpotId)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Long createMemo(Long scheduleId, MemoCreation memoCreation, Long memberId) {
+        Memo memo = scheduleRepository.findById(scheduleId)
+                .map(schedule -> getMemo(memoCreation, schedule, memberId))
+                .orElseThrow(() -> new RuntimeException(""));
+
+        return memoRepository.save(memo).getId();
+    }
+
+    private Memo getMemo(MemoCreation memoCreation, Schedule schedule, Long memberId) {
+        return Memo.builder()
+                .schedule(schedule)
+                .content(memoCreation.getContent())
+                .memberId(memberId)
+                .build();
     }
 }
