@@ -13,8 +13,15 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
+    // TODO: 2021.12.07 Teru - Taid 에 의한 구현이 완성되면 제거되어야 한다.
     public Member findById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("There is no such member with ID: " + id));
+    }
+
+    // TODO: 2021.12.07 Teru - Taid 에 의한 구현이 완성되면 제거되어야 한다.
+    public Long save(Member member) {
+        Member savedMember = memberRepository.save(member);
+        return savedMember.getId();
     }
 }
