@@ -5,6 +5,7 @@ import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.vo.Tag;
+import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -22,8 +23,7 @@ public class SchedulePostResponse {
 
     public GenderType genderType;
 
-    // TODO: 2021.12.06 Teru - 도시 엔티티 구현되면 수정
-    public String city;
+    public City city;
 
     // TODO: 현재 테마가 Tag로 잘못 올라가 있음. Tag 명칭 수정되면 같이 수정
     public List<Tag> themes;
@@ -35,7 +35,7 @@ public class SchedulePostResponse {
     @Builder
     private SchedulePostResponse(
             String profileImageUrl, String nickname, String title,
-            Ages ages, GenderType genderType, String city,
+            Ages ages, GenderType genderType, City city,
             List<Tag> themes, LocalDate startDate, LocalDate endDate)
     {
         this.profileImageUrl = profileImageUrl;
@@ -49,8 +49,8 @@ public class SchedulePostResponse {
         this.endDate = endDate;
     }
 
-    // TODO: 2021.12.06 Teru - 도시 엔티니 구현되면 수정, Tag 명칭 수정되면 수정
-    public static SchedulePostResponse from(Member member, Schedule schedule, String city, List<Tag> themes, String title) {
+    // TODO: 2021.12.06 Teru - Tag 명칭 수정되면 수정
+    public static SchedulePostResponse from(Member member, Schedule schedule, City city, List<Tag> themes, String title) {
         return SchedulePostResponse.builder()
                 .profileImageUrl(member.getProfileImage())
                 .nickname(member.getNickname())

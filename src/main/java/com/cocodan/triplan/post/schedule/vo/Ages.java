@@ -14,7 +14,7 @@ public enum Ages {
     private final String ages;
 
     Ages(String ages) {
-        this.ages = age;
+        this.ages = ages;
     }
 
     public static Ages from(String birth) { // Suppose : format of birth => YYYYMMDD
