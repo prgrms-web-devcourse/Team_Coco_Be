@@ -14,7 +14,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "schedule_post_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like extends BaseEntity<Long> {
+// TODO: 2021.12.07 Teru - 더 직관적인 네이밍 고민
+public class Like extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)
