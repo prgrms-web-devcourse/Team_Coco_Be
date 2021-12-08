@@ -33,7 +33,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberGetOneResponse getOne(Long id) {
         return memberRepository.findById(id)
-                .map(converter::toMemberFindAllResponse)
+                .map(converter::toMemberFindResponse)
                 .orElseThrow(
                         () -> new RuntimeException("사용자 id를 조회할 수 없습니다")
                 );
@@ -42,7 +42,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Page<MemberGetOneResponse> getAll(Pageable pageable){
         return memberRepository.findAll(pageable)
-                .map(converter::toMemberFindAllResponse);
+                .map(converter::toMemberFindResponse);
     }
 
     @Transactional
