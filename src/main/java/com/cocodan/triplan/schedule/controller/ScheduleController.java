@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -62,11 +63,27 @@ public class ScheduleController {
 
     // 메모
     @PostMapping("/{scheduleId}/memos")
-    public ResponseEntity<Long> createMemo(@PathVariable Long scheduleId, @RequestBody @Valid MemoCreationRequest memoCreationRequest) {
+    public ResponseEntity<Long> createMemo(@PathVariable Long scheduleId, @RequestBody @Valid MemoRequest memoRequest) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long savedId = scheduleService.createMemo(scheduleId, memoCreationRequest, member.getId());
+        Long savedId = scheduleService.createMemo(scheduleId, memoRequest, member.getId());
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{scheduleId}/memos/{memoId}")
+    public ResponseEntity<Void> modifyMemo(@PathVariable Long scheduleId, @PathVariable Long memoId, @RequestBody @Valid MemoRequest memoRequest) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        scheduleService.modifyMemo(scheduleId, memoId, memoRequest, member.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{scheduleId}/memos/{memoId}")
+    public ResponseEntity<Void> deleteMemo(@PathVariable Long scheduleId, @PathVariable Long memoId) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        scheduleService.deleteMemo(scheduleId, memoId, member.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 체크리스트
@@ -75,6 +92,22 @@ public class ScheduleController {
         Long savedId = scheduleService.createChecklist(scheduleId, checklistCreationRequest);
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/{scheduleId}/checklists/{checklistId}")
+    public ResponseEntity<Void> doCheck(@PathVariable Long scheduleId, @PathVariable Long checklistId, @RequestParam boolean flag) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        scheduleService.doCheck(scheduleId, checklistId, member.getId(), flag);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{scheduleId}/checklists/{checklistId}")
+    public ResponseEntity<Void> modifyChecklist(@PathVariable Long scheduleId, @PathVariable Long checklistId) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        scheduleService.deleteChecklist(scheduleId, checklistId, member.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 투표

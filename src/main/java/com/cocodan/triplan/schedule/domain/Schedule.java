@@ -54,6 +54,15 @@ public class Schedule {
         this.startDate = startDate;
         this.endDate = endDate;
         this.memberId = memberId;
+        ScheduleMember owner = createOwner(memberId);
+        scheduleMembers.add(owner);
+    }
+
+    private ScheduleMember createOwner(Long memberId) {
+        return ScheduleMember.builder()
+                .schedule(this)
+                .memberId(memberId)
+                .build();
     }
 
     public Long getId() {

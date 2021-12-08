@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemoCreationRequest {
+public class MemoRequest {
 
     private String content;
 }

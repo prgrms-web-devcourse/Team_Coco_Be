@@ -44,4 +44,7 @@ public class Memo {
     public Long getMemberId() {
         return memberId;
     }
+    public void modifyContent(String content) {
+        this.content = content;
+    }
 }
