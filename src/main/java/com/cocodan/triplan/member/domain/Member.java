@@ -54,6 +54,18 @@ public class Member extends BaseEntity<Long> {
         this.profileImage = profileImage;
     }
 
+    @Builder
+    public Member(Long id, String email, String name, String phoneNumber, String birth, GenderType gender, String nickname, String profileImage) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.birth = birth;
+        this.gender = gender;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+    }
+
     public void changeValues(String name, String phoneNumber, String nickname, String profileImage) {
         this.name = name.isBlank() ? this.name : name;
         this.phoneNumber = phoneNumber.isBlank() ? this.phoneNumber : phoneNumber;

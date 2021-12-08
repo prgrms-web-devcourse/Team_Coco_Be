@@ -22,7 +22,7 @@ public class MemberConverter {
                 .build();
     }
 
-    public MemberGetOneResponse toMemberFindAllResponse(Member member) {
+    public MemberGetOneResponse toMemberFindResponse(Member member) {
         return MemberGetOneResponse.builder()
                 .id(member.getId())
                 .email(member.getEmail())
