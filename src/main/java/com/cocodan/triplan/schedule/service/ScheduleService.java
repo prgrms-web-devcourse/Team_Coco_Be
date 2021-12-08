@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,6 +104,7 @@ public class ScheduleService {
                 .memberId(memberId)
                 .build();
     }
+
     @Transactional
     public void modifyMemo(Long scheduleId, Long memoId, MemoRequest memoRequest, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
@@ -167,7 +169,7 @@ public class ScheduleService {
 
     @Transactional
     public void deleteChecklist(Long scheduleId, Long checklistId, Long memberId) {
-        validateScheduleMember(scheduleId,memberId);
+        validateScheduleMember(scheduleId, memberId);
 
         checklistRepository.deleteById(checklistId);
     }
@@ -179,17 +181,25 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        Voting voting = Voting.builder()
+        Voting voting = createVoting(votingCreationRequest, memberId, schedule);
+
+        createVotingContents(votingCreationRequest, voting);
+
+        return votingRepository.save(voting).getId();
+    }
+
+    private void createVotingContents(VotingCreationRequest votingCreationRequest, Voting voting) {
+        votingCreationRequest.getContents().stream()
+                .map(v -> getVotingContent(voting, v))
+                .collect(Collectors.toList());
+    }
+
+    private Voting createVoting(VotingCreationRequest votingCreationRequest, Long memberId, Schedule schedule) {
+        return Voting.builder()
                 .schedule(schedule)
                 .title(votingCreationRequest.getTitle())
                 .memberId(memberId)
                 .build();
-
-        votingCreationRequest.getContents().stream()
-                .map(v -> getVotingContent(voting, v))
-                .collect(Collectors.toList());
-
-        return votingRepository.save(voting).getId();
     }
 
     private VotingContent getVotingContent(Voting voting, String v) {
@@ -199,9 +209,27 @@ public class ScheduleService {
                 .build();
     }
 
+    @Transactional
+    public void deleteVoting(Long scheduleId, Long votingId, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+
+        votingRepository.deleteById(votingId);
+    }
+
     // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
+
     public Schedule findById(Long id) {
         return scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("There is no such member with ID : " + id));
+    }
+
+    public void doVote(Long scheduleId, Long votingId, VotingRequest votingRequest, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+
+        Voting voting = votingRepository.findById(votingId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        votingRequest.getVotingMap()
+                .forEach( (contentId, flag) -> voting.vote(contentId,flag, memberId));
     }
 }
