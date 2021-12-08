@@ -37,8 +37,8 @@ public class Checklist {
         schedule.getChecklists().add(this);
     }
 
-    public void check(){
-        checked = !checked;
+    public void check(boolean flag) {
+        checked = flag;
     }
 
     public Long getId() {

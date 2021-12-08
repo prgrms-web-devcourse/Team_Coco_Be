@@ -1,13 +1,19 @@
 package com.cocodan.triplan.schedule.service;
 
+import com.cocodan.triplan.schedule.domain.Checklist;
+import com.cocodan.triplan.schedule.domain.Memo;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
+import com.cocodan.triplan.schedule.repository.ChecklistRepository;
+import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +36,12 @@ class ScheduleServiceTest {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
+
+    @Autowired
+    private MemoRepository memoRepository;
+
+    @Autowired
+    private ChecklistRepository checklistRepository;
 
     @Test
     @DisplayName("여행 일정을 생성한다.")
@@ -80,7 +92,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("일정 장소 리스트를 수정한다")
-    public void modifySpots() {
+    void modifySpots() {
         // Given
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long schedule = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
@@ -111,7 +123,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("일정을 삭제한다")
-    public void deleteSchedule() {
+    void deleteSchedule() {
         // Given
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long schedule = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
@@ -125,13 +137,13 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("메모를 추가한다")
-    public void createMemo() {
+    void createMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoCreationRequest memoCreationRequest = new MemoCreationRequest("JIFEOgoiioghiohgieogio");
+        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
 
         // When
-        Long memo = scheduleService.createMemo(schedule, memoCreationRequest, MEMBER_ID);
+        Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
 
 
         // Then
@@ -139,8 +151,41 @@ class ScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("메모를 수정한다")
+    void modifyMemo() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
+
+        // When
+        MemoRequest updateRequest = new MemoRequest("Updated Memo Content");
+        scheduleService.modifyMemo(schedule, memo, updateRequest, MEMBER_ID);
+
+        // Then
+        Memo updated = memoRepository.findById(memo).get();
+        assertThat(updated.getContent()).isEqualTo(updateRequest.getContent());
+    }
+
+    @Test
+    @DisplayName("메모를 삭제한다")
+    void deleteMemo() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
+
+        // When
+        scheduleService.deleteMemo(schedule, memo, MEMBER_ID);
+
+        // Then
+        Optional<Memo> optionalMemo = memoRepository.findById(memo);
+        assertThat(optionalMemo).isEqualTo(Optional.empty());
+    }
+
+    @Test
     @DisplayName("체크리스트를 추가한다")
-    public void createChecklist() {
+    void createChecklist() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
         ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
@@ -152,9 +197,42 @@ class ScheduleServiceTest {
         assertThat(checklist).isEqualTo(1L);
     }
 
+    @DisplayName("체크리스트 선택 및 해제")
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void doCheck(boolean flag) {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+        Long checklist = scheduleService.createChecklist(schedule, checklistCreationRequest);
+
+        // When
+        scheduleService.doCheck(schedule, checklist, MEMBER_ID, flag);
+        Checklist saved = checklistRepository.findById(checklist).get();
+
+        // Then
+        assertThat(saved.isChecked()).isEqualTo(flag);
+    }
+
+    @Test
+    @DisplayName("체크리스트를 삭제한다")
+    void deleteChecklist() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+        Long checklist = scheduleService.createChecklist(schedule, checklistCreationRequest);
+
+        // When
+        scheduleService.deleteChecklist(schedule,checklist,MEMBER_ID);
+        Optional<Checklist> saved = checklistRepository.findById(checklist);
+
+        // Then
+        assertThat(saved).isEqualTo(Optional.empty());
+    }
+
     @Test
     @DisplayName("투표를 추가한다")
-    public void createVoting() {
+    void createVoting() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
         VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
