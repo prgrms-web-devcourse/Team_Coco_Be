@@ -4,7 +4,7 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.vo.Tag;
+import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.Builder;
 
@@ -13,30 +13,30 @@ import java.util.List;
 
 public class SchedulePostResponse {
 
-    public String profileImageUrl;
+    private String profileImageUrl;
 
-    public String nickname;
+    private String nickname;
 
-    public String title;
+    private String title;
 
-    public Ages ages;
+    private Ages ages;
 
-    public GenderType genderType;
+    private GenderType genderType;
 
-    public City city;
+    private City city;
 
     // TODO: 현재 테마가 Tag로 잘못 올라가 있음. Tag 명칭 수정되면 같이 수정
-    public List<Tag> themes;
+    private List<Thema> themes;
 
-    public LocalDate startDate;
+    private LocalDate startDate;
 
-    public LocalDate endDate;
+    private LocalDate endDate;
 
     @Builder
     private SchedulePostResponse(
             String profileImageUrl, String nickname, String title,
             Ages ages, GenderType genderType, City city,
-            List<Tag> themes, LocalDate startDate, LocalDate endDate)
+            List<Thema> themes, LocalDate startDate, LocalDate endDate)
     {
         this.profileImageUrl = profileImageUrl;
         this.nickname = nickname;
@@ -50,7 +50,7 @@ public class SchedulePostResponse {
     }
 
     // TODO: 2021.12.06 Teru - Tag 명칭 수정되면 수정
-    public static SchedulePostResponse from(Member member, Schedule schedule, City city, List<Tag> themes, String title) {
+    public static SchedulePostResponse from(Member member, Schedule schedule, City city, List<Thema> themes, String title) {
         return SchedulePostResponse.builder()
                 .profileImageUrl(member.getProfileImage())
                 .nickname(member.getNickname())
@@ -62,5 +62,77 @@ public class SchedulePostResponse {
                 .startDate(schedule.getStartDate())
                 .endDate(schedule.getEndDate())
                 .build();
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Ages getAges() {
+        return ages;
+    }
+
+    public void setAges(Ages ages) {
+        this.ages = ages;
+    }
+
+    public GenderType getGenderType() {
+        return genderType;
+    }
+
+    public void setGenderType(GenderType genderType) {
+        this.genderType = genderType;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public List<Thema> getThemes() {
+        return themes;
+    }
+
+    public void setThemes(List<Thema> themes) {
+        this.themes = themes;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }
