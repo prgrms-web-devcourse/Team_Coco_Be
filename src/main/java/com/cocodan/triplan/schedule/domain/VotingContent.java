@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
 
 @Entity
@@ -26,6 +28,9 @@ public class VotingContent {
     @JoinColumn(name = "voting_id", referencedColumnName = "id")
     private Voting voting;
 
+    @OneToMany(mappedBy = "votingContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VotingMember> votingMembers = new ArrayList<>();
+
     @Builder
     public VotingContent(String content, Voting voting) {
         this.content = content;
@@ -33,16 +38,30 @@ public class VotingContent {
         this.voting.getVotingContents().add(this);
     }
 
-    public void doVoting(boolean flag){
-        if (flag) {
-            count++;
-            return;
+    public void vote(Long memberId) {
+        for (VotingMember votingMember : votingMembers) {
+            if (votingMember.getMemberId().equals(memberId)) {
+                return ;
+            }
         }
 
-        if (count <= 0) {
-            throw new RuntimeException("");
+        votingMembers.add(createVotingMember(memberId));
+        count++;
+    }
+
+    private VotingMember createVotingMember(Long memberId) {
+        return VotingMember.builder()
+                .votingContent(this)
+                .memberId(memberId)
+                .build();
+    }
+
+    public void cancel(Long memberId) {
+        boolean hasVoted = votingMembers.removeIf(votingMember -> votingMember.getMemberId().equals(memberId));
+
+        if (hasVoted) {
+            count--;
         }
-        count--;
     }
 
     public Long getId() {
@@ -55,5 +74,9 @@ public class VotingContent {
 
     public int getCount() {
         return count;
+    }
+
+    public List<VotingMember> getVotingMembers() {
+        return votingMembers;
     }
 }

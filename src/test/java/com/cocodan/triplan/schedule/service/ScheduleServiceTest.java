@@ -1,8 +1,6 @@
 package com.cocodan.triplan.schedule.service;
 
-import com.cocodan.triplan.schedule.domain.Checklist;
-import com.cocodan.triplan.schedule.domain.Memo;
-import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
@@ -10,6 +8,7 @@ import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
+import com.cocodan.triplan.schedule.repository.VotingRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,6 +42,9 @@ class ScheduleServiceTest {
 
     @Autowired
     private ChecklistRepository checklistRepository;
+
+    @Autowired
+    private VotingRepository votingRepository;
 
     @Test
     @DisplayName("여행 일정을 생성한다.")
@@ -223,7 +226,7 @@ class ScheduleServiceTest {
         Long checklist = scheduleService.createChecklist(schedule, checklistCreationRequest);
 
         // When
-        scheduleService.deleteChecklist(schedule,checklist,MEMBER_ID);
+        scheduleService.deleteChecklist(schedule, checklist, MEMBER_ID);
         Optional<Checklist> saved = checklistRepository.findById(checklist);
 
         // Then
@@ -242,5 +245,61 @@ class ScheduleServiceTest {
 
         // Then
         assertThat(voting).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("투표를 행사 한다")
+    void vote() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
+        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+
+        Map<Long, Boolean> votingMap = Map.of(1L, true, 2L, false, 3L, true, 4L, false);
+        VotingRequest votingRequest = new VotingRequest(votingMap);
+
+        // When
+        scheduleService.doVote(schedule, voting, votingRequest, MEMBER_ID);
+        Voting saved = votingRepository.findById(voting).get();
+
+        List<VotingContent> votingContents = saved.getVotingContents();
+
+        List<Integer> votingCountList = votingContents.stream()
+                .map(VotingContent::getCount)
+                .collect(Collectors.toList());
+
+        // Then
+        votingContents.forEach(votingContent -> {
+            if (votingMap.get(votingContent.getId())) {
+                assertThat(getVotingMemberIds(votingContent)).contains(MEMBER_ID);
+            } else {
+                assertThat(getVotingMemberIds(votingContent)).doesNotContain(MEMBER_ID);
+            }
+        });
+
+        assertThat(votingCountList).containsExactly(1, 0, 1, 0);
+    }
+
+    private List<Long> getVotingMemberIds(VotingContent votingContent) {
+        return votingContent.getVotingMembers()
+                .stream()
+                .map(VotingMember::getMemberId)
+                .collect(Collectors.toList());
+    }
+
+    @Test
+    @DisplayName("투표를 삭제한다")
+    void deleteVoting() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
+        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+
+        // When
+        scheduleService.deleteVoting(schedule, voting, MEMBER_ID);
+        Optional<Voting> actual = votingRepository.findById(voting);
+
+        // Then
+        assertThat(actual).isEqualTo(Optional.empty());
     }
 }

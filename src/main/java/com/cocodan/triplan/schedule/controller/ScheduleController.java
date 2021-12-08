@@ -118,4 +118,20 @@ public class ScheduleController {
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }
+
+    @PatchMapping("/{scheduleId}/votings/{votingId}")
+    public ResponseEntity<Void> doVote(@PathVariable Long scheduleId, @PathVariable Long votingId, @RequestBody @Valid VotingRequest votingRequest) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        scheduleService.doVote(scheduleId, votingId, votingRequest, member.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{scheduleId}/votings/{votingId}")
+    public ResponseEntity<Void> deleteVoting(@PathVariable Long scheduleId, @PathVariable Long votingId) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        scheduleService.deleteVoting(scheduleId, votingId, member.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

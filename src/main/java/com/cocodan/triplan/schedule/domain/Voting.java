@@ -37,31 +37,22 @@ public class Voting {
         this.schedule.getVotingList().add(this);
     }
 
-    public void addContent(String content) {
-        VotingContent votingContent = VotingContent.builder()
-                .content(content)
-                .voting(this)
-                .build();
-
-        votingContents.add(votingContent);
-    }
-
-    public void deleteContent(Long contentId) {
+    public void vote(Long contentId, boolean flag, Long memberId){
         for (VotingContent votingContent : votingContents) {
             if (votingContent.getId().equals(contentId)) {
-                votingContents.remove(votingContent);
+                voteByFlag(flag, memberId, votingContent);
                 break;
             }
         }
     }
 
-    public void vote(Long contentId, boolean flag){
-        for (VotingContent votingContent : votingContents) {
-            if (votingContent.getId().equals(contentId)) {
-                votingContent.doVoting(flag);
-                break;
-            }
+    private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {
+        if (flag) {
+            votingContent.vote(memberId);
+            return;
         }
+
+        votingContent.cancel(memberId);
     }
 
     public Long getId() {
