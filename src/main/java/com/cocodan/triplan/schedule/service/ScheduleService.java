@@ -2,12 +2,9 @@ package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.*;
-import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
-import com.cocodan.triplan.schedule.dto.request.MemoCreation;
-import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
-import com.cocodan.triplan.schedule.dto.request.VotingCreation;
-import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
-import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
+import com.cocodan.triplan.schedule.dto.request.*;
+import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
+import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
@@ -34,16 +31,14 @@ public class ScheduleService {
     private final VotingRepository votingRepository;
 
     @Transactional
-    public Long createSchedule(ScheduleCreation scheduleCreation) {
-        Schedule schedule = scheduleConverter.convertSchedule(scheduleCreation);
-
-        // TODO : Member와 연관관계 설정
+    public Long createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
+        Schedule schedule = scheduleConverter.convertSchedule(scheduleCreationRequest, memberId);
 
         return scheduleRepository.save(schedule).getId();
     }
 
     @Transactional(readOnly = true)
-    public List<ScheduleSimple> getSchedules(Long memberId) {
+    public List<ScheduleSimpleResponse> getSchedules(Long memberId) {
         return scheduleRepository.findByMemberId(memberId)
                 .stream()
                 .map(scheduleConverter::convertScheduleSimple)
@@ -51,7 +46,7 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public ScheduleDetail getSchedule(Long scheduleId) {
+    public ScheduleDetailResponse getSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
 
@@ -67,55 +62,79 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void modifySchedule(Long scheduleId, ScheduleModificationRequest scheduleModificationRequest) {
+        Schedule updated = scheduleRepository.findById(scheduleId)
+                .map(schedule -> {
+                    schedule.removeAllSpots();
+                    scheduleConverter.convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
+                    return schedule;
+                })
+                .orElseThrow(() -> new RuntimeException(""));
+
+        scheduleRepository.save(updated);
+    }
+
+    @Transactional
+    public void deleteSchedule(Long scheduleId, Long memberId) {
+        scheduleRepository.findById(scheduleId)
+                .filter(schedule -> isOwner(schedule, memberId))
+                .ifPresent(scheduleRepository::delete);
+    }
+
+    private boolean isOwner(Schedule schedule, Long memberId) {
+        return schedule.getMemberId().equals(memberId);
+    }
+
     // 메모
     @Transactional
-    public Long createMemo(Long scheduleId, MemoCreation memoCreation, Long memberId) {
+    public Long createMemo(Long scheduleId, MemoCreationRequest memoCreationRequest, Long memberId) {
         Memo memo = scheduleRepository.findById(scheduleId)
-                .map(schedule -> getMemo(memoCreation, schedule, memberId))
+                .map(schedule -> getMemo(memoCreationRequest, schedule, memberId))
                 .orElseThrow(() -> new RuntimeException(""));
 
         return memoRepository.save(memo).getId();
     }
-
-    private Memo getMemo(MemoCreation memoCreation, Schedule schedule, Long memberId) {
+    private Memo getMemo(MemoCreationRequest memoCreationRequest, Schedule schedule, Long memberId) {
         return Memo.builder()
                 .schedule(schedule)
-                .content(memoCreation.getContent())
+                .content(memoCreationRequest.getContent())
                 .memberId(memberId)
                 .build();
     }
 
     // 체크리스트
+
     @Transactional
-    public Long createChecklist(Long scheduleId, ChecklistCreation checklistCreation) {
+    public Long createChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest) {
         Checklist checklist = scheduleRepository.findById(scheduleId)
-                .map(schedule -> getChecklist(checklistCreation, schedule))
+                .map(schedule -> getChecklist(checklistCreationRequest, schedule))
                 .orElseThrow(() -> new RuntimeException(""));
 
         return checklistRepository.save(checklist).getId();
     }
-
-    private Checklist getChecklist(ChecklistCreation checklistCreation, Schedule schedule) {
+    private Checklist getChecklist(ChecklistCreationRequest checklistCreationRequest, Schedule schedule) {
         return Checklist.builder()
-                .content(checklistCreation.getContent())
+                .content(checklistCreationRequest.getContent())
                 .schedule(schedule)
-                .date(checklistCreation.getDate())
+                .date(checklistCreationRequest.getDate())
                 .build();
     }
 
     // 투표
+
     @Transactional
-    public Long createVoting(Long scheduleId, VotingCreation votingCreation, Long memberId) {
+    public Long createVoting(Long scheduleId, VotingCreationRequest votingCreationRequest, Long memberId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
 
         Voting voting = Voting.builder()
                 .schedule(schedule)
-                .title(votingCreation.getTitle())
+                .title(votingCreationRequest.getTitle())
                 .memberId(memberId)
                 .build();
 
-        votingCreation.getContents().stream()
+        votingCreationRequest.getContents().stream()
                 .map(v -> getVotingContent(voting, v))
                 .collect(Collectors.toList());
 
@@ -128,7 +147,7 @@ public class ScheduleService {
                 .voting(voting)
                 .build();
     }
-    
+
     // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
     public Schedule findById(Long id) {
         return scheduleRepository.findById(id)
