@@ -1,6 +1,5 @@
 package com.cocodan.triplan.common;
 
-import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;

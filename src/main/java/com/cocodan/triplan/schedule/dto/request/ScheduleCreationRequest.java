@@ -10,11 +10,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ScheduleCreation {
+public class ScheduleCreationRequest {
 
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
     private List<String> themas;
-    private List<DailyScheduleSpotCreation> dailyScheduleSpotCreations;
+    private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
 }
