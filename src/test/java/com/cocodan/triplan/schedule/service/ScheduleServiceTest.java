@@ -3,6 +3,7 @@ package com.cocodan.triplan.schedule.service;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.*;
+import com.cocodan.triplan.schedule.dto.response.MemoResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
@@ -143,14 +144,45 @@ class ScheduleServiceTest {
     void createMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
 
         // When
         Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
-        Memo saved = memoRepository.findById(memo).get();
+
+        Memo actual = memoRepository.findById(memo).get();
 
         // Then
-        assertThat(saved.getContent()).isEqualTo("JIFEOgoiioghiohgieogio");
+        assertThat(actual.getTitle()).isEqualTo("memotitle");
+        assertThat(actual.getContent()).isEqualTo("JIFEOgoiioghiohgieogio");
+    }
+
+    @Test
+    @DisplayName("메모 목록을 조회한다")
+    void getMemos() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
+        MemoRequest memoRequest2 = new MemoRequest("memotitle2", "JIFEOgoiioghiohgieogio2");
+        MemoRequest memoRequest3 = new MemoRequest("memotitle3", "JIFEOgoiioghiohgieogio3");
+
+        Long memo1 = scheduleService.createMemo(schedule, memoRequest1, MEMBER_ID);
+        Long memo2 = scheduleService.createMemo(schedule, memoRequest2, MEMBER_ID);
+        Long memo3 = scheduleService.createMemo(schedule, memoRequest3, MEMBER_ID);
+
+        // When
+        List<MemoResponse> memos = scheduleService.getMemos(schedule);
+
+        List<String> titles = memos.stream()
+                .map(MemoResponse::getTitle)
+                .collect(Collectors.toList());
+
+        List<String> contents = memos.stream()
+                .map((MemoResponse::getContent))
+                .collect(Collectors.toList());
+
+        // Then
+        assertThat(titles).containsExactlyInAnyOrder("memotitle1","memotitle2","memotitle3");
+        assertThat(contents).containsExactlyInAnyOrder("JIFEOgoiioghiohgieogio1", "JIFEOgoiioghiohgieogio2", "JIFEOgoiioghiohgieogio3");
     }
 
     @Test
@@ -158,11 +190,11 @@ class ScheduleServiceTest {
     void modifyMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
         Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
 
         // When
-        MemoRequest updateRequest = new MemoRequest("Updated Memo Content");
+        MemoRequest updateRequest = new MemoRequest("Updated Memo Title", "Updated Memo Content");
         scheduleService.modifyMemo(schedule, memo, updateRequest, MEMBER_ID);
 
         // Then
@@ -175,7 +207,7 @@ class ScheduleServiceTest {
     void deleteMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        MemoRequest memoRequest = new MemoRequest("memotitle","JIFEOgoiioghiohgieogio");
         Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
 
         // When

@@ -3,8 +3,10 @@ package com.cocodan.triplan.schedule.service;
 import com.cocodan.triplan.converter.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.dto.request.*;
+import com.cocodan.triplan.schedule.dto.response.MemoResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.VotingSimpleResponse;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
@@ -15,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,39 +92,55 @@ public class ScheduleService {
     @Transactional
     public Long createMemo(Long scheduleId, MemoRequest memoRequest, Long memberId) {
         Memo memo = scheduleRepository.findById(scheduleId)
-                .map(schedule -> getMemo(memoRequest, schedule, memberId))
+                .map(schedule -> createMemo(memoRequest, schedule, memberId))
                 .orElseThrow(() -> new RuntimeException(""));
 
         return memoRepository.save(memo).getId();
     }
 
-    private Memo getMemo(MemoRequest memoRequest, Schedule schedule, Long memberId) {
+    private Memo createMemo(MemoRequest memoRequest, Schedule schedule, Long memberId) {
         return Memo.builder()
                 .schedule(schedule)
+                .title(memoRequest.getTitle())
                 .content(memoRequest.getContent())
                 .memberId(memberId)
                 .build();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<MemoResponse> getMemos(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+                .map(Schedule::getMemos)
+                .map(memos -> memos.stream()
+                        .map(scheduleConverter::convertMemoResponse)
+                )
+                .map(memoResponseStream -> memoResponseStream.collect(Collectors.toList()))
+                .orElseThrow(() -> new RuntimeException(""));
     }
 
     @Transactional
     public void modifyMemo(Long scheduleId, Long memoId, MemoRequest memoRequest, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
 
-        memoRepository.findById(memoId)
-                .ifPresentOrElse(
-                        memo -> memo.modifyContent(memoRequest.getContent()),
-                        () -> {
-                            throw new RuntimeException("");
-                        }
-                );
+        Memo memo = memoRepository.findById(memoId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        memo.modify(memoRequest.getTitle(),memoRequest.getContent());
     }
 
     private void validateScheduleMember(Long scheduleId, Long memberId) {
-        scheduleRepository.findById(scheduleId)
-                .map(Schedule::getScheduleMembers)
-                .map(this::getMemberIds)
-                .filter(longs -> longs.contains(memberId))
+        Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
+
+        boolean noneMatchFlag = schedule.getScheduleMembers().stream()
+                .map(ScheduleMember::getMemberId)
+                .noneMatch(id -> id.equals(memberId));
+
+        if (noneMatchFlag) {
+            throw new RuntimeException("");
+        }
+
     }
 
     @Transactional
@@ -143,13 +160,13 @@ public class ScheduleService {
     @Transactional
     public Long createChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest) {
         Checklist checklist = scheduleRepository.findById(scheduleId)
-                .map(schedule -> getChecklist(checklistCreationRequest, schedule))
+                .map(schedule -> createChecklist(checklistCreationRequest, schedule))
                 .orElseThrow(() -> new RuntimeException(""));
 
         return checklistRepository.save(checklist).getId();
     }
 
-    private Checklist getChecklist(ChecklistCreationRequest checklistCreationRequest, Schedule schedule) {
+    private Checklist createChecklist(ChecklistCreationRequest checklistCreationRequest, Schedule schedule) {
         return Checklist.builder()
                 .content(checklistCreationRequest.getContent())
                 .schedule(schedule)
@@ -190,7 +207,7 @@ public class ScheduleService {
 
     private void createVotingContents(VotingCreationRequest votingCreationRequest, Voting voting) {
         votingCreationRequest.getContents().stream()
-                .map(v -> getVotingContent(voting, v))
+                .map(v -> createVotingContent(voting, v))
                 .collect(Collectors.toList());
     }
 
@@ -198,11 +215,12 @@ public class ScheduleService {
         return Voting.builder()
                 .schedule(schedule)
                 .title(votingCreationRequest.getTitle())
+                .multipleFlag(votingCreationRequest.isMultipleFlag())
                 .memberId(memberId)
                 .build();
     }
 
-    private VotingContent getVotingContent(Voting voting, String v) {
+    private VotingContent createVotingContent(Voting voting, String v) {
         return VotingContent.builder()
                 .content(v)
                 .voting(voting)
@@ -214,6 +232,16 @@ public class ScheduleService {
         validateScheduleMember(scheduleId, memberId);
 
         votingRepository.deleteById(votingId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VotingSimpleResponse> getVotingList(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+                .map(Schedule::getVotingList)
+                .map(votingList -> votingList.stream()
+                        .map(scheduleConverter::convertVotingSimpleResponse)
+                ).map(votingSimpleResponseStream -> votingSimpleResponseStream.collect(Collectors.toList()))
+                .orElseThrow(() -> new RuntimeException(""));
     }
 
     // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
@@ -231,4 +259,6 @@ public class ScheduleService {
 
         voting.vote(votingRequest.getVotingMap(), memberId);
     }
+
+
 }

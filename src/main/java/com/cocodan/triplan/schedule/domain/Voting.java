@@ -96,11 +96,15 @@ public class Voting {
         return votingContents;
     }
 
-    public boolean isMultipleFlag() {
-        return multipleFlag;
+    public Long getMemberId() {
+        return memberId;
     }
 
-    public int getVotingMemberCount() {
+    public int getVotingMemberCount(){
         return memberIds.size();
+    }
+
+    public boolean isMultipleFlag() {
+        return multipleFlag;
     }
 }

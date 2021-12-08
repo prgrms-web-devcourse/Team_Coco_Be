@@ -2,14 +2,15 @@ package com.cocodan.triplan.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.dto.request.*;
+import com.cocodan.triplan.schedule.dto.response.MemoResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.VotingSimpleResponse;
 import com.cocodan.triplan.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -70,6 +71,13 @@ public class ScheduleController {
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }
 
+    @GetMapping("/{scheduleId}/memos")
+    public ResponseEntity<List<MemoResponse>> getMemos(@PathVariable Long scheduleId) {
+        List<MemoResponse> memos = scheduleService.getMemos(scheduleId);
+
+        return new ResponseEntity<>(memos, HttpStatus.OK);
+    }
+
     @PutMapping("/{scheduleId}/memos/{memoId}")
     public ResponseEntity<Void> modifyMemo(@PathVariable Long scheduleId, @PathVariable Long memoId, @RequestBody @Valid MemoRequest memoRequest) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -117,6 +125,13 @@ public class ScheduleController {
         Long savedId = scheduleService.createVoting(scheduleId, votingCreationRequest, member.getId());
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{scheduleId}/votings")
+    public ResponseEntity<List<VotingSimpleResponse>> getVotingList(@PathVariable Long scheduleId) {
+        List<VotingSimpleResponse> votingSimpleResponses = scheduleService.getVotingList(scheduleId);
+
+        return new ResponseEntity<>(votingSimpleResponses, HttpStatus.OK);
     }
 
     @PatchMapping("/{scheduleId}/votings/{votingId}")

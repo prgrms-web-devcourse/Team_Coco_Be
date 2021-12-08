@@ -1,14 +1,14 @@
 package com.cocodan.triplan.converter;
 
-import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
-import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.ScheduleThema;
+import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleModificationRequest;
+import com.cocodan.triplan.schedule.dto.response.MemoResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.VotingSimpleResponse;
 import com.cocodan.triplan.spot.domain.Spot;
 import com.cocodan.triplan.spot.dto.response.SpotSimple;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -94,5 +95,19 @@ public class ScheduleConverter {
         return scheduleModificationRequest.getDailyScheduleSpotCreationRequests().stream()
                 .map(dailyScheduleSpotCreationRequest -> getDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
                 .collect(Collectors.toList());
+    }
+
+    public MemoResponse convertMemoResponse(Memo memo) {
+        return MemoResponse.builder()
+                .title(memo.getTitle())
+                .content(memo.getContent())
+                .build();
+    }
+
+    public VotingSimpleResponse convertVotingSimpleResponse(Voting voting) {
+        return VotingSimpleResponse.builder()
+                .title(voting.getTitle())
+                .memberCount(voting.getVotingMemberCount())
+                .build();
     }
 }
