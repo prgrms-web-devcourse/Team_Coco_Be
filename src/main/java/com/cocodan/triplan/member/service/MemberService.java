@@ -39,6 +39,11 @@ public class MemberService {
                 );
     }
 
+    public Member findById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("There is no such member with ID: " + id));
+    }
+
     @Transactional(readOnly = true)
     public Page<MemberGetOneResponse> getAll(Pageable pageable){
         return memberRepository.findAll(pageable)
