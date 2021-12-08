@@ -229,7 +229,6 @@ public class ScheduleService {
         Voting voting = votingRepository.findById(votingId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        votingRequest.getVotingMap()
-                .forEach( (contentId, flag) -> voting.vote(contentId,flag, memberId));
+        voting.vote(votingRequest.getVotingMap(), memberId);
     }
 }

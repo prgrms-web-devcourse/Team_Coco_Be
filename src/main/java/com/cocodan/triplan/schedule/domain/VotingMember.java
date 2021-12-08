@@ -16,14 +16,14 @@ public class VotingMember {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voting_content_id", referencedColumnName = "id")
-    private VotingContent votingContent;
+    private Voting voting;
 
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     @Builder
-    public VotingMember(VotingContent votingContent, Long memberId) {
-        this.votingContent = votingContent;
+    public VotingMember( Voting voting, Long memberId) {
+        this.voting = voting;
         this.memberId = memberId;
     }
 

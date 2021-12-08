@@ -13,9 +13,6 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Voting {
 
-    private static final int VOTE = 1;
-    private static final int NOTHING = 0;
-
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -97,5 +94,13 @@ public class Voting {
 
     public List<VotingContent> getVotingContents() {
         return votingContents;
+    }
+
+    public boolean isMultipleFlag() {
+        return multipleFlag;
+    }
+
+    public int getVotingMemberCount() {
+        return memberIds.size();
     }
 }

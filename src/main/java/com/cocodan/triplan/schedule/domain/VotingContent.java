@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,7 +28,7 @@ public class VotingContent {
     private Voting voting;
 
     @OneToMany(mappedBy = "votingContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VotingMember> votingMembers = new ArrayList<>();
+    private List<VotingContentMember> votingContentMembers = new ArrayList<>();
 
     @Builder
     public VotingContent(String content, Voting voting) {
@@ -76,7 +75,7 @@ public class VotingContent {
         return count;
     }
 
-    public List<VotingMember> getVotingMembers() {
-        return votingMembers;
+    public List<VotingContentMember> getVotingContentMembers() {
+        return votingContentMembers;
     }
 }
