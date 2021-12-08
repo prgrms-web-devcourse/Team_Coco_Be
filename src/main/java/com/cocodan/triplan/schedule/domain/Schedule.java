@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Schedule {
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,6 +87,7 @@ public class Schedule {
     public List<DailyScheduleSpot> getDailyScheduleSpots() {
         return dailyScheduleSpots;
     }
+
     public List<ScheduleMember> getScheduleMembers() {
         return scheduleMembers;
     }

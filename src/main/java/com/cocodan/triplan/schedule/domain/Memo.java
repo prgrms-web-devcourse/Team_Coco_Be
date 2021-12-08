@@ -5,11 +5,11 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.StringJoiner;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Memo {
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,14 +22,26 @@ public class Memo {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
+
     @Builder
-    public Memo(Schedule schedule, String content) {
+    public Memo(Schedule schedule, String content, Long memberId) {
         this.schedule = schedule;
         this.content = content;
+        this.memberId = memberId;
         this.schedule.getMemos().add(this);
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Long getMemberId() {
+        return memberId;
     }
 }

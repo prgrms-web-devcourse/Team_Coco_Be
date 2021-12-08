@@ -1,12 +1,10 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.schedule.domain.vo.Thema;
-import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreation;
-import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
+import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
-import com.cocodan.triplan.spot.dto.response.SpotSimple;
-import org.assertj.core.api.Assertions;
+import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +56,9 @@ class ScheduleServiceTest {
     @DisplayName("일정을 상세 조회한다.")
     void getSchedule() {
         ScheduleCreation scheduleCreation = createScheduleCreation();
-        scheduleService.createSchedule(scheduleCreation);
+        Long scheduleId = scheduleService.createSchedule(scheduleCreation);
 
-        ScheduleDetail schedule = scheduleService.getSchedule(1L);
+        ScheduleDetail schedule = scheduleService.getSchedule(scheduleId);
 
         assertThat(schedule.getStartDate()).isEqualTo(LocalDate.of(2021,12, 1));
         assertThat(schedule.getTitle()).isEqualTo("title");
@@ -71,5 +69,48 @@ class ScheduleServiceTest {
 
         // TODO: 장소 데이터 추가되면 다시 확인
         assertThat(ids).containsExactlyInAnyOrder(1L,2L,3L,4L,5L,6L,7L,8L);
+    }
+
+    @Test
+    @DisplayName("메모를 추가한다")
+    public void createMemo() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation());
+        MemoCreation memoCreation = new MemoCreation("JIFEOgoiioghiohgieogio");
+
+        // When
+        Long memo = scheduleService.createMemo(schedule, memoCreation, 1L);
+
+
+        // Then
+        assertThat(memo).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("체크리스트를 추가한다")
+    public void createChecklist() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation());
+        ChecklistCreation checklistCreation = new ChecklistCreation(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+
+        // When
+        Long checklist = scheduleService.createChecklist(schedule, checklistCreation);
+
+        // Then
+        assertThat(checklist).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("투표를 추가한다")
+    public void createVoting() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation());
+        VotingCreation votingCreation = new VotingCreation("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
+
+        // When
+        Long voting = scheduleService.createVoting(schedule, votingCreation, 1L);
+
+        // Then
+        assertThat(voting).isEqualTo(1L);
     }
 }

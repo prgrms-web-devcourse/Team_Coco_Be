@@ -26,11 +26,14 @@ public class Voting {
     @OneToMany(mappedBy = "voting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VotingContent> votingContents = new ArrayList<>();
 
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
+
     @Builder
-    public Voting(String title, Schedule schedule, List<VotingContent> votingContents) {
+    public Voting(String title, Schedule schedule, Long memberId) {
         this.schedule = schedule;
         this.title = title;
-        this.votingContents = votingContents;
+        this.memberId = memberId;
         this.schedule.getVotingList().add(this);
     }
 
