@@ -242,9 +242,18 @@ class ScheduleServiceTest {
 
         // When
         Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+        Voting savedVoting = votingRepository.findById(voting).get();
+
+
+        List<String> contentList = savedVoting.getVotingContents()
+                .stream()
+                .map(votingContent -> votingContent.getContent())
+                .collect(Collectors.toList());
 
         // Then
-        assertThat(voting).isEqualTo(1L);
+        assertThat(savedVoting.getTitle()).isEqualTo("무슨 요일날 갈까요?");
+        assertThat(savedVoting.isMultipleFlag()).isFalse();
+        assertThat(contentList).containsExactly("월", "화", "수", "목");
     }
 
     @Test
