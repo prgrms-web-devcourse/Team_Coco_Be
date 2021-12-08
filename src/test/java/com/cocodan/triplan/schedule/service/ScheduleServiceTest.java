@@ -3,8 +3,8 @@ package com.cocodan.triplan.schedule.service;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.*;
-import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
-import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
+import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
+import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,21 +34,21 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("여행 일정을 생성한다.")
     void createSchedule() {
-        ScheduleCreation scheduleCreation = createScheduleCreation();
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
 
-        scheduleService.createSchedule(scheduleCreation, MEMBER_ID);
+        scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
     }
 
-    private ScheduleCreation createScheduleCreation() {
-        return new ScheduleCreation("title", LocalDate.of(2021, 12, 1), LocalDate.of(2021, 12, 3), List.of("activity", "food"),
-                List.of(new DailyScheduleSpotCreation(1L, LocalDate.of(2021, 12, 1), 1),
-                        new DailyScheduleSpotCreation(2L, LocalDate.of(2021, 12, 1), 2),
-                        new DailyScheduleSpotCreation(3L, LocalDate.of(2021, 12, 1), 3),
-                        new DailyScheduleSpotCreation(4L, LocalDate.of(2021, 12, 2), 1),
-                        new DailyScheduleSpotCreation(5L, LocalDate.of(2021, 12, 2), 2),
-                        new DailyScheduleSpotCreation(6L, LocalDate.of(2021, 12, 2), 3),
-                        new DailyScheduleSpotCreation(7L, LocalDate.of(2021, 12, 3), 1),
-                        new DailyScheduleSpotCreation(8L, LocalDate.of(2021, 12, 3), 2)
+    private ScheduleCreationRequest createScheduleCreation() {
+        return new ScheduleCreationRequest("title", LocalDate.of(2021, 12, 1), LocalDate.of(2021, 12, 3), List.of("activity", "food"),
+                List.of(new DailyScheduleSpotCreationRequest(1L, LocalDate.of(2021, 12, 1), 1),
+                        new DailyScheduleSpotCreationRequest(2L, LocalDate.of(2021, 12, 1), 2),
+                        new DailyScheduleSpotCreationRequest(3L, LocalDate.of(2021, 12, 1), 3),
+                        new DailyScheduleSpotCreationRequest(4L, LocalDate.of(2021, 12, 2), 1),
+                        new DailyScheduleSpotCreationRequest(5L, LocalDate.of(2021, 12, 2), 2),
+                        new DailyScheduleSpotCreationRequest(6L, LocalDate.of(2021, 12, 2), 3),
+                        new DailyScheduleSpotCreationRequest(7L, LocalDate.of(2021, 12, 3), 1),
+                        new DailyScheduleSpotCreationRequest(8L, LocalDate.of(2021, 12, 3), 2)
                 ));
     }
 
@@ -56,16 +56,16 @@ class ScheduleServiceTest {
     @DisplayName("일정 목록을 조회한다.")
     void getSchedules() {
         //TODO: 멤버 엔티티 추가되면 test 실행
-        List<ScheduleSimple> schedules = scheduleService.getSchedules(MEMBER_ID);
+        List<ScheduleSimpleResponse> schedules = scheduleService.getSchedules(MEMBER_ID);
     }
 
     @Test
     @DisplayName("일정을 상세 조회한다.")
     void getSchedule() {
-        ScheduleCreation scheduleCreation = createScheduleCreation();
-        Long scheduleId = scheduleService.createSchedule(scheduleCreation, MEMBER_ID);
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long scheduleId = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
 
-        ScheduleDetail schedule = scheduleService.getSchedule(scheduleId);
+        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId);
 
         assertThat(schedule.getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(schedule.getTitle()).isEqualTo("title");
@@ -82,22 +82,22 @@ class ScheduleServiceTest {
     @DisplayName("일정 장소 리스트를 수정한다")
     public void modifySpots() {
         // Given
-        ScheduleCreation scheduleCreation = createScheduleCreation();
-        Long schedule = scheduleService.createSchedule(scheduleCreation, MEMBER_ID);
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long schedule = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
 
-        ScheduleModification scheduleModification = new ScheduleModification(
+        ScheduleModificationRequest scheduleModificationRequest = new ScheduleModificationRequest(
                 List.of(
-                        new DailyScheduleSpotCreation(5L, LocalDate.of(2021, 12, 22), 1),
-                        new DailyScheduleSpotCreation(6L, LocalDate.of(2021, 12, 22), 2),
-                        new DailyScheduleSpotCreation(7L, LocalDate.of(2021, 12, 23), 1),
-                        new DailyScheduleSpotCreation(8L, LocalDate.of(2021, 12, 23), 2),
-                        new DailyScheduleSpotCreation(9L, LocalDate.of(2021, 12, 24), 1),
-                        new DailyScheduleSpotCreation(11L, LocalDate.of(2021, 12, 24), 2),
-                        new DailyScheduleSpotCreation(12L, LocalDate.of(2021, 12, 24), 3)
+                        new DailyScheduleSpotCreationRequest(5L, LocalDate.of(2021, 12, 22), 1),
+                        new DailyScheduleSpotCreationRequest(6L, LocalDate.of(2021, 12, 22), 2),
+                        new DailyScheduleSpotCreationRequest(7L, LocalDate.of(2021, 12, 23), 1),
+                        new DailyScheduleSpotCreationRequest(8L, LocalDate.of(2021, 12, 23), 2),
+                        new DailyScheduleSpotCreationRequest(9L, LocalDate.of(2021, 12, 24), 1),
+                        new DailyScheduleSpotCreationRequest(11L, LocalDate.of(2021, 12, 24), 2),
+                        new DailyScheduleSpotCreationRequest(12L, LocalDate.of(2021, 12, 24), 3)
                 ));
 
         // When
-        scheduleService.modifySchedule(schedule, scheduleModification);
+        scheduleService.modifySchedule(schedule, scheduleModificationRequest);
 
         // Then
         Schedule updatedSchedule = scheduleRepository.findById(schedule).get();
@@ -113,8 +113,8 @@ class ScheduleServiceTest {
     @DisplayName("일정을 삭제한다")
     public void deleteSchedule() {
         // Given
-        ScheduleCreation scheduleCreation = createScheduleCreation();
-        Long schedule = scheduleService.createSchedule(scheduleCreation, MEMBER_ID);
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long schedule = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
         scheduleService.deleteSchedule(schedule, MEMBER_ID);
@@ -128,10 +128,10 @@ class ScheduleServiceTest {
     public void createMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoCreation memoCreation = new MemoCreation("JIFEOgoiioghiohgieogio");
+        MemoCreationRequest memoCreationRequest = new MemoCreationRequest("JIFEOgoiioghiohgieogio");
 
         // When
-        Long memo = scheduleService.createMemo(schedule, memoCreation, MEMBER_ID);
+        Long memo = scheduleService.createMemo(schedule, memoCreationRequest, MEMBER_ID);
 
 
         // Then
@@ -143,10 +143,10 @@ class ScheduleServiceTest {
     public void createChecklist() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        ChecklistCreation checklistCreation = new ChecklistCreation(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
 
         // When
-        Long checklist = scheduleService.createChecklist(schedule, checklistCreation);
+        Long checklist = scheduleService.createChecklist(schedule, checklistCreationRequest);
 
         // Then
         assertThat(checklist).isEqualTo(1L);
@@ -157,10 +157,10 @@ class ScheduleServiceTest {
     public void createVoting() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        VotingCreation votingCreation = new VotingCreation("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
+        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
 
         // When
-        Long voting = scheduleService.createVoting(schedule, votingCreation, MEMBER_ID);
+        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
 
         // Then
         assertThat(voting).isEqualTo(1L);

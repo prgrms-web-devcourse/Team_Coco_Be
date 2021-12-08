@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class DailyScheduleSpotCreation {
+@AllArgsConstructor
+public class ScheduleModificationRequest {
 
-    private Long spotId;
-    private LocalDate date;
-    private int order;
+    private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
+
 }

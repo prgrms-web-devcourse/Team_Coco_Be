@@ -101,6 +101,6 @@ public class Schedule {
     }
 
     public void removeAllSpots() {
-        dailyScheduleSpots = new ArrayList<>();
+        getDailyScheduleSpots().clear();
     }
 }

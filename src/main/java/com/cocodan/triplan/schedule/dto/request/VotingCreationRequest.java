@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class ScheduleModification {
+@NoArgsConstructor
+public class VotingCreationRequest {
 
-    private List<DailyScheduleSpotCreation> dailyScheduleSpotCreations;
-
+    private String title;
+    private List<String> contents;
+    private boolean multipleFlag;
 }
