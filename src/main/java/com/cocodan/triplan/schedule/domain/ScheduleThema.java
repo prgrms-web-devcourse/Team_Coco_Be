@@ -1,6 +1,6 @@
 package com.cocodan.triplan.schedule.domain;
 
-import com.cocodan.triplan.schedule.domain.vo.Tag;
+import com.cocodan.triplan.schedule.domain.vo.Thema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ScheduleTag {
+public class ScheduleThema {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -22,16 +22,20 @@ public class ScheduleTag {
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "tag")
-    private Tag tag;
+    private Thema thema;
 
     @Builder
-    public ScheduleTag(Schedule schedule, Tag tag) {
+    public ScheduleThema(Schedule schedule, Thema thema) {
         this.schedule = schedule;
-        this.tag = tag;
-        this.schedule.getScheduleTags().add(this);
+        this.thema = thema;
+        this.schedule.getScheduleThemas().add(this);
     }
 
     public Long getId() {
         return id;
+    }
+
+    public Thema getThema() {
+        return thema;
     }
 }

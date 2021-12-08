@@ -27,7 +27,7 @@ public class Schedule {
     private LocalDate endDate;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScheduleTag> scheduleTags = new ArrayList<>();
+    private List<ScheduleThema> scheduleThemas = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memo> memos = new ArrayList<>();
@@ -39,7 +39,7 @@ public class Schedule {
     private List<Voting> votingList = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DailySchedule> dailySchedules = new ArrayList<>();
+    private List<DailyScheduleSpot> dailyScheduleSpots = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule", orphanRemoval = true)
     private List<ScheduleMember> scheduleMembers = new ArrayList<>();
@@ -67,8 +67,8 @@ public class Schedule {
         return endDate;
     }
 
-    public List<ScheduleTag> getScheduleTags() {
-        return scheduleTags;
+    public List<ScheduleThema> getScheduleThemas() {
+        return scheduleThemas;
     }
 
     public List<Memo> getMemos() {
@@ -83,10 +83,9 @@ public class Schedule {
         return votingList;
     }
 
-    public List<DailySchedule> getDailySchedules() {
-        return dailySchedules;
+    public List<DailyScheduleSpot> getDailyScheduleSpots() {
+        return dailyScheduleSpots;
     }
-
     public List<ScheduleMember> getScheduleMembers() {
         return scheduleMembers;
     }
