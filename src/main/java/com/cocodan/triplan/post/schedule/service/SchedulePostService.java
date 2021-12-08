@@ -2,13 +2,12 @@ package com.cocodan.triplan.post.schedule.service;
 
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.dto.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreatieRequest;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.ScheduleTag;
 import com.cocodan.triplan.schedule.domain.ScheduleThema;
-import com.cocodan.triplan.schedule.domain.vo.Tag;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.service.ScheduleService;
 import com.cocodan.triplan.spot.domain.vo.City;
@@ -37,6 +36,13 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
+    public SchedulePost findById(Long id) {
+        return schedulePostRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("There is no such schedule post of ID : " + id)
+        );
+    }
+
+    @Transactional(readOnly = true)
     public List<SchedulePostResponse> getRecentSchedulePostList(Integer pageIndex) {
         List<SchedulePost> schedulePosts =
                 schedulePostRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(pageIndex, PAGE_SIZE));
@@ -50,5 +56,19 @@ public class SchedulePostService {
 
             return SchedulePostResponse.from(member, schedule, city, themes, title);
         }).collect(Collectors.toList());
+    }
+
+    public Long createSchedulePost(Member member, SchedulePostCreatieRequest request) {
+        SchedulePost post = SchedulePost.builder()
+                .memberId(member.getId())
+                .scheduleId(request.getScheduleId())
+                .title(request.title)
+                .content(request.content)
+                .views(0L)
+                .liked(0L)
+                .city(City.of(request.city))
+                .build();
+        SchedulePost savedSchedulePost = schedulePostRepository.save(post);
+        return savedSchedulePost.getScheduleId();
     }
 }

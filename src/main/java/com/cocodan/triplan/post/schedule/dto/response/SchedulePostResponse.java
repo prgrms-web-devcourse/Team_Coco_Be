@@ -1,4 +1,4 @@
-package com.cocodan.triplan.post.schedule.dto;
+package com.cocodan.triplan.post.schedule.dto.response;
 
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
