@@ -1,10 +1,7 @@
 package com.cocodan.triplan.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
-import com.cocodan.triplan.schedule.dto.request.MemoCreation;
-import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
-import com.cocodan.triplan.schedule.dto.request.VotingCreation;
+import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
 import com.cocodan.triplan.schedule.service.ScheduleService;
@@ -24,9 +21,11 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
+    // 일정
     @PostMapping()
     public ResponseEntity<Long> createSchedule(@Valid @RequestBody ScheduleCreation scheduleCreation) {
-        Long savedId = scheduleService.createSchedule(scheduleCreation);
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long savedId = scheduleService.createSchedule(scheduleCreation, member.getId());
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }
@@ -44,6 +43,21 @@ public class ScheduleController {
         ScheduleDetail schedule = scheduleService.getSchedule(scheduleId);
 
         return new ResponseEntity<>(schedule, HttpStatus.OK);
+    }
+
+    @PutMapping("/{scheduleId}")
+    public ResponseEntity<Void> modifySchedule(@PathVariable Long scheduleId, @RequestBody @Valid ScheduleModification scheduleModification) {
+        scheduleService.modifySchedule(scheduleId, scheduleModification);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        scheduleService.deleteSchedule(scheduleId, member.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 메모
@@ -64,7 +78,7 @@ public class ScheduleController {
     }
 
     // 투표
-    @PostMapping("/{scheduleId}/voting")
+    @PostMapping("/{scheduleId}/votings/")
     public ResponseEntity<Long> createVoting(@PathVariable Long scheduleId, @RequestBody @Valid VotingCreation votingCreation) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long savedId = scheduleService.createVoting(scheduleId, votingCreation, member.getId());

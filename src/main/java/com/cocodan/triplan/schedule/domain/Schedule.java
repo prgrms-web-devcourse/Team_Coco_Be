@@ -27,6 +27,9 @@ public class Schedule {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
+
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleThema> scheduleThemas = new ArrayList<>();
 
@@ -46,10 +49,11 @@ public class Schedule {
     private List<ScheduleMember> scheduleMembers = new ArrayList<>();
 
     @Builder
-    public Schedule(String title, LocalDate startDate, LocalDate endDate) {
+    public Schedule(String title, LocalDate startDate, LocalDate endDate, Long memberId) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.memberId = memberId;
     }
 
     public Long getId() {
@@ -90,5 +94,13 @@ public class Schedule {
 
     public List<ScheduleMember> getScheduleMembers() {
         return scheduleMembers;
+    }
+
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public void removeAllSpots() {
+        dailyScheduleSpots = new ArrayList<>();
     }
 }

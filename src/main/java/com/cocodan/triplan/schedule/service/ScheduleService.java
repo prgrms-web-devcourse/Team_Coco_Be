@@ -2,10 +2,7 @@ package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.*;
-import com.cocodan.triplan.schedule.dto.request.ChecklistCreation;
-import com.cocodan.triplan.schedule.dto.request.MemoCreation;
-import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
-import com.cocodan.triplan.schedule.dto.request.VotingCreation;
+import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
@@ -34,10 +31,8 @@ public class ScheduleService {
     private final VotingRepository votingRepository;
 
     @Transactional
-    public Long createSchedule(ScheduleCreation scheduleCreation) {
-        Schedule schedule = scheduleConverter.convertSchedule(scheduleCreation);
-
-        // TODO : Member와 연관관계 설정
+    public Long createSchedule(ScheduleCreation scheduleCreation, Long memberId) {
+        Schedule schedule = scheduleConverter.convertSchedule(scheduleCreation, memberId);
 
         return scheduleRepository.save(schedule).getId();
     }
@@ -67,6 +62,30 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void modifySchedule(Long scheduleId, ScheduleModification scheduleModification) {
+        Schedule updated = scheduleRepository.findById(scheduleId)
+                .map(schedule -> {
+                    schedule.removeAllSpots();
+                    scheduleConverter.convertDailyScheduleSpots(schedule, scheduleModification);
+                    return schedule;
+                })
+                .orElseThrow(() -> new RuntimeException(""));
+
+        scheduleRepository.save(updated);
+    }
+
+    @Transactional
+    public void deleteSchedule(Long scheduleId, Long memberId) {
+        scheduleRepository.findById(scheduleId)
+                .filter(schedule -> isOwner(schedule, memberId))
+                .ifPresent(scheduleRepository::delete);
+    }
+
+    private boolean isOwner(Schedule schedule, Long memberId) {
+        return schedule.getMemberId().equals(memberId);
+    }
+
     // 메모
     @Transactional
     public Long createMemo(Long scheduleId, MemoCreation memoCreation, Long memberId) {
@@ -76,7 +95,6 @@ public class ScheduleService {
 
         return memoRepository.save(memo).getId();
     }
-
     private Memo getMemo(MemoCreation memoCreation, Schedule schedule, Long memberId) {
         return Memo.builder()
                 .schedule(schedule)
@@ -86,6 +104,7 @@ public class ScheduleService {
     }
 
     // 체크리스트
+
     @Transactional
     public Long createChecklist(Long scheduleId, ChecklistCreation checklistCreation) {
         Checklist checklist = scheduleRepository.findById(scheduleId)
@@ -94,7 +113,6 @@ public class ScheduleService {
 
         return checklistRepository.save(checklist).getId();
     }
-
     private Checklist getChecklist(ChecklistCreation checklistCreation, Schedule schedule) {
         return Checklist.builder()
                 .content(checklistCreation.getContent())
@@ -104,6 +122,7 @@ public class ScheduleService {
     }
 
     // 투표
+
     @Transactional
     public Long createVoting(Long scheduleId, VotingCreation votingCreation, Long memberId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
@@ -128,5 +147,4 @@ public class ScheduleService {
                 .voting(voting)
                 .build();
     }
-
 }

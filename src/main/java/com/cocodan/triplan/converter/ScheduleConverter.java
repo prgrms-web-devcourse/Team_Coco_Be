@@ -6,6 +6,7 @@ import com.cocodan.triplan.schedule.domain.ScheduleThema;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreation;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreation;
+import com.cocodan.triplan.schedule.dto.request.ScheduleModification;
 import com.cocodan.triplan.schedule.dto.response.ScheduleDetail;
 import com.cocodan.triplan.schedule.dto.response.ScheduleSimple;
 import com.cocodan.triplan.spot.domain.Spot;
@@ -22,11 +23,12 @@ public class ScheduleConverter {
 
     private final SpotConverter spotConverter;
 
-    public Schedule convertSchedule(ScheduleCreation scheduleCreation) {
+    public Schedule convertSchedule(ScheduleCreation scheduleCreation, Long memberId) {
         Schedule schedule = Schedule.builder()
                 .title(scheduleCreation.getTitle())
                 .startDate(scheduleCreation.getStartDate())
                 .endDate(scheduleCreation.getEndDate())
+                .memberId(memberId)
                 .build();
 
         scheduleCreation.getThemas()
@@ -44,12 +46,11 @@ public class ScheduleConverter {
     }
 
     private DailyScheduleSpot getDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreation dailyScheduleSpotCreation) {
-        return new DailyScheduleSpot(
-                schedule,
-                dailyScheduleSpotCreation.getSpotId(),
-                dailyScheduleSpotCreation.getDate(),
-                dailyScheduleSpotCreation.getOrder()
-        );
+        return DailyScheduleSpot.builder()
+                .spotId(dailyScheduleSpotCreation.getSpotId())
+                .date(dailyScheduleSpotCreation.getDate())
+                .schedule(schedule)
+                .build();
     }
 
 
@@ -86,6 +87,12 @@ public class ScheduleConverter {
     private List<SpotSimple> getSpotSimple(List<Spot> spots) {
         return spots.stream()
                 .map(spotConverter::convertSpotSimple)
+                .collect(Collectors.toList());
+    }
+
+    public List<DailyScheduleSpot> convertDailyScheduleSpots(Schedule schedule, ScheduleModification scheduleModification) {
+        return scheduleModification.getDailyScheduleSpotCreations().stream()
+                .map(dailyScheduleSpotCreation -> getDailyScheduleSpot(schedule, dailyScheduleSpotCreation))
                 .collect(Collectors.toList());
     }
 }
