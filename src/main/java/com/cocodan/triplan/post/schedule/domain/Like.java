@@ -1,10 +1,13 @@
 package com.cocodan.triplan.post.schedule.domain;
 
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -13,10 +16,12 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "schedule_post_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like {
+// TODO: 2021.12.07 Teru - 더 직관적인 네이밍 고민
+public class Like extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "member_id", nullable = false)

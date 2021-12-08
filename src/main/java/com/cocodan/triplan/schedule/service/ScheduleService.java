@@ -147,4 +147,10 @@ public class ScheduleService {
                 .voting(voting)
                 .build();
     }
+
+    // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
+    public Schedule findById(Long id) {
+        return scheduleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("There is no such member with ID : " + id));
+    }
 }
