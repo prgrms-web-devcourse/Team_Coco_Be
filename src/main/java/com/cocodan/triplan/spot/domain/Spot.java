@@ -12,11 +12,19 @@ public class Spot {
 
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false)
-    private String name;
+    private String placeName;
+
+    @Column(name = "address_name")
+    private String addressName;
+
+    @Column(name = "road_address_name")
+    private String roadAddressName;
+
+    @Column(name = "phone")
+    private String phone;
 
     @Column(name = "latitude", nullable = false)
     private double latitude;
@@ -25,8 +33,12 @@ public class Spot {
     private double longitude;
 
     @Builder
-    public Spot(String name, double latitude, double longitude) {
-        this.name = name;
+    public Spot(Long id, String placeName, String addressName, String roadAddressName, String phone, double latitude, double longitude) {
+        this.id = id;
+        this.placeName = placeName;
+        this.addressName = addressName;
+        this.roadAddressName = roadAddressName;
+        this.phone = phone;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -35,8 +47,8 @@ public class Spot {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getPlaceName() {
+        return placeName;
     }
 
     public double getLatitude() {
@@ -45,5 +57,17 @@ public class Spot {
 
     public double getLongitude() {
         return longitude;
+    }
+
+    public String getAddressName() {
+        return addressName;
+    }
+
+    public String getRoadAddressName() {
+        return roadAddressName;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 }

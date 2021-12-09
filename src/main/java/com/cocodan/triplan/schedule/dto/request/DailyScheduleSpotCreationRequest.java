@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class DailyScheduleSpotCreationRequest {
 
-    private Long id;
+    private Long spotId;
 
     private String addressName;
 
@@ -22,9 +22,7 @@ public class DailyScheduleSpotCreationRequest {
 
     private String placeName;
 
-    private double x;
-
-    private double y;
+    private Position position;
 
     private LocalDate date;
 
