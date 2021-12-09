@@ -30,18 +30,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and();
     }
 
-    @Bean //<-- 이 부분을 빼먹어서 '자격 증명에 실패하였습니다' 메세지를 찾는다고 고생. 주의!!!
+    @Bean
     @Override
     public UserDetailsService userDetailsService() {
         //인메모리에 username, password, role 설정
         UserDetails user =
                 User.withDefaultPasswordEncoder()
                         .username("user")
-                        .password("pwd")
+                        .password("pwd")    // 팀에서 정한 비밀번호를 설정해 주세요.
                         .roles("USER")
                         .build();
-
-        System.out.println("password : " + user.getPassword());
 
         return new InMemoryUserDetailsManager(user);
     }
