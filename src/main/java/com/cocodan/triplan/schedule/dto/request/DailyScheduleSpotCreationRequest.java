@@ -12,7 +12,22 @@ import java.util.List;
 @NoArgsConstructor
 public class DailyScheduleSpotCreationRequest {
 
-    private Long spotId;
+    private Long id;
+
+    private String addressName;
+
+    private String roadAddressName;
+
+    private String phone;
+
+    private String placeName;
+
+    private double x;
+
+    private double y;
+
     private LocalDate date;
+
     private int order;
+
 }

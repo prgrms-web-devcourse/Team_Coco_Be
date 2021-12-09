@@ -36,7 +36,7 @@ public class ScheduleConverter {
                 .memberId(memberId)
                 .build();
 
-        scheduleCreationRequest.getThemas()
+        scheduleCreationRequest.getThemeList()
                 .stream()
                 .map(s -> Theme.valueOf(s.toUpperCase()))
                 .map(thema -> new ScheduleThema(schedule, thema))
@@ -52,7 +52,7 @@ public class ScheduleConverter {
 
     private DailyScheduleSpot getDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
         return DailyScheduleSpot.builder()
-                .spotId(dailyScheduleSpotCreationRequest.getSpotId())
+                .spotId(dailyScheduleSpotCreationRequest.getId())
                 .date(dailyScheduleSpotCreationRequest.getDate())
                 .schedule(schedule)
                 .build();

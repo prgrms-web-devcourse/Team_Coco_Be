@@ -122,7 +122,7 @@ public class ScheduleService {
                 .map(memoResponseStream -> memoResponseStream.collect(Collectors.toList()))
                 .orElseThrow(() -> new RuntimeException(""));
     }
-
+    
     private void validateScheduleMember(Long scheduleId, Long memberId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
@@ -177,7 +177,7 @@ public class ScheduleService {
 
         memo.modify(memoRequest.getTitle(), memoRequest.getContent());
     }
-
+    
     @Transactional
     public void deleteMemo(Long scheduleId, Long memoId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
