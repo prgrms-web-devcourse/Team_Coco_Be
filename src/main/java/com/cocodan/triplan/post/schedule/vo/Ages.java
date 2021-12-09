@@ -42,8 +42,4 @@ public enum Ages {
                 return Ages.ELDER;
         }
     }
-
-    public String getAges() {
-        return ages;
-    }
 }
