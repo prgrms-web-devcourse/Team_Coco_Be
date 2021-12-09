@@ -9,7 +9,7 @@ import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.ScheduleThema;
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.service.ScheduleService;
 import com.cocodan.triplan.spot.domain.vo.City;
@@ -69,7 +69,7 @@ public class SchedulePostService {
     public List<SchedulePostResponse> getSchedulePostList(
             String search,
             City city,
-            Thema theme,
+            Theme theme,
             SchedulePostSortingRule sortRule,
             Integer pageIndex
     ) {
@@ -140,7 +140,7 @@ public class SchedulePostService {
             MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMemberId());
             Schedule schedule = schedulePost.getSchedule();
             City city = schedulePost.getCity();
-            List<Thema> themes = schedule.getScheduleThemas().stream()
+            List<Theme> themes = schedule.getScheduleThemas().stream()
                     .map(ScheduleThema::getThema).collect(Collectors.toList());
             String title = schedulePost.getTitle();
 

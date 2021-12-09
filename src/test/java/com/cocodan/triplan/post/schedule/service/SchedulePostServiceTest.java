@@ -6,7 +6,7 @@ import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;
 import com.cocodan.triplan.schedule.service.ScheduleService;
@@ -63,7 +63,6 @@ class SchedulePostServiceTest {
     @DisplayName("생성된 여행 공유 게시글 리스트를 정상적으로 조회 할 수 있다.")
     @Transactional
     void getRecentSchedulePostList() {
-        // TODO: 2012.12.07 Teru - 게시글 조회 테스트 추가
         // 여행 생성
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
@@ -78,7 +77,7 @@ class SchedulePostServiceTest {
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
 
         // 여행 공유 게시글 조회
-        List<SchedulePostResponse> posts = schedulePostService.getSchedulePostList("", City.ALL, Thema.ALL, SchedulePostSortingRule.RECENT, 0);
+        List<SchedulePostResponse> posts = schedulePostService.getSchedulePostList("", City.ALL, Theme.ALL, SchedulePostSortingRule.RECENT, 0);
         assertThat(posts.size()).isEqualTo(1);
         assertThat(posts.get(0).getProfileImageUrl()).isEqualTo(PROFILE_IMAGE);
         assertThat(posts.get(0).getNickname()).isEqualTo(NICKNAME);
@@ -87,7 +86,9 @@ class SchedulePostServiceTest {
         assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL);
         assertThat(posts.get(0).getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(posts.get(0).getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
-        assertThat(posts.get(0).getThemes()).contains(Thema.ACTIVITY, Thema.FOOD);
+        assertThat(posts.get(0).getThema()).contains(Theme.ACTIVITY, Theme.FOOD);
+
+        // TODO: 다양한 조건으로 테스트 추가
     }
 
     private ScheduleCreationRequest createScheduleCreation() {

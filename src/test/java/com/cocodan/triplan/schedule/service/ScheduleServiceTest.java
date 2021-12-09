@@ -3,13 +3,14 @@ package com.cocodan.triplan.schedule.service;
 import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.*;
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.repository.VotingRepository;
+import com.cocodan.triplan.spot.dto.response.SpotSimple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -95,9 +96,9 @@ class ScheduleServiceTest {
 
         assertThat(schedule.getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(schedule.getTitle()).isEqualTo("title");
-        assertThat(schedule.getThemas()).contains(Thema.valueOf("ACTIVITY"), Thema.valueOf("FOOD"));
+        assertThat(schedule.getThema()).contains(Theme.valueOf("ACTIVITY"), Theme.valueOf("FOOD"));
         List<Long> ids = schedule.getSpotSimpleList().stream()
-                .map(spotSimple -> spotSimple.getId())
+                .map(SpotSimple::getId)
                 .collect(Collectors.toList());
 
         // TODO: 장소 데이터 추가되면 다시 확인
@@ -129,7 +130,7 @@ class ScheduleServiceTest {
         Schedule updatedSchedule = scheduleRepository.findById(schedule).get();
 
         List<Long> ids = updatedSchedule.getDailyScheduleSpots().stream()
-                .map(dailyScheduleSpot -> dailyScheduleSpot.getSpotId())
+                .map(DailyScheduleSpot::getSpotId)
                 .collect(Collectors.toList());
 
         assertThat(ids).containsExactlyInAnyOrder(5L, 6L, 7L, 8L, 9L, 11L, 12L);
@@ -306,7 +307,7 @@ class ScheduleServiceTest {
 
         List<String> contentList = savedVoting.getVotingContents()
                 .stream()
-                .map(votingContent -> votingContent.getContent())
+                .map(VotingContent::getContent)
                 .collect(Collectors.toList());
 
         // Then

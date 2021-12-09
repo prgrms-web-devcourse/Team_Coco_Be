@@ -1,8 +1,9 @@
 package com.cocodan.triplan.converter;
 
-import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.schedule.domain.*;
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
+import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.domain.ScheduleThema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleModificationRequest;
@@ -33,7 +34,7 @@ public class ScheduleConverter {
 
         scheduleCreationRequest.getThemas()
                 .stream()
-                .map(s -> Thema.valueOf(s.toUpperCase()))
+                .map(s -> Theme.valueOf(s.toUpperCase()))
                 .map(thema -> new ScheduleThema(schedule, thema))
                 .collect(Collectors.toList());
 
@@ -64,7 +65,7 @@ public class ScheduleConverter {
                 .build();
     }
 
-    private List<Thema> getThema(Schedule schedule) {
+    private List<Theme> getThema(Schedule schedule) {
         return schedule.getScheduleThemas().stream()
                 .map(ScheduleThema::getThema)
                 .collect(Collectors.toList());
@@ -76,7 +77,7 @@ public class ScheduleConverter {
                 .startDate(schedule.getStartDate())
                 .endDate(schedule.getEndDate())
                 .title(schedule.getTitle())
-                .themas(getThema(schedule))
+                .thema(getThema(schedule))
                 .spotSimpleList(getSpotSimple(spotList))
                 .memberImageUrls(imageUrls)
                 .build();

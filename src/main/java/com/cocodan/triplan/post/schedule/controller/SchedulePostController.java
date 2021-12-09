@@ -6,7 +6,7 @@ import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +43,7 @@ public class SchedulePostController {
             @RequestParam(defaultValue = "최신순") String sorting
     ) {
         City city = City.of(searchingCity);
-        Thema theme = Thema.valueOf(searchingTheme);
+        Theme theme = Theme.valueOf(searchingTheme);
         SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
 
         List<SchedulePostResponse> schedulePostList

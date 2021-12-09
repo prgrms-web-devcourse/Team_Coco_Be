@@ -3,7 +3,7 @@ package com.cocodan.triplan.schedule.domain.vo;
 import lombok.Getter;
 
 @Getter
-public enum Thema {
+public enum Theme {
 
     ACTIVITY("ACTIVITY"),
     FOOD("FOOD"),
@@ -14,7 +14,7 @@ public enum Thema {
 
     private String value;
 
-    Thema(String value) {
+    Theme(String value) {
         this.value = value;
     }
 }
