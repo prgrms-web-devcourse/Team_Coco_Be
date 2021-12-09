@@ -5,9 +5,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class VotingSimpleResponse {
+public class VotingContentResponse {
 
     private Long id;
-    private String title;
-    private int memberCount;
+    private String content;
+    private int numOfParticipants;
+    private boolean participantFlag;
 }

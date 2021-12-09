@@ -1,14 +1,12 @@
 package com.cocodan.triplan.converter;
 
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleModificationRequest;
-import com.cocodan.triplan.schedule.dto.response.MemoResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
-import com.cocodan.triplan.schedule.dto.response.VotingSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.spot.domain.Spot;
 import com.cocodan.triplan.spot.dto.response.SpotSimple;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -107,8 +104,40 @@ public class ScheduleConverter {
 
     public VotingSimpleResponse convertVotingSimpleResponse(Voting voting) {
         return VotingSimpleResponse.builder()
+                .id(voting.getId())
                 .title(voting.getTitle())
-                .memberCount(voting.getVotingMemberCount())
+                .memberCount(voting.getNumOfTotalParticipants())
                 .build();
+    }
+
+    public VotingDetailResponse convertVotingDetailResponse(Voting voting, Member member, Long memberId) {
+        int numOfTotalParticipants = voting.getNumOfTotalParticipants();
+
+        List<VotingContentResponse> votingContentResponses = voting.getVotingContents().stream()
+                .map(votingContent -> convertVotingContentResponse(votingContent, memberId))
+                .collect(Collectors.toList());
+
+        return VotingDetailResponse.builder()
+                .numOfTotalParticipants(numOfTotalParticipants)
+                .id(voting.getId())
+                .title(voting.getTitle())
+                .ownerId(member.getId())
+                .ownerNickname(member.getNickname())
+                .votingContentResponses(votingContentResponses)
+                .build();
+    }
+
+    public VotingContentResponse convertVotingContentResponse(VotingContent votingContent, Long memberId) {
+        return VotingContentResponse.builder()
+                .id(votingContent.getId())
+                .content(votingContent.getContent())
+                .numOfParticipants(votingContent.getNumOfParticipants())
+                .participantFlag(checkParticipant(votingContent, memberId))
+                .build();
+    }
+
+    private boolean checkParticipant(VotingContent votingContent, Long memberId) {
+        return votingContent.getVotingContentMembers().stream()
+                .anyMatch(votingContentMember -> votingContentMember.getMemberId().equals(memberId));
     }
 }

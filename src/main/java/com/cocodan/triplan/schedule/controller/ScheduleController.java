@@ -2,10 +2,7 @@ package com.cocodan.triplan.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.dto.request.*;
-import com.cocodan.triplan.schedule.dto.response.MemoResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
-import com.cocodan.triplan.schedule.dto.response.VotingSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -132,6 +129,14 @@ public class ScheduleController {
         List<VotingSimpleResponse> votingSimpleResponses = scheduleService.getVotingList(scheduleId);
 
         return new ResponseEntity<>(votingSimpleResponses, HttpStatus.OK);
+    }
+
+    @GetMapping("/{scheduleId}/votings/{votingId}")
+    public ResponseEntity<VotingDetailResponse> getVoting(@PathVariable Long scheduleId, @PathVariable Long votingId) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        VotingDetailResponse votingDetailResponse = scheduleService.getVoting(scheduleId, votingId, member.getId());
+
+        return new ResponseEntity<>(votingDetailResponse, HttpStatus.OK);
     }
 
     @PatchMapping("/{scheduleId}/votings/{votingId}")

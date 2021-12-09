@@ -1,12 +1,11 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
+import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.dto.request.*;
-import com.cocodan.triplan.schedule.dto.response.MemoResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
-import com.cocodan.triplan.schedule.dto.response.VotingSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
@@ -28,6 +27,7 @@ public class ScheduleService {
     private final SpotRepository spotRepository;
     private final ScheduleConverter scheduleConverter;
 
+    private final MemberRepository memberRepository;
     private final MemoRepository memoRepository;
     private final ChecklistRepository checklistRepository;
     private final VotingRepository votingRepository;
@@ -150,12 +150,6 @@ public class ScheduleService {
         memoRepository.deleteById(memoId);
     }
 
-    private List<Long> getMemberIds(List<ScheduleMember> scheduleMembers) {
-        return scheduleMembers.stream()
-                .map(ScheduleMember::getMemberId)
-                .collect(Collectors.toList());
-    }
-
     // 체크리스트
     @Transactional
     public Long createChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest) {
@@ -244,11 +238,20 @@ public class ScheduleService {
                 .orElseThrow(() -> new RuntimeException(""));
     }
 
-    // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
+    @Transactional(readOnly = true)
+    public VotingDetailResponse getVoting(Long scheduleId, Long votingId, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
 
-    public Schedule findById(Long id) {
-        return scheduleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("There is no such member with ID : " + id));
+        Voting voting = votingRepository.findById(votingId)
+                .orElseThrow(() -> new RuntimeException());
+
+        Long ownerId = voting.getMemberId();
+
+        Member owner = memberRepository.findById(ownerId)
+                .orElseThrow(() -> new RuntimeException());
+
+        return scheduleConverter.convertVotingDetailResponse(voting, owner, memberId);
+
     }
 
     public void doVote(Long scheduleId, Long votingId, VotingRequest votingRequest, Long memberId) {
@@ -258,6 +261,13 @@ public class ScheduleService {
                 .orElseThrow(() -> new RuntimeException(""));
 
         voting.vote(votingRequest.getVotingMap(), memberId);
+    }
+    
+    // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
+
+    public Schedule findById(Long id) {
+        return scheduleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("There is no such member with ID : " + id));
     }
 
 
