@@ -56,7 +56,7 @@ public class SchedulePostController {
     @PostMapping("/schedules")
     public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostCreatieRequest request) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long postId = schedulePostService.createSchedulePost(member, request);
+        Long postId = schedulePostService.createSchedulePost(member.getId(), request);
         return new ResponseEntity<>(SchedulePostCreateResponse.from(postId), HttpStatus.OK);
     }
 

@@ -39,18 +39,6 @@ public class MemberService {
                 );
     }
 
-    // TODO: 2021.12.07 Teru - TP-42 등 게시그 도메인 작업시 Taid 구현사항으로 변경하 후 해당 findById 메서드 제거하기
-    public Member findById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("There is no such member with ID: " + id));
-    }
-
-    // TODO: 2021.12.07 Teru - Taid 에 의한 구현이 완성되면 제거되어야 한다.
-    public Long save(Member member) {
-        Member savedMember = memberRepository.save(member);
-        return savedMember.getId();
-    }
-
     @Transactional(readOnly = true)
     public Page<MemberGetOneResponse> getAll(Pageable pageable){
         return memberRepository.findAll(pageable)

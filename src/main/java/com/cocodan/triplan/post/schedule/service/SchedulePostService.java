@@ -1,6 +1,7 @@
 package com.cocodan.triplan.post.schedule.service;
 
 import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreatieRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
@@ -17,12 +18,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule.*;
 
 @Service
 public class SchedulePostService {
@@ -51,9 +49,9 @@ public class SchedulePostService {
         );
     }
 
-    public Long createSchedulePost(Member member, SchedulePostCreatieRequest request) {
+    public Long createSchedulePost(Long memberId, SchedulePostCreatieRequest request) {
         SchedulePost post = SchedulePost.builder()
-                .memberId(member.getId())
+                .memberId(memberId)
                 .schedule(scheduleRepository.findById(request.getScheduleId()).orElseThrow(
                         () -> new RuntimeException("There is no such schedule (ID : " + request.getScheduleId() + ")")
                 ))
@@ -140,14 +138,14 @@ public class SchedulePostService {
 
     private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
         return schedulePosts.stream().map(schedulePost -> {
-            Member member = memberService.findById(schedulePost.getMemberId());
+            MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMemberId());
             Schedule schedule = schedulePost.getSchedule();
             City city = schedulePost.getCity();
             List<Thema> themes = schedule.getScheduleThemas().stream()
                     .map(ScheduleThema::getThema).collect(Collectors.toList());
             String title = schedulePost.getTitle();
 
-            return SchedulePostResponse.from(member, schedule, city, themes, title);
+            return SchedulePostResponse.from(memberResponse, schedule, city, themes, title);
         }).collect(Collectors.toList());
     }
 }
