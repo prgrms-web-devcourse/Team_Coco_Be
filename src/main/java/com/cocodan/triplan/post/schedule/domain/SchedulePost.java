@@ -1,6 +1,7 @@
 package com.cocodan.triplan.post.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.AccessLevel;
@@ -29,8 +30,9 @@ public class SchedulePost extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne
+    @JoinColumn(name = "member", referencedColumnName = "id")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule", referencedColumnName = "id")
@@ -39,7 +41,7 @@ public class SchedulePost extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "text")
     private String content;
 
     @Column(name = "views", nullable = false)
@@ -53,8 +55,8 @@ public class SchedulePost extends BaseEntity {
     private City city;
 
     @Builder
-    public SchedulePost(Long memberId, Schedule schedule, String title, String content, Long views, Long liked, City city) {
-        this.memberId = memberId;
+    public SchedulePost(Member member, Schedule schedule, String title, String content, Long views, Long liked, City city) {
+        this.member = member;
         this.schedule = schedule;
         this.title = title;
         this.content = content;
@@ -67,8 +69,8 @@ public class SchedulePost extends BaseEntity {
         return id;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
     public Schedule getSchedule() {

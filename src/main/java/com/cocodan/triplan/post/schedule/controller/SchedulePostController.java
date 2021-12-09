@@ -3,6 +3,7 @@ package com.cocodan.triplan.post.schedule.controller;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +37,7 @@ public class SchedulePostController {
     }
 
     @GetMapping("/schedules")
-    public ResponseEntity<List<SchedulePostResponse>> scheduleList(
+    public ResponseEntity<List<SchedulePostResponse>> schedulePostList(
             @RequestParam(defaultValue = "0") Integer pageIndex,
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "전체") String searchingCity,
@@ -47,9 +49,9 @@ public class SchedulePostController {
         SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
 
         List<SchedulePostResponse> schedulePostList
-                = schedulePostService.getSchedulePostList(search, city, theme, sortRule, pageIndex);
+                = schedulePostService.getSchedulePosts(search, city, theme, sortRule, pageIndex);
 
-        return new ResponseEntity<>(schedulePostList, HttpStatus.OK);
+        return ResponseEntity.ok(schedulePostList);
         // TODO: 검색 효율성 개선
     }
 
@@ -57,7 +59,12 @@ public class SchedulePostController {
     public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostCreateRequest request) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long postId = schedulePostService.createSchedulePost(member.getId(), request);
-        return new ResponseEntity<>(SchedulePostCreateResponse.from(postId), HttpStatus.OK);
+        return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
     }
 
+    @GetMapping("/{postId}/schedules")
+    public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable Long postId) {
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(postId);
+        return ResponseEntity.ok(schedulePostDetail);
+    }
 }
