@@ -9,11 +9,10 @@ import java.util.List;
 @Builder
 public class VotingDetailResponse {
 
-    private Long id;
-    private String title;
-    private int numOfTotalParticipants;
-    private List<VotingContentResponse> votingContentResponses;
-
-    private Long ownerId;
-    private String ownerNickname;
+    private final Long id;
+    private final String title;
+    private final int numOfTotalParticipants;
+    private final List<VotingContentResponse> votingContentResponses;
+    private final Long ownerId;
+    private final String ownerNickname;
 }

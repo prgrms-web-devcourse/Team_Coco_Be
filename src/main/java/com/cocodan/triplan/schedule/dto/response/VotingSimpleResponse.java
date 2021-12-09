@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class VotingSimpleResponse {
 
-    private Long id;
-    private String title;
-    private int memberCount;
+    private final Long id;
+    private final String title;
+    private final int memberCount;
 }

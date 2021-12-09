@@ -7,8 +7,8 @@ import lombok.Getter;
 @Builder
 public class VotingContentResponse {
 
-    private Long id;
-    private String content;
-    private int numOfParticipants;
-    private boolean participantFlag;
+    private final Long id;
+    private final String content;
+    private final int numOfParticipants;
+    private final boolean participantFlag;
 }

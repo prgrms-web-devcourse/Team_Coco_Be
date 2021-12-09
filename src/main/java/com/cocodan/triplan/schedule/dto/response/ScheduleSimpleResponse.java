@@ -10,11 +10,11 @@ import java.util.List;
 @Getter
 public class ScheduleSimpleResponse {
 
-    private Long id;
-    private String title;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private List<Thema> themas;
+    private final Long id;
+    private final String title;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
+    private final List<Thema> themas;
 
     @Builder
     public ScheduleSimpleResponse(Long id, String title, LocalDate startDate, LocalDate endDate, List<Thema> themas) {
