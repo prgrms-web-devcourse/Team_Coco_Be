@@ -45,7 +45,7 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyScheduleSpot> dailyScheduleSpots = new ArrayList<>();
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleMember> scheduleMembers = new ArrayList<>();
 
     @Builder

@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.StringJoiner;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,6 +27,9 @@ public class VotingContent {
     @JoinColumn(name = "voting_id", referencedColumnName = "id")
     private Voting voting;
 
+    @OneToMany(mappedBy = "votingContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VotingContentMember> votingContentMembers = new ArrayList<>();
+
     @Builder
     public VotingContent(String content, Voting voting) {
         this.content = content;
@@ -33,16 +37,30 @@ public class VotingContent {
         this.voting.getVotingContents().add(this);
     }
 
-    public void doVoting(boolean flag){
-        if (flag) {
-            count++;
-            return;
+    public void vote(Long memberId) {
+        for (VotingContentMember votingContentMember : votingContentMembers) {
+            if (votingContentMember.getMemberId().equals(memberId)) {
+                return ;
+            }
         }
 
-        if (count <= 0) {
-            throw new RuntimeException("");
+        votingContentMembers.add(createVotingMember(memberId));
+        count++;
+    }
+
+    private VotingContentMember createVotingMember(Long memberId) {
+        return VotingContentMember.builder()
+                .votingContent(this)
+                .memberId(memberId)
+                .build();
+    }
+
+    public void cancel(Long memberId) {
+        boolean hasVoted = votingContentMembers.removeIf(votingContentMember -> votingContentMember.getMemberId().equals(memberId));
+
+        if (hasVoted) {
+            count--;
         }
-        count--;
     }
 
     public Long getId() {
@@ -55,5 +73,9 @@ public class VotingContent {
 
     public int getCount() {
         return count;
+    }
+
+    public List<VotingContentMember> getVotingContentMembers() {
+        return votingContentMembers;
     }
 }

@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Voting {
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,39 +31,57 @@ public class Voting {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
+    @OneToMany(mappedBy = "voting", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VotingMember> memberIds = new ArrayList<>();
+
+    @Column(name = "multiple_flag")
+    private boolean multipleFlag;
+
     @Builder
-    public Voting(String title, Schedule schedule, Long memberId) {
+    public Voting(String title, Schedule schedule, Long memberId, boolean multipleFlag) {
         this.schedule = schedule;
         this.title = title;
         this.memberId = memberId;
+        this.multipleFlag = multipleFlag;
         this.schedule.getVotingList().add(this);
     }
 
-    public void addContent(String content) {
-        VotingContent votingContent = VotingContent.builder()
-                .content(content)
+    public void vote(Map<Long, Boolean> votingMap, Long memberId) {
+        memberIds.removeIf(m -> m.getMemberId().equals(memberId));
+
+        if (votingMap.containsValue(true)) {
+            VotingMember votingMember = createVotingMember(memberId);
+            memberIds.add(votingMember);
+        }
+
+        votingMap.forEach( (contentId,flag) ->{
+            VotingContent votingContent = getVotingContent(contentId);
+            voteByFlag(flag, memberId, votingContent);
+        });
+
+    }
+
+    private VotingContent getVotingContent(Long contentId) {
+        return votingContents.stream()
+                .filter(votingContent -> votingContent.getId().equals(contentId))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private VotingMember createVotingMember(Long memberId) {
+        return VotingMember.builder()
                 .voting(this)
+                .memberId(memberId)
                 .build();
-
-        votingContents.add(votingContent);
     }
 
-    public void deleteContent(Long contentId) {
-        for (VotingContent votingContent : votingContents) {
-            if (votingContent.getId().equals(contentId)) {
-                votingContents.remove(votingContent);
-                break;
-            }
+    private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {
+        if (flag) {
+            votingContent.vote(memberId);
+            return ;
         }
-    }
 
-    public void vote(Long contentId, boolean flag){
-        for (VotingContent votingContent : votingContents) {
-            if (votingContent.getId().equals(contentId)) {
-                votingContent.doVoting(flag);
-                break;
-            }
-        }
+        votingContent.cancel(memberId);
     }
 
     public Long getId() {
@@ -74,5 +94,13 @@ public class Voting {
 
     public List<VotingContent> getVotingContents() {
         return votingContents;
+    }
+
+    public boolean isMultipleFlag() {
+        return multipleFlag;
+    }
+
+    public int getVotingMemberCount() {
+        return memberIds.size();
     }
 }
