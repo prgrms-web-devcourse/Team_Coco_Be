@@ -4,7 +4,7 @@ import lombok.Builder;
 
 import javax.validation.constraints.NotBlank;
 
-public class SchedulePostCreatieRequest {
+public class SchedulePostCreateRequest {
 
     @NotBlank
     public String title;
@@ -19,7 +19,7 @@ public class SchedulePostCreatieRequest {
     public Long scheduleId;
 
     @Builder
-    public SchedulePostCreatieRequest(String title, String content, String city, Long scheduleId) {
+    public SchedulePostCreateRequest(String title, String content, String city, Long scheduleId) {
         this.title = title;
         this.content = content;
         this.city = city;

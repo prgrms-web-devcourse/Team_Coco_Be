@@ -1,7 +1,7 @@
 package com.cocodan.triplan.post.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreatieRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
@@ -37,7 +37,7 @@ public class SchedulePostController {
     @GetMapping("/schedules")
     public ResponseEntity<List<SchedulePostResponse>> scheduleList(
             @RequestParam(defaultValue = "0") Integer pageIndex,
-            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "전체") String searchingCity,
             @RequestParam(defaultValue = "ALL") String searchingTheme,
             @RequestParam(defaultValue = "최신순") String sorting
@@ -54,7 +54,7 @@ public class SchedulePostController {
     }
 
     @PostMapping("/schedules")
-    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostCreatieRequest request) {
+    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostCreateRequest request) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long postId = schedulePostService.createSchedulePost(member.getId(), request);
         return new ResponseEntity<>(SchedulePostCreateResponse.from(postId), HttpStatus.OK);

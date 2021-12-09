@@ -1,9 +1,8 @@
 package com.cocodan.triplan.post.schedule.service;
 
-import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreatieRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
@@ -49,7 +48,7 @@ public class SchedulePostService {
         );
     }
 
-    public Long createSchedulePost(Long memberId, SchedulePostCreatieRequest request) {
+    public Long createSchedulePost(Long memberId, SchedulePostCreateRequest request) {
         SchedulePost post = SchedulePost.builder()
                 .memberId(memberId)
                 .schedule(scheduleRepository.findById(request.getScheduleId()).orElseThrow(
