@@ -12,6 +12,7 @@ import com.cocodan.triplan.spot.dto.response.SpotSimple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class ScheduleConverter {
 
     private final SpotConverter spotConverter;
+    private final int BASIC_AGE = 1;
 
     public Schedule convertSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
         Schedule schedule = Schedule.builder()
@@ -94,8 +96,8 @@ public class ScheduleConverter {
                 .collect(Collectors.toList());
     }
 
-    public MemoResponse convertMemoResponse(Memo memo) {
-        return MemoResponse.builder()
+    public MemoSimpleResponse convertMemoSimpleResponse(Memo memo) {
+        return MemoSimpleResponse.builder()
                 .id(memo.getId())
                 .title(memo.getTitle())
                 .content(memo.getContent())
@@ -123,6 +125,8 @@ public class ScheduleConverter {
                 .title(voting.getTitle())
                 .ownerId(member.getId())
                 .ownerNickname(member.getNickname())
+                .ownerAge(convertAge(member.getBirth()))
+                .ownerGender(member.getGender().getTypeStr())
                 .votingContentResponses(votingContentResponses)
                 .build();
     }
@@ -139,5 +143,30 @@ public class ScheduleConverter {
     private boolean checkParticipant(VotingContent votingContent, Long memberId) {
         return votingContent.getVotingContentMembers().stream()
                 .anyMatch(votingContentMember -> votingContentMember.getMemberId().equals(memberId));
+    }
+
+    public MemoDetailResponse convertMemoDetailResponse(Memo memo, Member member) {
+        return MemoDetailResponse.builder()
+                .id(memo.getId())
+                .title(memo.getTitle())
+                .content(memo.getContent())
+                .ownerId(member.getId())
+                .ownerNickname(member.getNickname())
+                .ownerGender(member.getGender().getTypeStr())
+                .ownerAge(convertAge(member.getBirth()))
+                .build();
+    }
+
+    private int convertAge(String birth) {
+        Calendar current = Calendar.getInstance();
+        int currentYear = current.get(Calendar.YEAR);
+
+        int birthYear = getBirthYear(birth);
+
+        return currentYear - birthYear + BASIC_AGE;
+    }
+
+    private int getBirthYear(String birth) {
+        return Integer.parseInt(birth.split("-")[0]);
     }
 }

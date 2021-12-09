@@ -1,7 +1,5 @@
 package com.cocodan.triplan.schedule.service;
 
-import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.*;
@@ -12,7 +10,6 @@ import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.repository.VotingRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -183,19 +180,36 @@ class ScheduleServiceTest {
         Long memo3 = scheduleService.createMemo(schedule, memoRequest3, MEMBER_ID);
 
         // When
-        List<MemoResponse> memos = scheduleService.getMemos(schedule);
+        List<MemoSimpleResponse> memos = scheduleService.getMemos(schedule, MEMBER_ID);
 
         List<String> titles = memos.stream()
-                .map(MemoResponse::getTitle)
+                .map(MemoSimpleResponse::getTitle)
                 .collect(Collectors.toList());
 
         List<String> contents = memos.stream()
-                .map((MemoResponse::getContent))
+                .map((MemoSimpleResponse::getContent))
                 .collect(Collectors.toList());
 
         // Then
         assertThat(titles).containsExactlyInAnyOrder("memotitle1", "memotitle2", "memotitle3");
         assertThat(contents).containsExactlyInAnyOrder("JIFEOgoiioghiohgieogio1", "JIFEOgoiioghiohgieogio2", "JIFEOgoiioghiohgieogio3");
+    }
+
+    @Test
+    @DisplayName("메모를 상세 조회 한다")
+    void getMemo() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
+        Long memo = scheduleService.createMemo(schedule, memoRequest1, MEMBER_ID);
+
+        // When
+        MemoDetailResponse actual = scheduleService.getMemo(schedule, memo, MEMBER_ID);
+
+        // Then
+        assertThat(actual.getTitle()).isEqualTo("memotitle1");
+        assertThat(actual.getContent()).isEqualTo("JIFEOgoiioghiohgieogio1");
+        assertThat(actual.getOwnerId()).isEqualTo(MEMBER_ID);
     }
 
     @Test
