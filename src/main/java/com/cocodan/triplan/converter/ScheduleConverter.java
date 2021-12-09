@@ -99,6 +99,7 @@ public class ScheduleConverter {
 
     public MemoResponse convertMemoResponse(Memo memo) {
         return MemoResponse.builder()
+                .id(memo.getId())
                 .title(memo.getTitle())
                 .content(memo.getContent())
                 .build();
