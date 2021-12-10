@@ -1,7 +1,7 @@
 package com.cocodan.triplan.post.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostUpdateRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
@@ -9,13 +9,13 @@ import com.cocodan.triplan.post.schedule.service.SchedulePostService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,7 +45,7 @@ public class SchedulePostController {
             @RequestParam(defaultValue = "ALL") String searchingTheme,
             @RequestParam(defaultValue = "최신순") String sorting
     ) {
-        City city = City.of(searchingCity);
+        City city = City.from(searchingCity);
         Theme theme = Theme.valueOf(searchingTheme);
         SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
 
@@ -57,7 +57,7 @@ public class SchedulePostController {
     }
 
     @PostMapping("/schedules")
-    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostCreateRequest request) {
+    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostUpdateRequest request) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long postId = schedulePostService.createSchedulePost(member.getId(), request);
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
@@ -72,8 +72,15 @@ public class SchedulePostController {
     @DeleteMapping("/schedules/{schedulePostId}")
     public ResponseEntity<Void> deleteSchedulePost(@PathVariable Long schedulePostId) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        schedulePostService.validateRemovable(member.getId(), schedulePostId);
-        schedulePostService.deleteSchedulePost(schedulePostId);
+        schedulePostService.deleteSchedulePost(member.getId(), schedulePostId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/schedules/{schedulePostId}")
+    public ResponseEntity<Void> modifySchedulePost(@PathVariable Long schedulePostId, @RequestBody SchedulePostUpdateRequest request) {
+        // TODO: 2021.12.10 Teru - 별도의 Util class 를 만들어 요청을 보내는 유저 정보 받아오는 메서드 작성하기
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        schedulePostService.modifySchedulePost(member.getId(), request);
         return ResponseEntity.ok().build();
     }
 }

@@ -4,7 +4,7 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostUpdateRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
@@ -50,7 +50,7 @@ public class SchedulePostService {
         );
     }
 
-    public Long createSchedulePost(Long memberId, SchedulePostCreateRequest request) {
+    public Long createSchedulePost(Long memberId, SchedulePostUpdateRequest request) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException("Invalid User Detected")
         );
@@ -63,7 +63,7 @@ public class SchedulePostService {
                 .content(request.content)
                 .views(0L)
                 .liked(0L)
-                .city(City.of(request.city))
+                .city(City.from(request.city))
                 .build();
 
         SchedulePost savedSchedulePost = schedulePostRepository.save(post);
@@ -162,10 +162,10 @@ public class SchedulePostService {
         }).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public void validateRemovable(Long memberId, Long schedulePostId) {
+    private SchedulePost validateAuthorities(Long memberId, Long schedulePostId) {
         SchedulePost schedulePost = validateExistence(schedulePostId);
         validateOwnership(memberId, schedulePost);
+        return schedulePost;
     }
 
     private void validateOwnership(Long memberId, SchedulePost schedulePost) {
@@ -181,7 +181,17 @@ public class SchedulePostService {
 
     }
 
-    public void deleteSchedulePost(Long schedulePostId) {
-        schedulePostRepository.deleteById(schedulePostId);
+    @Transactional
+    public void deleteSchedulePost(Long memberId, Long schedulePostId) {
+        SchedulePost schedulePost = validateAuthorities(memberId, schedulePostId);
+        schedulePostRepository.delete(schedulePost);
+    }
+
+    @Transactional
+    public void modifySchedulePost(Long memberId, SchedulePostUpdateRequest request) {
+        Long requestedSchedulePostId = request.getScheduleId();
+        SchedulePost schedulePost = validateAuthorities(memberId, requestedSchedulePostId);
+        schedulePost.applyUpdate(request);
+        schedulePostRepository.save(schedulePost);
     }
 }
