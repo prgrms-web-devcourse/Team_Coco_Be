@@ -1,9 +1,9 @@
 package com.cocodan.triplan.schedule.service;
 
-import com.cocodan.triplan.converter.ScheduleConverter;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.schedule.domain.*;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
@@ -24,17 +24,20 @@ import java.util.stream.Collectors;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+
     private final SpotService spotService;
-    private final ScheduleConverter scheduleConverter;
 
     private final MemberRepository memberRepository;
+
     private final MemoRepository memoRepository;
+
     private final ChecklistRepository checklistRepository;
+
     private final VotingRepository votingRepository;
 
     @Transactional
     public Long createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
-        Schedule schedule = scheduleConverter.convertSchedule(scheduleCreationRequest, memberId);
+        Schedule schedule = convertSchedule(scheduleCreationRequest, memberId);
 
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
                 .filter(this::isNotSavedSpot)
@@ -51,23 +54,35 @@ public class ScheduleService {
     public List<ScheduleSimpleResponse> getSchedules(Long memberId) {
         return scheduleRepository.findByMemberId(memberId)
                 .stream()
-                .map(scheduleConverter::convertScheduleSimple)
+                .map(ScheduleSimpleResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public ScheduleDetailResponse getSchedule(Long scheduleId) {
+    public ScheduleDetailResponse getSchedule(Long scheduleId, Long memberId) {
+        validateScheduleMember(scheduleId,memberId);
+
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
+
+        List<Long> scheduleMemberIds = getMemberIds(schedule);
+
+        List<Member> members = memberRepository.findByIdIn(scheduleMemberIds);
 
         List<Spot> spots = spotService.findByIdIn(getSpotIds(schedule));
 
         //TODO : 멤버 Repository 로 imageURl 가져오기
-        return scheduleConverter.convertScheduleDetail(schedule, spots, null);
+        return ScheduleDetailResponse.of(schedule, spots, members);
     }
 
-    private List<Long> getSpotIds(Schedule schedule) {
-        return schedule.getDailyScheduleSpots().stream()
+    private List<Long> getMemberIds(Schedule schedule) {
+        return schedule.getScheduleMembers().stream()
+                .map(ScheduleMember::getMemberId)
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getSpotIds(Schedule dailyScheduleSpots) {
+        return dailyScheduleSpots.getDailyScheduleSpots().stream()
                 .map(DailyScheduleSpot::getSpotId)
                 .collect(Collectors.toList());
     }
@@ -77,12 +92,18 @@ public class ScheduleService {
         Schedule updated = scheduleRepository.findById(scheduleId)
                 .map(schedule -> {
                     schedule.removeAllSpots();
-                    scheduleConverter.convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
+                    convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
                     return schedule;
                 })
                 .orElseThrow(() -> new RuntimeException(""));
 
         scheduleRepository.save(updated);
+    }
+
+    private List<DailyScheduleSpot> convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
+        return scheduleModificationRequest.getDailyScheduleSpotCreationRequests().stream()
+                .map(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -123,7 +144,7 @@ public class ScheduleService {
         return scheduleRepository.findById(scheduleId)
                 .map(Schedule::getMemos)
                 .map(memos -> memos.stream()
-                        .map(scheduleConverter::convertMemoSimpleResponse)
+                        .map(MemoSimpleResponse::from)
                 )
                 .map(memoResponseStream -> memoResponseStream.collect(Collectors.toList()))
                 .orElseThrow(() -> new RuntimeException(""));
@@ -156,7 +177,7 @@ public class ScheduleService {
         Member member = memberRepository.findById(ownerId)
                 .orElseThrow(() -> new RuntimeException());
 
-        return scheduleConverter.convertMemoDetailResponse(memo, member);
+        return MemoDetailResponse.of(memo, member);
     }
 
     private void validateScheduleMemo(Long scheduleId, Long memoId) {
@@ -208,6 +229,15 @@ public class ScheduleService {
                 .schedule(schedule)
                 .date(checklistCreationRequest.getDate())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChecklistResponse> getChecklists(Long scheduleId, Long memberId) {
+        validateScheduleMember(scheduleId,memberId);
+
+        return checklistRepository.findByScheduleId(scheduleId).stream()
+                .map(ChecklistResponse::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -304,7 +334,7 @@ public class ScheduleService {
         return scheduleRepository.findById(scheduleId)
                 .map(Schedule::getVotingList)
                 .map(votingList -> votingList.stream()
-                        .map(scheduleConverter::convertVotingSimpleResponse)
+                        .map(VotingSimpleResponse::from)
                 ).map(votingSimpleResponseStream -> votingSimpleResponseStream.collect(Collectors.toList()))
                 .orElseThrow(() -> new RuntimeException(""));
     }
@@ -322,7 +352,7 @@ public class ScheduleService {
         Member owner = memberRepository.findById(ownerId)
                 .orElseThrow(() -> new RuntimeException());
 
-        return scheduleConverter.convertVotingDetailResponse(voting, owner, memberId);
+        return VotingDetailResponse.of(voting, owner, memberId);
 
     }
 

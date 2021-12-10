@@ -1,5 +1,6 @@
 package com.cocodan.triplan.schedule.dto.request;
 
+import com.cocodan.triplan.spot.domain.Spot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,4 @@ public class DailyScheduleSpotCreationRequest {
     private LocalDate date;
 
     private int order;
-
 }

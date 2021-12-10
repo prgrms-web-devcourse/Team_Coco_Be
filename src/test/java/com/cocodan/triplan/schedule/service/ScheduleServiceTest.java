@@ -10,7 +10,7 @@ import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.repository.VotingRepository;
-import com.cocodan.triplan.spot.dto.response.SpotSimple;
+import com.cocodan.triplan.spot.dto.response.SpotResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -54,7 +54,14 @@ class ScheduleServiceTest {
 
     @PostConstruct
     void postConstruct() {
-        MemberCreateResponse memberCreateResponse = memberService.create("ffff@naver.com", "taehyun", "01011111111", "1994-12-16", "남성", "henry", "");
+        MemberCreateResponse memberCreateResponse = memberService.create(
+                "ffff@naver.com",
+                "taehyun",
+                "01011111111",
+                "1994-12-16",
+                "남성",
+                "henry",
+                "");
         MEMBER_ID = memberCreateResponse.getId();
     }
 
@@ -68,14 +75,14 @@ class ScheduleServiceTest {
 
     private ScheduleCreationRequest createScheduleCreation() {
         return new ScheduleCreationRequest("title", LocalDate.of(2021, 12, 1), LocalDate.of(2021, 12, 3), List.of("activity", "food"),
-                List.of(new DailyScheduleSpotCreationRequest(1L, "address1", "roadAddress1", "010-1111-2222", "불국사1", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 1),
-                        new DailyScheduleSpotCreationRequest(2L, "address2", "roadAddress2", "010-1111-2223", "불국사2", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 2),
-                        new DailyScheduleSpotCreationRequest(3L, "address3", "roadAddress3", "010-1111-2224", "불국사3", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 3),
-                        new DailyScheduleSpotCreationRequest(4L, "address4", "roadAddress4", "010-1111-2225", "불국사4", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 1),
-                        new DailyScheduleSpotCreationRequest(5L, "address5", "roadAddress5", "010-1111-2226", "불국사5", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 2),
-                        new DailyScheduleSpotCreationRequest(6L, "address6", "roadAddress6", "010-1111-2227", "불국사6", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 3),
-                        new DailyScheduleSpotCreationRequest(7L, "address7", "roadAddress7", "010-1111-2228", "불국사7", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 3), 1),
-                        new DailyScheduleSpotCreationRequest(8L, "address8", "roadAddress8", "010-1111-2229", "불국사8", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 3), 2)
+                List.of(new DailyScheduleSpotCreationRequest(11L, "address1", "roadAddress1", "010-1111-2222", "불국사1", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 1),
+                        new DailyScheduleSpotCreationRequest(21L, "address2", "roadAddress2", "010-1111-2223", "불국사2", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 2),
+                        new DailyScheduleSpotCreationRequest(31L, "address3", "roadAddress3", "010-1111-2224", "불국사3", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 3),
+                        new DailyScheduleSpotCreationRequest(41L, "address4", "roadAddress4", "010-1111-2225", "불국사4", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 1),
+                        new DailyScheduleSpotCreationRequest(51L, "address5", "roadAddress5", "010-1111-2226", "불국사5", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 2),
+                        new DailyScheduleSpotCreationRequest(61L, "address6", "roadAddress6", "010-1111-2227", "불국사6", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 3),
+                        new DailyScheduleSpotCreationRequest(71L, "address7", "roadAddress7", "010-1111-2228", "불국사7", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 3), 1),
+                        new DailyScheduleSpotCreationRequest(81L, "address8", "roadAddress8", "010-1111-2229", "불국사8", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 3), 2)
                 ));
     }
 
@@ -89,20 +96,37 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("일정을 상세 조회한다.")
     void getSchedule() {
+        // Given
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long scheduleId = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
 
-        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId);
+        // When
+        ScheduleDetailResponse response = scheduleService.getSchedule(scheduleId, MEMBER_ID);
 
-        assertThat(schedule.getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
-        assertThat(schedule.getTitle()).isEqualTo("title");
-        assertThat(schedule.getThema()).contains(Theme.valueOf("ACTIVITY"), Theme.valueOf("FOOD"));
-        List<Long> ids = schedule.getSpotSimpleList().stream()
-                .map(SpotSimple::getId)
+        // Then
+        assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
+        assertThat(response.getScheduleSimpleResponse().getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
+        assertThat(response.getScheduleSimpleResponse().getTitle()).isEqualTo("title");
+        assertThat(response.getScheduleSimpleResponse().getThemes()).contains("ACTIVITY", "FOOD");
+
+        List<Long> memberIds = response.getMemberSimpleResponses().stream()
+                .map(MemberSimpleResponse::getId)
                 .collect(Collectors.toList());
 
-        // TODO: 장소 데이터 추가되면 다시 확인
-        assertThat(ids).containsExactlyInAnyOrder(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L);
+        assertThat(memberIds).containsExactly(MEMBER_ID);
+
+        List<String> memberNicknames = response.getMemberSimpleResponses().stream()
+                .map(MemberSimpleResponse::getNickname)
+                .collect(Collectors.toList());
+
+        assertThat(memberNicknames).containsExactly("henry");
+
+        List<Long> spotIds = response.getSpotResponseList().stream()
+                .map(ScheduleSpotResponse::getSpotResponse)
+                .map(SpotResponse::getId)
+                .collect(Collectors.toList());
+
+        assertThat(spotIds).containsExactly(11L, 21L, 31L, 41L, 51L, 61L, 71L, 81L);
     }
 
     @Test
@@ -113,14 +137,14 @@ class ScheduleServiceTest {
         Long schedule = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
 
         ScheduleModificationRequest scheduleModificationRequest = new ScheduleModificationRequest(
-                List.of(new DailyScheduleSpotCreationRequest(1L, "address1", "roadAddress1", "010-1111-2222", "불국사1", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 1),
-                        new DailyScheduleSpotCreationRequest(2L, "address2", "roadAddress2", "010-1111-2223", "불국사2", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 2),
-                        new DailyScheduleSpotCreationRequest(3L, "address3", "roadAddress3", "010-1111-2224", "불국사3", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 1), 3),
-                        new DailyScheduleSpotCreationRequest(4L, "address4", "roadAddress4", "010-1111-2225", "불국사4", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 1),
-                        new DailyScheduleSpotCreationRequest(5L, "address5", "roadAddress5", "010-1111-2226", "불국사5", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 2),
-                        new DailyScheduleSpotCreationRequest(6L, "address6", "roadAddress6", "010-1111-2227", "불국사6", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 2), 3),
-                        new DailyScheduleSpotCreationRequest(7L, "address7", "roadAddress7", "010-1111-2228", "불국사7", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 3), 1),
-                        new DailyScheduleSpotCreationRequest(8L, "address8", "roadAddress8", "010-1111-2229", "불국사8", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 3), 2)
+                List.of(
+                        new DailyScheduleSpotCreationRequest(5L, "address1", "roadAddress1", "010-1111-2222", "불국사1", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 22), 1),
+                        new DailyScheduleSpotCreationRequest(6L, "address2", "roadAddress2", "010-1111-2223", "불국사2", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 22), 2),
+                        new DailyScheduleSpotCreationRequest(7L, "address3", "roadAddress3", "010-1111-2224", "불국사3", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 23), 1),
+                        new DailyScheduleSpotCreationRequest(8L, "address4", "roadAddress4", "010-1111-2225", "불국사4", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 23), 2),
+                        new DailyScheduleSpotCreationRequest(9L, "address5", "roadAddress5", "010-1111-2226", "불국사5", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 24), 1),
+                        new DailyScheduleSpotCreationRequest(11L, "address6", "roadAddress6", "010-1111-2227", "불국사6", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 24), 2),
+                        new DailyScheduleSpotCreationRequest(12L, "address7", "roadAddress7", "010-1111-22228", "불국사7", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 24), 3)
                 ));
 
         // When
