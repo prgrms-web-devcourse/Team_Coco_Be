@@ -178,7 +178,8 @@ class SchedulePostServiceTest {
         assertThat(schedulePostDetail.getGender()).isEqualTo(post.getMember().getGender());
         assertThat(schedulePostDetail.getNickname()).isEqualTo(post.getMember().getNickname());
         assertThat(schedulePostDetail.getAges()).isEqualTo(Ages.from(post.getMember().getBirth()));
-        
+
+        // TODO: 2021.12.10 Teru - equals method를 오버라이드 하지 않고, 그냥 DTO의 toString() 을 통해서 String 비교로 검증하도록 수정.
         Assertions.assertArrayEquals(
                 schedulePostDetail.getDailyScheduleSpots().toArray(),
                 post.getSchedule().getDailyScheduleSpots().stream()

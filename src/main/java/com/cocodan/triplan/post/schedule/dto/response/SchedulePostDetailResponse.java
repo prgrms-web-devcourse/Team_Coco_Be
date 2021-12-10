@@ -73,9 +73,4 @@ public class SchedulePostDetailResponse {
         SchedulePostDetailResponse that = (SchedulePostDetailResponse) o;
         return nickname.equals(that.nickname) && ages == that.ages && gender == that.gender && city == that.city && startDate.equals(that.startDate) && endDate.equals(that.endDate) && title.equals(that.title) && content.equals(that.content) && dailyScheduleSpots.equals(that.dailyScheduleSpots) && createdAt.equals(that.createdAt) && views.equals(that.views) && liked.equals(that.liked);
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(nickname, ages, gender, city, startDate, endDate, title, content, dailyScheduleSpots, createdAt, views, liked);
-    }
 }

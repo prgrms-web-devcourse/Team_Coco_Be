@@ -1,8 +1,12 @@
 package com.cocodan.triplan.converter;
 
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
+import com.cocodan.triplan.schedule.domain.Memo;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.ScheduleThema;
+import com.cocodan.triplan.schedule.domain.Voting;
+import com.cocodan.triplan.schedule.domain.VotingContent;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;

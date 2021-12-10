@@ -30,7 +30,7 @@ public class SchedulePost extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member", referencedColumnName = "id")
     private Member member;
 

@@ -17,7 +17,7 @@ public class DailyScheduleSpotResponse {
 
     private LocalDate date;
 
-    private Integer order;
+    private int order;
 
     public static DailyScheduleSpotResponse from(DailyScheduleSpot dailyScheduleSpot) {
         return DailyScheduleSpotResponse.builder()
@@ -32,11 +32,6 @@ public class DailyScheduleSpotResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DailyScheduleSpotResponse that = (DailyScheduleSpotResponse) o;
-        return spotId.equals(that.spotId) && date.equals(that.date) && order.equals(that.order);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(spotId, date, order);
+        return spotId.equals(that.spotId) && date.equals(that.date) && order == that.order;
     }
 }
