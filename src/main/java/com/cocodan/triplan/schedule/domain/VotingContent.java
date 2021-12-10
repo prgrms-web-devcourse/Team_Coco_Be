@@ -20,9 +20,6 @@ public class VotingContent {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "count")
-    private int count;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voting_id", referencedColumnName = "id")
     private Voting voting;
@@ -45,7 +42,6 @@ public class VotingContent {
         }
 
         votingContentMembers.add(createVotingMember(memberId));
-        count++;
     }
 
     private VotingContentMember createVotingMember(Long memberId) {
@@ -56,11 +52,7 @@ public class VotingContent {
     }
 
     public void cancel(Long memberId) {
-        boolean hasVoted = votingContentMembers.removeIf(votingContentMember -> votingContentMember.getMemberId().equals(memberId));
-
-        if (hasVoted) {
-            count--;
-        }
+        votingContentMembers.removeIf(votingContentMember -> votingContentMember.getMemberId().equals(memberId));
     }
 
     public Long getId() {
@@ -71,8 +63,8 @@ public class VotingContent {
         return content;
     }
 
-    public int getCount() {
-        return count;
+    public int getNumOfParticipants() {
+        return votingContentMembers.size();
     }
 
     public List<VotingContentMember> getVotingContentMembers() {

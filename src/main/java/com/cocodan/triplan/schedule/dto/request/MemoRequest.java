@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemoRequest {
 
+    private String title;
     private String content;
 }

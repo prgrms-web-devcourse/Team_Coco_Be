@@ -19,6 +19,9 @@ public class Memo {
     @JoinColumn(name = "schedule_id", referencedColumnName = "id")
     private Schedule schedule;
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
     @Column(name = "content", nullable = false)
     private String content;
 
@@ -26,8 +29,9 @@ public class Memo {
     private Long memberId;
 
     @Builder
-    public Memo(Schedule schedule, String content, Long memberId) {
+    public Memo(Schedule schedule, String title, String content, Long memberId) {
         this.schedule = schedule;
+        this.title = title;
         this.content = content;
         this.memberId = memberId;
         this.schedule.getMemos().add(this);
@@ -37,6 +41,10 @@ public class Memo {
         return id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public String getContent() {
         return content;
     }
@@ -44,7 +52,9 @@ public class Memo {
     public Long getMemberId() {
         return memberId;
     }
-    public void modifyContent(String content) {
+
+    public void modify(String title, String content) {
+        this.title = title;
         this.content = content;
     }
 }

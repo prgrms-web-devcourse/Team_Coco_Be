@@ -1,10 +1,11 @@
 package com.cocodan.triplan.schedule.service;
 
+import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
+import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
 import com.cocodan.triplan.schedule.dto.request.*;
-import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 class ScheduleServiceTest {
 
-    private final Long MEMBER_ID = 1L;
+    private Long MEMBER_ID;
 
     @Autowired
     private ScheduleService scheduleService;
@@ -45,6 +47,15 @@ class ScheduleServiceTest {
 
     @Autowired
     private VotingRepository votingRepository;
+
+    @Autowired
+    private MemberService memberService;
+
+    @PostConstruct
+    void postConstruct(){
+        MemberCreateResponse memberCreateResponse = memberService.create("ffff@naver.com", "taehyun", "01011111111", "1994-12-16", "남성", "henry", "");
+        MEMBER_ID = memberCreateResponse.getId();
+    }
 
     @Test
     @DisplayName("여행 일정을 생성한다.")
@@ -143,14 +154,62 @@ class ScheduleServiceTest {
     void createMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
 
         // When
         Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
-        Memo saved = memoRepository.findById(memo).get();
+
+        Memo actual = memoRepository.findById(memo).get();
 
         // Then
-        assertThat(saved.getContent()).isEqualTo("JIFEOgoiioghiohgieogio");
+        assertThat(actual.getTitle()).isEqualTo("memotitle");
+        assertThat(actual.getContent()).isEqualTo("JIFEOgoiioghiohgieogio");
+    }
+
+    @Test
+    @DisplayName("메모 목록을 조회한다")
+    void getMemos() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
+        MemoRequest memoRequest2 = new MemoRequest("memotitle2", "JIFEOgoiioghiohgieogio2");
+        MemoRequest memoRequest3 = new MemoRequest("memotitle3", "JIFEOgoiioghiohgieogio3");
+
+        Long memo1 = scheduleService.createMemo(schedule, memoRequest1, MEMBER_ID);
+        Long memo2 = scheduleService.createMemo(schedule, memoRequest2, MEMBER_ID);
+        Long memo3 = scheduleService.createMemo(schedule, memoRequest3, MEMBER_ID);
+
+        // When
+        List<MemoSimpleResponse> memos = scheduleService.getMemos(schedule, MEMBER_ID);
+
+        List<String> titles = memos.stream()
+                .map(MemoSimpleResponse::getTitle)
+                .collect(Collectors.toList());
+
+        List<String> contents = memos.stream()
+                .map((MemoSimpleResponse::getContent))
+                .collect(Collectors.toList());
+
+        // Then
+        assertThat(titles).containsExactlyInAnyOrder("memotitle1", "memotitle2", "memotitle3");
+        assertThat(contents).containsExactlyInAnyOrder("JIFEOgoiioghiohgieogio1", "JIFEOgoiioghiohgieogio2", "JIFEOgoiioghiohgieogio3");
+    }
+
+    @Test
+    @DisplayName("메모를 상세 조회 한다")
+    void getMemo() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
+        Long memo = scheduleService.createMemo(schedule, memoRequest1, MEMBER_ID);
+
+        // When
+        MemoDetailResponse actual = scheduleService.getMemo(schedule, memo, MEMBER_ID);
+
+        // Then
+        assertThat(actual.getTitle()).isEqualTo("memotitle1");
+        assertThat(actual.getContent()).isEqualTo("JIFEOgoiioghiohgieogio1");
+        assertThat(actual.getOwnerId()).isEqualTo(MEMBER_ID);
     }
 
     @Test
@@ -158,11 +217,11 @@ class ScheduleServiceTest {
     void modifyMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
         Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
 
         // When
-        MemoRequest updateRequest = new MemoRequest("Updated Memo Content");
+        MemoRequest updateRequest = new MemoRequest("Updated Memo Title", "Updated Memo Content");
         scheduleService.modifyMemo(schedule, memo, updateRequest, MEMBER_ID);
 
         // Then
@@ -175,7 +234,7 @@ class ScheduleServiceTest {
     void deleteMemo() {
         // Given
         Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("JIFEOgoiioghiohgieogio");
+        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
         Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
 
         // When
@@ -257,6 +316,57 @@ class ScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("투표 목록을 조회한다")
+    void getVotings() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        VotingCreationRequest votingCreationRequest1 = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
+        VotingCreationRequest votingCreationRequest2 = new VotingCreationRequest("어디 여행 갈래", List.of("서울", "부산", "제주도", "안 가"), true);
+
+        Long voting1 = scheduleService.createVoting(schedule, votingCreationRequest1, MEMBER_ID);
+        Long voting2 = scheduleService.createVoting(schedule, votingCreationRequest2, MEMBER_ID);
+
+        // When
+        List<VotingSimpleResponse> votingList = scheduleService.getVotingList(schedule);
+
+        List<String> titles = votingList.stream()
+                .map(VotingSimpleResponse::getTitle)
+                .collect(Collectors.toList());
+
+        List<Integer> counts = votingList.stream()
+                .map(VotingSimpleResponse::getMemberCount)
+                .collect(Collectors.toList());
+
+        // Then
+        assertThat(titles).contains("무슨 요일날 갈까요?", "어디 여행 갈래");
+        assertThat(counts).containsExactly(0, 0);
+    }
+
+    @Test
+    @DisplayName("투표의 상세 정보를 조회한다")
+    void getVoting() {
+        // Given
+        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
+
+        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+
+        // When
+        VotingDetailResponse response = scheduleService.getVoting(schedule, voting, MEMBER_ID);
+
+        List<String> contents = response.getVotingContentResponses().stream()
+                .map(VotingContentResponse::getContent)
+                .collect(Collectors.toList());
+
+        // Then
+        assertThat(response.getId()).isEqualTo(voting);
+        assertThat(response.getTitle()).isEqualTo("무슨 요일날 갈까요?");
+        assertThat(response.getNumOfTotalParticipants()).isZero();
+        assertThat(response.getOwnerId()).isEqualTo(MEMBER_ID);
+        assertThat(contents).containsExactly("월", "화", "수", "목");
+    }
+
+    @Test
     @DisplayName("투표를 행사 한다")
     void vote() {
         // Given
@@ -267,7 +377,7 @@ class ScheduleServiceTest {
         Voting saved = votingRepository.findById(voting).get();
 
         List<Long> ids = saved.getVotingContents().stream()
-                .map(votingContent -> votingContent.getId())
+                .map(VotingContent::getId)
                 .collect(Collectors.toList());
 
         Map<Long, Boolean> votingMap = Map.of(ids.get(0), true, ids.get(1), false, ids.get(2), true, ids.get(3), false);
@@ -279,7 +389,7 @@ class ScheduleServiceTest {
         List<VotingContent> votingContents = saved.getVotingContents();
 
         List<Integer> votingCountList = votingContents.stream()
-                .map(VotingContent::getCount)
+                .map(VotingContent::getNumOfParticipants)
                 .collect(Collectors.toList());
 
         // Then
@@ -292,7 +402,7 @@ class ScheduleServiceTest {
         });
 
         assertThat(votingCountList).containsExactly(1, 0, 1, 0);
-        assertThat(saved.getVotingMemberCount()).isEqualTo(1);
+        assertThat(saved.getNumOfTotalParticipants()).isEqualTo(1);
     }
 
     private List<Long> getVotingMemberIds(VotingContent votingContent) {

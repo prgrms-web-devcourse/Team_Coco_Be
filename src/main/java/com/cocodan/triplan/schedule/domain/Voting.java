@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,9 +32,6 @@ public class Voting {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
-    @OneToMany(mappedBy = "voting", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VotingMember> memberIds = new ArrayList<>();
-
     @Column(name = "multiple_flag")
     private boolean multipleFlag;
 
@@ -47,14 +45,7 @@ public class Voting {
     }
 
     public void vote(Map<Long, Boolean> votingMap, Long memberId) {
-        memberIds.removeIf(m -> m.getMemberId().equals(memberId));
-
-        if (votingMap.containsValue(true)) {
-            VotingMember votingMember = createVotingMember(memberId);
-            memberIds.add(votingMember);
-        }
-
-        votingMap.forEach( (contentId,flag) ->{
+        votingMap.forEach((contentId, flag) -> {
             VotingContent votingContent = getVotingContent(contentId);
             voteByFlag(flag, memberId, votingContent);
         });
@@ -65,20 +56,13 @@ public class Voting {
         return votingContents.stream()
                 .filter(votingContent -> votingContent.getId().equals(contentId))
                 .findFirst()
-                .orElseThrow();
-    }
-
-    private VotingMember createVotingMember(Long memberId) {
-        return VotingMember.builder()
-                .voting(this)
-                .memberId(memberId)
-                .build();
+                .orElseThrow(() -> new RuntimeException(""));
     }
 
     private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {
         if (flag) {
             votingContent.vote(memberId);
-            return ;
+            return;
         }
 
         votingContent.cancel(memberId);
@@ -96,11 +80,19 @@ public class Voting {
         return votingContents;
     }
 
+    public Long getMemberId() {
+        return memberId;
+    }
+
     public boolean isMultipleFlag() {
         return multipleFlag;
     }
 
-    public int getVotingMemberCount() {
-        return memberIds.size();
+    public int getNumOfTotalParticipants() {
+         return (int) votingContents.stream()
+                 .flatMap(votingContent -> votingContent.getVotingContentMembers().stream())
+                 .map(VotingContentMember::getMemberId)
+                 .distinct()
+                 .count();
     }
 }

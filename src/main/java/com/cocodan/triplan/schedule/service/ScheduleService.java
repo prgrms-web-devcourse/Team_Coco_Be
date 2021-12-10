@@ -1,10 +1,12 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
+import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
+import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.dto.request.*;
-import com.cocodan.triplan.schedule.dto.response.ScheduleDetailResponse;
-import com.cocodan.triplan.schedule.dto.response.ScheduleSimpleResponse;
+import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
@@ -15,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +29,7 @@ public class ScheduleService {
     private final SpotRepository spotRepository;
     private final ScheduleConverter scheduleConverter;
 
+    private final MemberRepository memberRepository;
     private final MemoRepository memoRepository;
     private final ChecklistRepository checklistRepository;
     private final VotingRepository votingRepository;
@@ -91,65 +94,109 @@ public class ScheduleService {
     @Transactional
     public Long createMemo(Long scheduleId, MemoRequest memoRequest, Long memberId) {
         Memo memo = scheduleRepository.findById(scheduleId)
-                .map(schedule -> getMemo(memoRequest, schedule, memberId))
+                .map(schedule -> createMemo(memoRequest, schedule, memberId))
                 .orElseThrow(() -> new RuntimeException(""));
 
         return memoRepository.save(memo).getId();
     }
 
-    private Memo getMemo(MemoRequest memoRequest, Schedule schedule, Long memberId) {
+    private Memo createMemo(MemoRequest memoRequest, Schedule schedule, Long memberId) {
         return Memo.builder()
                 .schedule(schedule)
+                .title(memoRequest.getTitle())
                 .content(memoRequest.getContent())
                 .memberId(memberId)
                 .build();
     }
 
-    @Transactional
-    public void modifyMemo(Long scheduleId, Long memoId, MemoRequest memoRequest, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
 
-        memoRepository.findById(memoId)
-                .ifPresentOrElse(
-                        memo -> memo.modifyContent(memoRequest.getContent()),
-                        () -> {
-                            throw new RuntimeException("");
-                        }
-                );
+    @Transactional(readOnly = true)
+    public List<MemoSimpleResponse> getMemos(Long scheduleId, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+        
+        return scheduleRepository.findById(scheduleId)
+                .map(Schedule::getMemos)
+                .map(memos -> memos.stream()
+                        .map(scheduleConverter::convertMemoSimpleResponse)
+                )
+                .map(memoResponseStream -> memoResponseStream.collect(Collectors.toList()))
+                .orElseThrow(() -> new RuntimeException(""));
     }
 
     private void validateScheduleMember(Long scheduleId, Long memberId) {
-        scheduleRepository.findById(scheduleId)
-                .map(Schedule::getScheduleMembers)
-                .map(this::getMemberIds)
-                .filter(longs -> longs.contains(memberId))
+        Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
+
+        boolean noneMatchFlag = schedule.getScheduleMembers().stream()
+                .map(ScheduleMember::getMemberId)
+                .noneMatch(id -> id.equals(memberId));
+
+        if (noneMatchFlag) {
+            throw new RuntimeException("");
+        }
+
+    }
+
+    @Transactional(readOnly = true)
+    public MemoDetailResponse getMemo(Long scheduleId, Long memoId, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+        validateScheduleMemo(scheduleId, memoId);
+
+        Memo memo = memoRepository.findById(memoId)
+                .orElseThrow(() -> new RuntimeException());
+
+        Long ownerId = memo.getMemberId();
+
+        Member member = memberRepository.findById(ownerId)
+                .orElseThrow(() -> new RuntimeException());
+
+        return scheduleConverter.convertMemoDetailResponse(memo, member);
+    }
+
+    private void validateScheduleMemo(Long scheduleId, Long memoId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException());
+
+        boolean flag = schedule.getMemos().stream()
+                .map(Memo::getId)
+                .noneMatch(id -> id.equals(memoId));
+
+        if (flag) {
+            throw new RuntimeException("");
+        }
+    }
+
+
+    @Transactional
+    public void modifyMemo(Long scheduleId, Long memoId, MemoRequest memoRequest, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+        validateScheduleMemo(scheduleId, memoId);
+
+        Memo memo = memoRepository.findById(memoId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        memo.modify(memoRequest.getTitle(), memoRequest.getContent());
     }
 
     @Transactional
     public void deleteMemo(Long scheduleId, Long memoId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
+        validateScheduleMemo(scheduleId, memoId);
 
         memoRepository.deleteById(memoId);
-    }
-
-    private List<Long> getMemberIds(List<ScheduleMember> scheduleMembers) {
-        return scheduleMembers.stream()
-                .map(ScheduleMember::getMemberId)
-                .collect(Collectors.toList());
     }
 
     // 체크리스트
     @Transactional
     public Long createChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest) {
         Checklist checklist = scheduleRepository.findById(scheduleId)
-                .map(schedule -> getChecklist(checklistCreationRequest, schedule))
+                .map(schedule -> createChecklist(checklistCreationRequest, schedule))
                 .orElseThrow(() -> new RuntimeException(""));
 
         return checklistRepository.save(checklist).getId();
     }
 
-    private Checklist getChecklist(ChecklistCreationRequest checklistCreationRequest, Schedule schedule) {
+    private Checklist createChecklist(ChecklistCreationRequest checklistCreationRequest, Schedule schedule) {
         return Checklist.builder()
                 .content(checklistCreationRequest.getContent())
                 .schedule(schedule)
@@ -160,6 +207,7 @@ public class ScheduleService {
     @Transactional
     public void doCheck(Long scheduleId, Long checklistId, Long memberId, boolean flag) {
         validateScheduleMember(scheduleId, memberId);
+        validateScheduleChecklist(scheduleId, checklistId);
 
         Checklist checklist = checklistRepository.findById(checklistId)
                 .orElseThrow(() -> new RuntimeException(""));
@@ -167,9 +215,23 @@ public class ScheduleService {
         checklist.check(flag);
     }
 
+    private void validateScheduleChecklist(Long scheduleId, Long checklistId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException());
+
+        boolean flag = schedule.getChecklists().stream()
+                .map(Checklist::getId)
+                .noneMatch(id -> id.equals(checklistId));
+
+        if (flag) {
+            throw new RuntimeException("");
+        }
+    }
+
     @Transactional
     public void deleteChecklist(Long scheduleId, Long checklistId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
+        validateScheduleChecklist(scheduleId, checklistId);
 
         checklistRepository.deleteById(checklistId);
     }
@@ -188,21 +250,22 @@ public class ScheduleService {
         return votingRepository.save(voting).getId();
     }
 
-    private void createVotingContents(VotingCreationRequest votingCreationRequest, Voting voting) {
-        votingCreationRequest.getContents().stream()
-                .map(v -> getVotingContent(voting, v))
-                .collect(Collectors.toList());
-    }
-
     private Voting createVoting(VotingCreationRequest votingCreationRequest, Long memberId, Schedule schedule) {
         return Voting.builder()
                 .schedule(schedule)
                 .title(votingCreationRequest.getTitle())
+                .multipleFlag(votingCreationRequest.isMultipleFlag())
                 .memberId(memberId)
                 .build();
     }
 
-    private VotingContent getVotingContent(Voting voting, String v) {
+    private void createVotingContents(VotingCreationRequest votingCreationRequest, Voting voting) {
+        votingCreationRequest.getContents().stream()
+                .map(content -> createVotingContent(voting, content))
+                .collect(Collectors.toList());
+    }
+
+    private VotingContent createVotingContent(Voting voting, String v) {
         return VotingContent.builder()
                 .content(v)
                 .voting(voting)
@@ -212,12 +275,55 @@ public class ScheduleService {
     @Transactional
     public void deleteVoting(Long scheduleId, Long votingId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
+        validateScheduleVoting(scheduleId, votingId);
 
         votingRepository.deleteById(votingId);
     }
 
+    private void validateScheduleVoting(Long scheduleId, Long votingId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException());
+
+        boolean flag = schedule.getVotingList().stream()
+                .map(Voting::getId)
+                .noneMatch(id -> id.equals(votingId));
+
+        if (flag) {
+            throw new RuntimeException("");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<VotingSimpleResponse> getVotingList(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+                .map(Schedule::getVotingList)
+                .map(votingList -> votingList.stream()
+                        .map(scheduleConverter::convertVotingSimpleResponse)
+                ).map(votingSimpleResponseStream -> votingSimpleResponseStream.collect(Collectors.toList()))
+                .orElseThrow(() -> new RuntimeException(""));
+    }
+
+    @Transactional(readOnly = true)
+    public VotingDetailResponse getVoting(Long scheduleId, Long votingId, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+        validateScheduleVoting(scheduleId, votingId);
+
+        Voting voting = votingRepository.findById(votingId)
+                .orElseThrow(() -> new RuntimeException());
+
+        Long ownerId = voting.getMemberId();
+
+        Member owner = memberRepository.findById(ownerId)
+                .orElseThrow(() -> new RuntimeException());
+
+        return scheduleConverter.convertVotingDetailResponse(voting, owner, memberId);
+
+    }
+
+    @Transactional
     public void doVote(Long scheduleId, Long votingId, VotingRequest votingRequest, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
+        validateScheduleVoting(scheduleId, votingId);
 
         Voting voting = votingRepository.findById(votingId)
                 .orElseThrow(() -> new RuntimeException(""));

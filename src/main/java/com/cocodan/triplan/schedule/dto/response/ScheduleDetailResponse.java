@@ -10,13 +10,13 @@ import java.util.List;
 
 @Getter
 public class ScheduleDetailResponse {
-    private Long id;
-    private String title;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private List<SpotSimple> spotSimpleList;
-    private List<Thema> themas;
-    private List<String> memberImageUrls;
+    private final Long id;
+    private final String title;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
+    private final List<SpotSimple> spotSimpleList;
+    private final List<Thema> themas;
+    private final List<String> memberImageUrls;
 
     @Builder
     public ScheduleDetailResponse(Long id, String title, LocalDate startDate, LocalDate endDate, List<SpotSimple> spotSimpleList, List<Thema> themas, List<String> memberImageUrls) {

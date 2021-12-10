@@ -4,13 +4,17 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemoResponse {
+public class MemoSimpleResponse {
+
+    private final Long id;
 
     private final String title;
+
     private final String content;
 
     @Builder
-    public MemoResponse(String title, String content) {
+    public MemoSimpleResponse(Long id, String title, String content) {
+        this.id = id;
         this.title = title;
         this.content = content;
     }
