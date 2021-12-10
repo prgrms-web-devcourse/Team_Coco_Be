@@ -36,8 +36,7 @@ public class ScheduleService {
     private final VotingRepository votingRepository;
 
     @Transactional
-    public Long createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
-
+    public Long saveSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
         Schedule schedule = convertSchedule(scheduleCreationRequest, memberId);
 
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
@@ -51,25 +50,34 @@ public class ScheduleService {
     }
 
     private Schedule convertSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
-        Schedule schedule = Schedule.builder()
+        Schedule schedule = createSchedule(scheduleCreationRequest, memberId);
+
+        createScheduleThema(scheduleCreationRequest, schedule);
+
+        createScheduleDailySpots(scheduleCreationRequest, schedule);
+
+        return schedule;
+    }
+
+    private void createScheduleDailySpots(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
+        scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
+                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
+    }
+
+    private void createScheduleThema(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
+        scheduleCreationRequest.getThemeList()
+                .stream()
+                .map(s -> Theme.valueOf(s.toUpperCase()))
+                .forEach(theme -> new ScheduleTheme(schedule, theme));
+    }
+
+    private Schedule createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
+        return Schedule.builder()
                 .title(scheduleCreationRequest.getTitle())
                 .startDate(scheduleCreationRequest.getStartDate())
                 .endDate(scheduleCreationRequest.getEndDate())
                 .memberId(memberId)
                 .build();
-
-        scheduleCreationRequest.getThemeList()
-                .stream()
-                .map(s -> Theme.valueOf(s.toUpperCase()))
-                .map(theme -> new ScheduleTheme(schedule, theme))
-                .collect(Collectors.toList());
-
-        scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
-                .stream()
-                .map(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
-                .collect(Collectors.toList());
-
-        return schedule;
     }
 
     private DailyScheduleSpot createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
@@ -95,7 +103,7 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public ScheduleDetailResponse getSchedule(Long scheduleId, Long memberId) {
-        validateScheduleMember(scheduleId,memberId);
+        validateScheduleMember(scheduleId, memberId);
 
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
@@ -124,21 +132,18 @@ public class ScheduleService {
 
     @Transactional
     public void modifySchedule(Long scheduleId, ScheduleModificationRequest scheduleModificationRequest) {
-        Schedule updated = scheduleRepository.findById(scheduleId)
+        scheduleRepository.findById(scheduleId)
                 .map(schedule -> {
                     schedule.removeAllSpots();
                     convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
                     return schedule;
                 })
                 .orElseThrow(() -> new RuntimeException(""));
-
-        scheduleRepository.save(updated);
     }
 
-    private List<DailyScheduleSpot> convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
-        return scheduleModificationRequest.getDailyScheduleSpotCreationRequests().stream()
-                .map(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
-                .collect(Collectors.toList());
+    private void convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
+        scheduleModificationRequest.getDailyScheduleSpotCreationRequests()
+                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
     }
 
     @Transactional
@@ -154,7 +159,7 @@ public class ScheduleService {
 
     // 메모
     @Transactional
-    public Long createMemo(Long scheduleId, MemoRequest memoRequest, Long memberId) {
+    public Long saveMemo(Long scheduleId, MemoRequest memoRequest, Long memberId) {
         Memo memo = scheduleRepository.findById(scheduleId)
                 .map(schedule -> createMemo(memoRequest, schedule, memberId))
                 .orElseThrow(() -> new RuntimeException(""));
@@ -174,8 +179,8 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<MemoSimpleResponse> getMemos(Long scheduleId, Long memberId) {
-        validateScheduleMember(scheduleId,memberId);
-        
+        validateScheduleMember(scheduleId, memberId);
+
         return scheduleRepository.findById(scheduleId)
                 .map(Schedule::getMemos)
                 .map(memos -> memos.stream()
@@ -184,7 +189,7 @@ public class ScheduleService {
                 .map(memoResponseStream -> memoResponseStream.collect(Collectors.toList()))
                 .orElseThrow(() -> new RuntimeException(""));
     }
-    
+
     private void validateScheduleMember(Long scheduleId, Long memberId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
@@ -237,9 +242,9 @@ public class ScheduleService {
         Memo memo = memoRepository.findById(memoId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        memo.modify(memoRequest.getTitle(),memoRequest.getContent());
+        memo.modify(memoRequest.getTitle(), memoRequest.getContent());
     }
-    
+
     @Transactional
     public void deleteMemo(Long scheduleId, Long memoId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
@@ -250,7 +255,7 @@ public class ScheduleService {
 
     // 체크리스트
     @Transactional
-    public Long createChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest) {
+    public Long saveChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest) {
         Checklist checklist = scheduleRepository.findById(scheduleId)
                 .map(schedule -> createChecklist(checklistCreationRequest, schedule))
                 .orElseThrow(() -> new RuntimeException(""));
@@ -268,7 +273,7 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<ChecklistResponse> getChecklists(Long scheduleId, Long memberId) {
-        validateScheduleMember(scheduleId,memberId);
+        validateScheduleMember(scheduleId, memberId);
 
         return checklistRepository.findByScheduleId(scheduleId).stream()
                 .map(ChecklistResponse::from)
@@ -310,7 +315,7 @@ public class ScheduleService {
 
     // 투표
     @Transactional
-    public Long createVoting(Long scheduleId, VotingCreationRequest votingCreationRequest, Long memberId) {
+    public Long saveVoting(Long scheduleId, VotingCreationRequest votingCreationRequest, Long memberId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
 

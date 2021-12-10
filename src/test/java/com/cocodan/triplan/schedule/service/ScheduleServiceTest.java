@@ -3,7 +3,6 @@ package com.cocodan.triplan.schedule.service;
 import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.*;
-import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
@@ -70,7 +69,7 @@ class ScheduleServiceTest {
     void createSchedule() {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
 
-        scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
+        scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
     }
 
     private ScheduleCreationRequest createScheduleCreation() {
@@ -98,7 +97,7 @@ class ScheduleServiceTest {
     void getSchedule() {
         // Given
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long scheduleId = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
+        Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
         ScheduleDetailResponse response = scheduleService.getSchedule(scheduleId, MEMBER_ID);
@@ -134,7 +133,7 @@ class ScheduleServiceTest {
     void modifySpots() {
         // Given
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long schedule = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         ScheduleModificationRequest scheduleModificationRequest = new ScheduleModificationRequest(
                 List.of(
@@ -165,7 +164,7 @@ class ScheduleServiceTest {
     void deleteSchedule() {
         // Given
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long schedule = scheduleService.createSchedule(scheduleCreationRequest, MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
         scheduleService.deleteSchedule(schedule, MEMBER_ID);
@@ -178,11 +177,11 @@ class ScheduleServiceTest {
     @DisplayName("메모를 추가한다")
     void createMemo() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
 
         // When
-        Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
+        Long memo = scheduleService.saveMemo(schedule, memoRequest, MEMBER_ID);
 
         Memo actual = memoRepository.findById(memo).get();
 
@@ -195,14 +194,14 @@ class ScheduleServiceTest {
     @DisplayName("메모 목록을 조회한다")
     void getMemos() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
         MemoRequest memoRequest2 = new MemoRequest("memotitle2", "JIFEOgoiioghiohgieogio2");
         MemoRequest memoRequest3 = new MemoRequest("memotitle3", "JIFEOgoiioghiohgieogio3");
 
-        Long memo1 = scheduleService.createMemo(schedule, memoRequest1, MEMBER_ID);
-        Long memo2 = scheduleService.createMemo(schedule, memoRequest2, MEMBER_ID);
-        Long memo3 = scheduleService.createMemo(schedule, memoRequest3, MEMBER_ID);
+        Long memo1 = scheduleService.saveMemo(schedule, memoRequest1, MEMBER_ID);
+        Long memo2 = scheduleService.saveMemo(schedule, memoRequest2, MEMBER_ID);
+        Long memo3 = scheduleService.saveMemo(schedule, memoRequest3, MEMBER_ID);
 
         // When
         List<MemoSimpleResponse> memos = scheduleService.getMemos(schedule, MEMBER_ID);
@@ -224,9 +223,9 @@ class ScheduleServiceTest {
     @DisplayName("메모를 상세 조회 한다")
     void getMemo() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
-        Long memo = scheduleService.createMemo(schedule, memoRequest1, MEMBER_ID);
+        Long memo = scheduleService.saveMemo(schedule, memoRequest1, MEMBER_ID);
 
         // When
         MemoDetailResponse actual = scheduleService.getMemo(schedule, memo, MEMBER_ID);
@@ -241,9 +240,9 @@ class ScheduleServiceTest {
     @DisplayName("메모를 수정한다")
     void modifyMemo() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
-        Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
+        Long memo = scheduleService.saveMemo(schedule, memoRequest, MEMBER_ID);
 
         // When
         MemoRequest updateRequest = new MemoRequest("Updated Memo Title", "Updated Memo Content");
@@ -258,9 +257,9 @@ class ScheduleServiceTest {
     @DisplayName("메모를 삭제한다")
     void deleteMemo() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
-        Long memo = scheduleService.createMemo(schedule, memoRequest, MEMBER_ID);
+        Long memo = scheduleService.saveMemo(schedule, memoRequest, MEMBER_ID);
 
         // When
         scheduleService.deleteMemo(schedule, memo, MEMBER_ID);
@@ -274,11 +273,11 @@ class ScheduleServiceTest {
     @DisplayName("체크리스트를 추가한다")
     void createChecklist() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
 
         // When
-        Long checklist = scheduleService.createChecklist(schedule, checklistCreationRequest);
+        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest);
 
         // Then
         assertThat(checklist).isEqualTo(1L);
@@ -289,9 +288,9 @@ class ScheduleServiceTest {
     @ValueSource(booleans = {true, false})
     void doCheck(boolean flag) {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
-        Long checklist = scheduleService.createChecklist(schedule, checklistCreationRequest);
+        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest);
 
         // When
         scheduleService.doCheck(schedule, checklist, MEMBER_ID, flag);
@@ -305,9 +304,9 @@ class ScheduleServiceTest {
     @DisplayName("체크리스트를 삭제한다")
     void deleteChecklist() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
-        Long checklist = scheduleService.createChecklist(schedule, checklistCreationRequest);
+        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest);
 
         // When
         scheduleService.deleteChecklist(schedule, checklist, MEMBER_ID);
@@ -321,11 +320,11 @@ class ScheduleServiceTest {
     @DisplayName("투표를 추가한다")
     void createVoting() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
 
         // When
-        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
         Voting savedVoting = votingRepository.findById(voting).get();
 
 
@@ -344,12 +343,12 @@ class ScheduleServiceTest {
     @DisplayName("투표 목록을 조회한다")
     void getVotings() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         VotingCreationRequest votingCreationRequest1 = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
         VotingCreationRequest votingCreationRequest2 = new VotingCreationRequest("어디 여행 갈래", List.of("서울", "부산", "제주도", "안 가"), true);
 
-        Long voting1 = scheduleService.createVoting(schedule, votingCreationRequest1, MEMBER_ID);
-        Long voting2 = scheduleService.createVoting(schedule, votingCreationRequest2, MEMBER_ID);
+        Long voting1 = scheduleService.saveVoting(schedule, votingCreationRequest1, MEMBER_ID);
+        Long voting2 = scheduleService.saveVoting(schedule, votingCreationRequest2, MEMBER_ID);
 
         // When
         List<VotingSimpleResponse> votingList = scheduleService.getVotingList(schedule);
@@ -371,10 +370,10 @@ class ScheduleServiceTest {
     @DisplayName("투표의 상세 정보를 조회한다")
     void getVoting() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
 
-        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
 
         // When
         VotingDetailResponse response = scheduleService.getVoting(schedule, voting, MEMBER_ID);
@@ -395,10 +394,10 @@ class ScheduleServiceTest {
     @DisplayName("투표를 행사 한다")
     void vote() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
 
-        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
         Voting saved = votingRepository.findById(voting).get();
 
         List<Long> ids = saved.getVotingContents().stream()
@@ -441,9 +440,9 @@ class ScheduleServiceTest {
     @DisplayName("투표를 삭제한다")
     void deleteVoting() {
         // Given
-        Long schedule = scheduleService.createSchedule(createScheduleCreation(), MEMBER_ID);
+        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
-        Long voting = scheduleService.createVoting(schedule, votingCreationRequest, MEMBER_ID);
+        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
 
         // When
         scheduleService.deleteVoting(schedule, voting, MEMBER_ID);

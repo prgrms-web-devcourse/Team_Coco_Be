@@ -1,7 +1,6 @@
 package com.cocodan.triplan.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.service.ScheduleService;
@@ -23,9 +22,9 @@ public class ScheduleController {
 
     // 일정
     @PostMapping()
-    public ResponseEntity<Long> createSchedule(@Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest) {
+    public ResponseEntity<Long> saveSchedule(@Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest) {
         Member member = getMember();
-        Long savedId = scheduleService.createSchedule(scheduleCreationRequest, member.getId());
+        Long savedId = scheduleService.saveSchedule(scheduleCreationRequest, member.getId());
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }
@@ -67,9 +66,9 @@ public class ScheduleController {
 
     // 메모
     @PostMapping("/{scheduleId}/memos")
-    public ResponseEntity<Long> createMemo(@PathVariable Long scheduleId, @RequestBody @Valid MemoRequest memoRequest) {
+    public ResponseEntity<Long> saveMemo(@PathVariable Long scheduleId, @RequestBody @Valid MemoRequest memoRequest) {
         Member member = getMember();
-        Long savedId = scheduleService.createMemo(scheduleId, memoRequest, member.getId());
+        Long savedId = scheduleService.saveMemo(scheduleId, memoRequest, member.getId());
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }
@@ -108,8 +107,8 @@ public class ScheduleController {
 
     // 체크리스트
     @PostMapping("/{scheduleId}/checklists")
-    public ResponseEntity<Long> createChecklist(@PathVariable Long scheduleId, @RequestBody @Valid ChecklistCreationRequest checklistCreationRequest) {
-        Long savedId = scheduleService.createChecklist(scheduleId, checklistCreationRequest);
+    public ResponseEntity<Long> saveChecklist(@PathVariable Long scheduleId, @RequestBody @Valid ChecklistCreationRequest checklistCreationRequest) {
+        Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest);
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }
@@ -140,9 +139,9 @@ public class ScheduleController {
 
     // 투표
     @PostMapping("/{scheduleId}/votings")
-    public ResponseEntity<Long> createVoting(@PathVariable Long scheduleId, @RequestBody @Valid VotingCreationRequest votingCreationRequest) {
+    public ResponseEntity<Long> saveVoting(@PathVariable Long scheduleId, @RequestBody @Valid VotingCreationRequest votingCreationRequest) {
         Member member = getMember();
-        Long savedId = scheduleService.createVoting(scheduleId, votingCreationRequest, member.getId());
+        Long savedId = scheduleService.saveVoting(scheduleId, votingCreationRequest, member.getId());
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
     }

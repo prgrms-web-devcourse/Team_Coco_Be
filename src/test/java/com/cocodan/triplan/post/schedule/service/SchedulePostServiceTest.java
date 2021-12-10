@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -71,7 +70,7 @@ class SchedulePostServiceTest {
     void getRecentSchedulePostList() {
         // 여행 생성
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
+        Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         // 여행 공유 게시글 생성
         SchedulePostCreateRequest request = SchedulePostCreateRequest.builder()
@@ -115,7 +114,7 @@ class SchedulePostServiceTest {
     @Transactional
     void createSchedulePost() {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
+        Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         SchedulePostCreateRequest request = SchedulePostCreateRequest.builder()
                 .title("1번 여행!")
@@ -144,7 +143,7 @@ class SchedulePostServiceTest {
     @Transactional
     void getSchedulePostDetail() {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
+        Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
         SchedulePostCreateRequest request = SchedulePostCreateRequest.builder()
                 .title("1번 여행!")
                 .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
