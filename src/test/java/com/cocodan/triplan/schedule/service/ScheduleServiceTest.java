@@ -147,7 +147,7 @@ class ScheduleServiceTest {
                 ));
 
         // When
-        scheduleService.modifySchedule(schedule, scheduleModificationRequest);
+        scheduleService.modifySchedule(schedule, scheduleModificationRequest, MEMBER_ID);
 
         // Then
         Schedule updatedSchedule = scheduleRepository.findById(schedule).get();

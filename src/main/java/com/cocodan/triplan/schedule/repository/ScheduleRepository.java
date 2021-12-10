@@ -5,6 +5,7 @@ import com.cocodan.triplan.schedule.domain.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
                 "LEFT JOIN FETCH s.dailyScheduleSpots " +
             "WHERE s.id = :id"
     )
+
     Optional<Schedule> findOneWithSpotsById(Long id);
 
+    boolean existsByIdAndMemberId(Long id, Long memberId);
+
+    @Query(value = "SELECT s FROM Schedule s FETCH JOIN s.scheduleMembers WEHRE s.id = :id")
+    Optional<Schedule> findScheduleMemosById(Long id);
 }

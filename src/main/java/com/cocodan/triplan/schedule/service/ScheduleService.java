@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,9 +57,13 @@ public class ScheduleService {
         return schedule;
     }
 
-    private void createScheduleDailySpots(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
-        scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
-                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
+    private Schedule createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
+        return Schedule.builder()
+                .title(scheduleCreationRequest.getTitle())
+                .startDate(scheduleCreationRequest.getStartDate())
+                .endDate(scheduleCreationRequest.getEndDate())
+                .memberId(memberId)
+                .build();
     }
 
     private void createScheduleThema(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
@@ -68,13 +73,9 @@ public class ScheduleService {
                 .forEach(theme -> new ScheduleTheme(schedule, theme));
     }
 
-    private Schedule createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
-        return Schedule.builder()
-                .title(scheduleCreationRequest.getTitle())
-                .startDate(scheduleCreationRequest.getStartDate())
-                .endDate(scheduleCreationRequest.getEndDate())
-                .memberId(memberId)
-                .build();
+    private void createScheduleDailySpots(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
+        scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
+                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
     }
 
     private DailyScheduleSpot createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
@@ -100,10 +101,10 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public ScheduleDetailResponse getSchedule(Long scheduleId, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
-
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
+
+        validateScheduleMember(scheduleId, memberId);
 
         List<Long> scheduleMemberIds = getMemberIds(schedule);
 
@@ -111,8 +112,15 @@ public class ScheduleService {
 
         List<Spot> spots = spotService.findByIdIn(getSpotIds(schedule));
 
-        //TODO : 멤버 Repository 로 imageURl 가져오기
         return ScheduleDetailResponse.of(schedule, spots, members);
+    }
+
+    private void validateScheduleMember(Long scheduleId, Long memberId) {
+        boolean flag = scheduleRepository.existsByIdAndMemberId(scheduleId, memberId);
+
+        if (!flag) {
+            throw new RuntimeException("");
+        }
     }
 
     private List<Long> getMemberIds(Schedule schedule) {
@@ -128,7 +136,9 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void modifySchedule(Long scheduleId, ScheduleModificationRequest scheduleModificationRequest) {
+    public void modifySchedule(Long scheduleId, ScheduleModificationRequest scheduleModificationRequest, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+
         scheduleRepository.findById(scheduleId)
                 .map(schedule -> {
                     schedule.removeAllSpots();
@@ -178,27 +188,12 @@ public class ScheduleService {
     public List<MemoSimpleResponse> getMemos(Long scheduleId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
 
-        return scheduleRepository.findById(scheduleId)
+        return scheduleRepository.findScheduleMemosById(scheduleId)
                 .map(Schedule::getMemos)
-                .map(memos -> memos.stream()
-                        .map(MemoSimpleResponse::from)
-                )
-                .map(memoResponseStream -> memoResponseStream.collect(Collectors.toList()))
-                .orElseThrow(() -> new RuntimeException(""));
-    }
-
-    private void validateScheduleMember(Long scheduleId, Long memberId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException(""));
-
-        boolean noneMatchFlag = schedule.getScheduleMembers().stream()
-                .map(ScheduleMember::getMemberId)
-                .noneMatch(id -> id.equals(memberId));
-
-        if (noneMatchFlag) {
-            throw new RuntimeException("");
-        }
-
+                .stream()
+                .flatMap(Collection::stream)
+                .map(MemoSimpleResponse::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
