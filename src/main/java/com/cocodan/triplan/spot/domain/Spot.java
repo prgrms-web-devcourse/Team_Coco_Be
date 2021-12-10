@@ -4,12 +4,13 @@ import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Spot extends BaseEntity {
+public class Spot extends BaseEntity implements Persistable<Long> {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -46,6 +47,11 @@ public class Spot extends BaseEntity {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return super.getCreatedDate() == null ;
     }
 
     public String getPlaceName() {
