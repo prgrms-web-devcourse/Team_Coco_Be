@@ -1,5 +1,6 @@
 package com.cocodan.triplan.schedule.repository;
 
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query(value =
             "SELECT s " +
             "FROM Schedule s " +
-                "JOIN FETCH s.scheduleThemas " +
+                "JOIN FETCH s.scheduleThema " +
                 "JOIN s.scheduleMembers sm " +
             "WHERE sm.memberId = :memberId"
     )
@@ -25,4 +26,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "WHERE s.id = :id"
     )
     Optional<Schedule> findOneWithSpotsById(Long id);
+
 }

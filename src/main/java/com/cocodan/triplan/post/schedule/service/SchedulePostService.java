@@ -11,7 +11,7 @@ import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.ScheduleThema;
+import com.cocodan.triplan.schedule.domain.ScheduleTheme;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.service.ScheduleService;
@@ -154,8 +154,8 @@ public class SchedulePostService {
             MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMember().getId());
             Schedule schedule = schedulePost.getSchedule();
             City city = schedulePost.getCity();
-            List<Theme> themes = schedule.getScheduleThemas().stream()
-                    .map(ScheduleThema::getThema).collect(Collectors.toList());
+            List<Theme> themes = schedule.getScheduleThema().stream()
+                    .map(ScheduleTheme::getTheme).collect(Collectors.toList());
             String title = schedulePost.getTitle();
 
             return SchedulePostResponse.from(memberResponse, schedule, city, themes, title);

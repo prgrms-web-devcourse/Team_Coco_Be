@@ -10,12 +10,16 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 @DynamicUpdate
 public class Member extends BaseEntity {
+
+    private static final int BASIC_AGE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
@@ -103,5 +107,19 @@ public class Member extends BaseEntity {
 
     public String getProfileImage() {
         return profileImage;
+    }
+
+
+    public int getAge() {
+        Calendar current = Calendar.getInstance();
+        int currentYear = current.get(Calendar.YEAR);
+
+        int birthYear = getBirthYear(birth);
+
+        return currentYear - birthYear + BASIC_AGE;
+    }
+
+    private int getBirthYear(String birth) {
+        return Integer.parseInt(birth.split("-")[0]);
     }
 }

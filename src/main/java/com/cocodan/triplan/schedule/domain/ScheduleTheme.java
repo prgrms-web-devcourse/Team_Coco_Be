@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ScheduleThema {
+public class ScheduleTheme {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -25,17 +25,17 @@ public class ScheduleThema {
     private Theme theme;
 
     @Builder
-    public ScheduleThema(Schedule schedule, Theme theme) {
+    public ScheduleTheme(Schedule schedule, Theme theme) {
         this.schedule = schedule;
         this.theme = theme;
-        this.schedule.getScheduleThemas().add(this);
+        this.schedule.getScheduleThema().add(this);
     }
 
     public Long getId() {
         return id;
     }
 
-    public Theme getThema() {
+    public Theme getTheme() {
         return theme;
     }
 

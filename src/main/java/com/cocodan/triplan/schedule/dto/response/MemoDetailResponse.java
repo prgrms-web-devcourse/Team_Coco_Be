@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.dto.response;
 
-import com.cocodan.triplan.member.domain.vo.GenderType;
+import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.schedule.domain.Memo;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,5 +21,17 @@ public class MemoDetailResponse {
 
     private final int ownerAge;
 
-    private final GenderType ownerGender;
+    private final String ownerGender;
+
+    public static MemoDetailResponse of(Memo memo, Member member) {
+        return MemoDetailResponse.builder()
+                .id(memo.getId())
+                .title(memo.getTitle())
+                .content(memo.getContent())
+                .ownerId(member.getId())
+                .ownerNickname(member.getNickname())
+                .ownerGender(member.getGender().getTypeStr())
+                .ownerAge(member.getAge())
+                .build();
+    }
 }
