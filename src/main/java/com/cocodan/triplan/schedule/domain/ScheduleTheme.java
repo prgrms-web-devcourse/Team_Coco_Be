@@ -25,17 +25,17 @@ public class ScheduleTheme {
     private Theme theme;
 
     @Builder
-    public ScheduleThema(Schedule schedule, Theme theme) {
+    public ScheduleTheme(Schedule schedule, Theme theme) {
         this.schedule = schedule;
         this.theme = theme;
-        this.schedule.getScheduleThemas().add(this);
+        this.schedule.getScheduleThemes().add(this);
     }
 
     public Long getId() {
         return id;
     }
 
-    public Theme getThema() {
+    public Theme getTheme() {
         return theme;
     }
 

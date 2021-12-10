@@ -154,8 +154,8 @@ public class SchedulePostService {
             MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMember().getId());
             Schedule schedule = schedulePost.getSchedule();
             City city = schedulePost.getCity();
-            List<Theme> themes = schedule.getScheduleThemas().stream()
-                    .map(ScheduleThema::getThema).collect(Collectors.toList());
+            List<Theme> themes = schedule.getScheduleThemes().stream()
+                    .map(ScheduleTheme::getTheme).collect(Collectors.toList());
             String title = schedulePost.getTitle();
 
             return SchedulePostResponse.from(memberResponse, schedule, city, themes, title);

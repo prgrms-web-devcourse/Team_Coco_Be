@@ -36,7 +36,7 @@ public class ScheduleSimpleResponse {
 
     public static List<String> getThemes(Schedule schedule) {
         return schedule.getScheduleThemes().stream()
-                .map(ScheduleTheme::getThema)
+                .map(ScheduleTheme::getTheme)
                 .map(Theme::toString)
                 .collect(Collectors.toList());
     }
