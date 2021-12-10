@@ -42,9 +42,6 @@ public class ScheduleService {
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
                 .filter(this::doesNotSavedSpot)
                 .forEach(spotService::createSpot);
-        scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
-                .filter(this::doesNotSavedSpot)
-                .forEach(spotService::createSpot);
 
         return scheduleRepository.save(schedule).getId();
     }
