@@ -1,5 +1,6 @@
 package com.cocodan.triplan.schedule.domain;
 
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Voting {
+public class Voting extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)
