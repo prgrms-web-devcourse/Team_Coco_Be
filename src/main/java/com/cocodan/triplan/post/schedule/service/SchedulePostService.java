@@ -161,4 +161,20 @@ public class SchedulePostService {
             return SchedulePostResponse.from(memberResponse, schedule, city, themes, title);
         }).collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public void validateOwnership(Long memberId, Long schedulePostId) {
+        // existence 와 ownership 두 가지를 한번에 검증하고 있는데 분리하는게 나을까요?
+        SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
+        );
+
+        if (!memberId.equals(schedulePost.getMember().getId())) {
+            throw new RuntimeException("Invalid access for schedule post. Only owner can access to it");
+        }
+    }
+
+    public void deleteSchedulePost(Long schedulePostId) {
+        schedulePostRepository.deleteById(schedulePostId);
+    }
 }

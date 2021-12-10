@@ -12,6 +12,7 @@ import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,5 +67,13 @@ public class SchedulePostController {
     public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable Long schedulePostId) {
         SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(schedulePostId);
         return ResponseEntity.ok(schedulePostDetail);
+    }
+
+    @DeleteMapping("/schedules/{schedulePostId}")
+    public ResponseEntity<Void> deleteSchedulePost(@PathVariable Long schedulePostId) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        schedulePostService.validateOwnership(member.getId(), schedulePostId);
+        schedulePostService.deleteSchedulePost(schedulePostId);
+        return ResponseEntity.ok().build();
     }
 }
