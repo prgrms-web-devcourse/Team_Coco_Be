@@ -13,8 +13,12 @@ import java.util.List;
 public class ScheduleCreationRequest {
 
     private String title;
+
     private LocalDate startDate;
+
     private LocalDate endDate;
-    private List<String> themas;
+
+    private List<String> themeList;
+
     private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
 }

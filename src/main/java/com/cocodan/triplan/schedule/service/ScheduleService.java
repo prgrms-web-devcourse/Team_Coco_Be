@@ -2,7 +2,6 @@ package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.converter.ScheduleConverter;
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.dto.request.*;
@@ -12,13 +11,12 @@ import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.repository.VotingRepository;
 import com.cocodan.triplan.spot.domain.Spot;
-import com.cocodan.triplan.spot.repository.SpotRepository;
+import com.cocodan.triplan.spot.service.SpotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +24,7 @@ import java.util.stream.Collectors;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
-    private final SpotRepository spotRepository;
+    private final SpotService spotService;
     private final ScheduleConverter scheduleConverter;
 
     private final MemberRepository memberRepository;
@@ -38,7 +36,15 @@ public class ScheduleService {
     public Long createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
         Schedule schedule = scheduleConverter.convertSchedule(scheduleCreationRequest, memberId);
 
+        scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
+                .filter(this::isNotSavedSpot)
+                .forEach(spotService::createSpot);
+
         return scheduleRepository.save(schedule).getId();
+    }
+
+    private boolean isNotSavedSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+        return !spotService.existsById(dailyScheduleSpotCreationRequest.getSpotId());
     }
 
     @Transactional(readOnly = true)
@@ -54,7 +60,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        List<Spot> spots = spotRepository.findByIdIn(getSpotIds(schedule));
+        List<Spot> spots = spotService.findByIdIn(getSpotIds(schedule));
 
         //TODO : 멤버 Repository 로 imageURl 가져오기
         return scheduleConverter.convertScheduleDetail(schedule, spots, null);
@@ -122,7 +128,7 @@ public class ScheduleService {
                 .map(memoResponseStream -> memoResponseStream.collect(Collectors.toList()))
                 .orElseThrow(() -> new RuntimeException(""));
     }
-
+    
     private void validateScheduleMember(Long scheduleId, Long memberId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
@@ -177,7 +183,7 @@ public class ScheduleService {
 
         memo.modify(memoRequest.getTitle(), memoRequest.getContent());
     }
-
+    
     @Transactional
     public void deleteMemo(Long scheduleId, Long memoId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);

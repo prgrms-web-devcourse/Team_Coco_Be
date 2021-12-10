@@ -1,12 +1,7 @@
 package com.cocodan.triplan.converter;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
-import com.cocodan.triplan.schedule.domain.Memo;
-import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.ScheduleThema;
-import com.cocodan.triplan.schedule.domain.Voting;
-import com.cocodan.triplan.schedule.domain.VotingContent;
+import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;
@@ -36,24 +31,25 @@ public class ScheduleConverter {
                 .memberId(memberId)
                 .build();
 
-        scheduleCreationRequest.getThemas()
+        scheduleCreationRequest.getThemeList()
                 .stream()
                 .map(s -> Theme.valueOf(s.toUpperCase()))
-                .map(thema -> new ScheduleThema(schedule, thema))
+                .map(theme -> new ScheduleThema(schedule, theme))
                 .collect(Collectors.toList());
 
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
                 .stream()
-                .map(dailyScheduleSpotCreationRequest -> getDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
+                .map(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
                 .collect(Collectors.toList());
 
         return schedule;
     }
 
-    private DailyScheduleSpot getDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+    private DailyScheduleSpot createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
         return DailyScheduleSpot.builder()
                 .spotId(dailyScheduleSpotCreationRequest.getSpotId())
                 .date(dailyScheduleSpotCreationRequest.getDate())
+                .order(dailyScheduleSpotCreationRequest.getOrder())
                 .schedule(schedule)
                 .build();
     }
@@ -65,11 +61,11 @@ public class ScheduleConverter {
                 .title(schedule.getTitle())
                 .startDate(schedule.getStartDate())
                 .endDate(schedule.getEndDate())
-                .themas(getThema(schedule))
+                .themas(getThemeList(schedule))
                 .build();
     }
 
-    private List<Theme> getThema(Schedule schedule) {
+    private List<Theme> getThemeList(Schedule schedule) {
         return schedule.getScheduleThemas().stream()
                 .map(ScheduleThema::getThema)
                 .collect(Collectors.toList());
@@ -81,7 +77,7 @@ public class ScheduleConverter {
                 .startDate(schedule.getStartDate())
                 .endDate(schedule.getEndDate())
                 .title(schedule.getTitle())
-                .thema(getThema(schedule))
+                .thema(getThemeList(schedule))
                 .spotSimpleList(getSpotSimple(spotList))
                 .memberImageUrls(imageUrls)
                 .build();
@@ -97,7 +93,7 @@ public class ScheduleConverter {
 
     public List<DailyScheduleSpot> convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
         return scheduleModificationRequest.getDailyScheduleSpotCreationRequests().stream()
-                .map(dailyScheduleSpotCreationRequest -> getDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
+                .map(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest))
                 .collect(Collectors.toList());
     }
 

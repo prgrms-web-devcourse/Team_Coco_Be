@@ -13,6 +13,19 @@ import java.util.List;
 public class DailyScheduleSpotCreationRequest {
 
     private Long spotId;
+
+    private String addressName;
+
+    private String roadAddressName;
+
+    private String phone;
+
+    private String placeName;
+
+    private Position position;
+
     private LocalDate date;
+
     private int order;
+
 }
