@@ -9,7 +9,8 @@ public enum Thema {
     FOOD("FOOD"),
     ART("ART"),
     ARCHITECT("ARCHITECT"),
-    NATURE("NATURE");
+    NATURE("NATURE"),
+    ALL("ALL"); // 검색 전용
 
     private String value;
 

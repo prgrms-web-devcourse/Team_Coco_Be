@@ -1,6 +1,7 @@
 package com.cocodan.triplan.post.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,9 +11,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -27,8 +31,10 @@ public class SchedulePost extends BaseEntity {
 
     @Column(name = "member_id", nullable = false)
     private Long memberId;
-    @Column(name = "schedule_id", nullable = false)
-    private Long scheduleId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule", referencedColumnName = "id")
+    private Schedule schedule;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -47,9 +53,9 @@ public class SchedulePost extends BaseEntity {
     private City city;
 
     @Builder
-    public SchedulePost(Long memberId, Long scheduleId, String title, String content, Long views, Long liked, City city) {
+    public SchedulePost(Long memberId, Schedule schedule, String title, String content, Long views, Long liked, City city) {
         this.memberId = memberId;
-        this.scheduleId = scheduleId;
+        this.schedule = schedule;
         this.title = title;
         this.content = content;
         this.views = views;
@@ -65,8 +71,8 @@ public class SchedulePost extends BaseEntity {
         return memberId;
     }
 
-    public Long getScheduleId() {
-        return scheduleId;
+    public Schedule getSchedule() {
+        return schedule;
     }
 
     public String getTitle() {

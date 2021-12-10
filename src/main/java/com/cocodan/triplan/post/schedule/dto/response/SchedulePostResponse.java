@@ -2,6 +2,7 @@ package com.cocodan.triplan.post.schedule.dto.response;
 
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
+import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.vo.Thema;
@@ -49,8 +50,7 @@ public class SchedulePostResponse {
         this.endDate = endDate;
     }
 
-    // TODO: 2021.12.06 Teru - Tag 명칭 수정되면 수정
-    public static SchedulePostResponse from(Member member, Schedule schedule, City city, List<Thema> themes, String title) {
+    public static SchedulePostResponse from(MemberGetOneResponse member, Schedule schedule, City city, List<Thema> themes, String title) {
         return SchedulePostResponse.builder()
                 .profileImageUrl(member.getProfileImage())
                 .nickname(member.getNickname())
