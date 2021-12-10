@@ -3,6 +3,7 @@ package com.cocodan.triplan.member.dto.request;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -10,6 +11,7 @@ import javax.validation.constraints.Pattern;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class MemberCreateRequest {
     @NotBlank(message = "이메일은 공백이 아니여야 합니다")
