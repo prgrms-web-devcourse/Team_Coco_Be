@@ -62,9 +62,9 @@ public class SchedulePostController {
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
     }
 
-    @GetMapping("/{postId}/schedules")
-    public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable Long postId) {
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(postId);
+    @GetMapping("/schedules/{schedulePostId}")
+    public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable Long schedulePostId) {
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(schedulePostId);
         return ResponseEntity.ok(schedulePostDetail);
     }
 }
