@@ -1,5 +1,6 @@
 package com.cocodan.triplan.schedule.domain;
 
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DailyScheduleSpot {
+public class DailyScheduleSpot extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)
