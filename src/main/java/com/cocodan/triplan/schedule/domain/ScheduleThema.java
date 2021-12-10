@@ -1,6 +1,6 @@
 package com.cocodan.triplan.schedule.domain;
 
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -21,13 +21,13 @@ public class ScheduleThema {
     private Schedule schedule;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "tag")
-    private Thema thema;
+    @Column(name = "theme")
+    private Theme theme;
 
     @Builder
-    public ScheduleThema(Schedule schedule, Thema thema) {
+    public ScheduleThema(Schedule schedule, Theme theme) {
         this.schedule = schedule;
-        this.thema = thema;
+        this.theme = theme;
         this.schedule.getScheduleThemas().add(this);
     }
 
@@ -35,8 +35,8 @@ public class ScheduleThema {
         return id;
     }
 
-    public Thema getThema() {
-        return thema;
+    public Theme getThema() {
+        return theme;
     }
 
     public Schedule getSchedule() {

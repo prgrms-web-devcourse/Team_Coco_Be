@@ -33,7 +33,7 @@ public enum Ages {
             case 3:
                 return Ages.THIRTIES;
             case 4:
-                return Ages.FIFTIES;
+                return Ages.FORTIES;
             case 5:
                 return Ages.FIFTIES;
             case 6:

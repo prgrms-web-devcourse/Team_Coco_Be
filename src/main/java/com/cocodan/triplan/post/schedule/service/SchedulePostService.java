@@ -1,15 +1,18 @@
 package com.cocodan.triplan.post.schedule.service;
 
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
+import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.ScheduleThema;
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.service.ScheduleService;
 import com.cocodan.triplan.spot.domain.vo.City;
@@ -28,15 +31,14 @@ public class SchedulePostService {
 
     private final MemberService memberService;
 
-    private final ScheduleService scheduleService;
-
+    private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
 
     private final SchedulePostRepository schedulePostRepository;
 
-    public SchedulePostService(MemberService memberService, ScheduleService scheduleService, ScheduleRepository scheduleRepository, SchedulePostRepository schedulePostRepository) {
+    public SchedulePostService(MemberService memberService, ScheduleService scheduleService, MemberRepository memberRepository, ScheduleRepository scheduleRepository, SchedulePostRepository schedulePostRepository) {
         this.memberService = memberService;
-        this.scheduleService = scheduleService;
+        this.memberRepository = memberRepository;
         this.scheduleRepository = scheduleRepository;
         this.schedulePostRepository = schedulePostRepository;
     }
@@ -49,8 +51,11 @@ public class SchedulePostService {
     }
 
     public Long createSchedulePost(Long memberId, SchedulePostCreateRequest request) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException("Invalid User Detected")
+        );
         SchedulePost post = SchedulePost.builder()
-                .memberId(memberId)
+                .member(member)
                 .schedule(scheduleRepository.findById(request.getScheduleId()).orElseThrow(
                         () -> new RuntimeException("There is no such schedule (ID : " + request.getScheduleId() + ")")
                 ))
@@ -66,10 +71,10 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public List<SchedulePostResponse> getSchedulePostList(
+    public List<SchedulePostResponse> getSchedulePosts(
             String search,
             City city,
-            Thema theme,
+            Theme theme,
             SchedulePostSortingRule sortRule,
             Integer pageIndex
     ) {
@@ -135,12 +140,21 @@ public class SchedulePostService {
         return Collections.emptyList();
     }
 
+    @Transactional(readOnly = true)
+    public SchedulePostDetailResponse getSchedulePostDetail(Long postId) {
+        SchedulePost schedulePost = schedulePostRepository.findById(postId).orElseThrow(
+                () -> new RuntimeException("No such post found (ID : " + postId + ")")
+        );
+
+        return SchedulePostDetailResponse.from(schedulePost);
+    }
+
     private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
         return schedulePosts.stream().map(schedulePost -> {
-            MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMemberId());
+            MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMember().getId());
             Schedule schedule = schedulePost.getSchedule();
             City city = schedulePost.getCity();
-            List<Thema> themes = schedule.getScheduleThemas().stream()
+            List<Theme> themes = schedule.getScheduleThemas().stream()
                     .map(ScheduleThema::getThema).collect(Collectors.toList());
             String title = schedulePost.getTitle();
 

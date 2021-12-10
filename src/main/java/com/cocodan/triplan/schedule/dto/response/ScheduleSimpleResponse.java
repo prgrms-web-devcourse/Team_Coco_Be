@@ -1,6 +1,6 @@
 package com.cocodan.triplan.schedule.dto.response;
 
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,14 +10,14 @@ import java.util.List;
 @Getter
 public class ScheduleSimpleResponse {
 
-    private final Long id;
-    private final String title;
-    private final LocalDate startDate;
-    private final LocalDate endDate;
-    private final List<Thema> themas;
+    private Long id;
+    private String title;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private List<Theme> themas;
 
     @Builder
-    public ScheduleSimpleResponse(Long id, String title, LocalDate startDate, LocalDate endDate, List<Thema> themas) {
+    public ScheduleSimpleResponse(Long id, String title, LocalDate startDate, LocalDate endDate, List<Theme> themas) {
         this.id = id;
         this.title = title;
         this.startDate = startDate;

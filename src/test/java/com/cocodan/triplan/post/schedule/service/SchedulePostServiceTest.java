@@ -4,13 +4,17 @@ import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
-import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;
+import com.cocodan.triplan.schedule.dto.response.DailyScheduleSpotResponse;
 import com.cocodan.triplan.schedule.service.ScheduleService;
 import com.cocodan.triplan.spot.domain.vo.City;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -56,14 +61,13 @@ class SchedulePostServiceTest {
                 GENDER,
                 NICKNAME,
                 PROFILE_IMAGE
-                        ).getId();
+        ).getId();
     }
 
     @Test
     @DisplayName("생성된 여행 공유 게시글 리스트를 정상적으로 조회 할 수 있다.")
     @Transactional
     void getRecentSchedulePostList() {
-        // TODO: 2012.12.07 Teru - 게시글 조회 테스트 추가
         // 여행 생성
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
@@ -78,7 +82,7 @@ class SchedulePostServiceTest {
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
 
         // 여행 공유 게시글 조회
-        List<SchedulePostResponse> posts = schedulePostService.getSchedulePostList("", City.ALL, Thema.ALL, SchedulePostSortingRule.RECENT, 0);
+        List<SchedulePostResponse> posts = schedulePostService.getSchedulePosts("", City.ALL, Theme.ALL, SchedulePostSortingRule.RECENT, 0);
         assertThat(posts.size()).isEqualTo(1);
         assertThat(posts.get(0).getProfileImageUrl()).isEqualTo(PROFILE_IMAGE);
         assertThat(posts.get(0).getNickname()).isEqualTo(NICKNAME);
@@ -87,7 +91,9 @@ class SchedulePostServiceTest {
         assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL);
         assertThat(posts.get(0).getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(posts.get(0).getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
-        assertThat(posts.get(0).getThemes()).contains(Thema.ACTIVITY, Thema.FOOD);
+        assertThat(posts.get(0).getThema()).contains(Theme.ACTIVITY, Theme.FOOD);
+
+        // TODO: 다양한 조건으로 테스트 추가
     }
 
     private ScheduleCreationRequest createScheduleCreation() {
@@ -119,16 +125,66 @@ class SchedulePostServiceTest {
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
         SchedulePost post1 = schedulePostService.findById(createdSchedulePostId);
 
-        assertThat(post1.getMemberId()).isEqualTo(testMemberId);
-        assertThat(memberService.getOne(post1.getMemberId()).getEmail()).isEqualTo(EMAIL);
-        assertThat(memberService.getOne(post1.getMemberId()).getName()).isEqualTo(NAME);
-        assertThat(memberService.getOne(post1.getMemberId()).getPhoneNumber()).isEqualTo(PHONE);
-        assertThat(memberService.getOne(post1.getMemberId()).getBirth()).isEqualTo(BIRTH);
-        assertThat(memberService.getOne(post1.getMemberId()).getNickname()).isEqualTo(NICKNAME);
-        assertThat(memberService.getOne(post1.getMemberId()).getProfileImage()).isEqualTo(PROFILE_IMAGE);
+        assertThat(post1.getMember().getId()).isEqualTo(testMemberId);
+        assertThat(memberService.getOne(post1.getMember().getId()).getEmail()).isEqualTo(EMAIL);
+        assertThat(memberService.getOne(post1.getMember().getId()).getName()).isEqualTo(NAME);
+        assertThat(memberService.getOne(post1.getMember().getId()).getPhoneNumber()).isEqualTo(PHONE);
+        assertThat(memberService.getOne(post1.getMember().getId()).getBirth()).isEqualTo(BIRTH);
+        assertThat(memberService.getOne(post1.getMember().getId()).getNickname()).isEqualTo(NICKNAME);
+        assertThat(memberService.getOne(post1.getMember().getId()).getProfileImage()).isEqualTo(PROFILE_IMAGE);
         assertThat(post1.getTitle()).isEqualTo("1번 여행!");
         assertThat(post1.getContent()).isEqualTo("어디로든 갔다옴~");
         assertThat(post1.getCity()).isEqualTo(City.SEOUL);
         assertThat(post1.getSchedule().getId()).isEqualTo(createdScheduleId);
+    }
+
+    @Test
+    @DisplayName("여행 공유 게시글을 상세 조회 할 수 있다.")
+    @Transactional
+    void getSchedulePostDetail() {
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
+        SchedulePostCreateRequest request = SchedulePostCreateRequest.builder()
+                .title("1번 여행!")
+                .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
+                        "\n" +
+                        "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
+                        "\n" +
+                        "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
+                        "\n" +
+                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]")
+                .city("서울")
+                .scheduleId(createdScheduleId)
+                .build();
+        Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
+        SchedulePost post = schedulePostService.findById(createdSchedulePostId);
+
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId);
+
+        assertThat(schedulePostDetail.getTitle()).isEqualTo("1번 여행!");
+        assertThat(schedulePostDetail.getContent()).isEqualTo("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
+                "\n" +
+                "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
+                "\n" +
+                "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
+                "\n" +
+                "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]");
+        assertThat(schedulePostDetail.getCity()).isEqualTo(City.SEOUL);
+        assertThat(schedulePostDetail.getCreatedAt()).isEqualTo(post.getCreatedDate());
+        assertThat(schedulePostDetail.getViews()).isEqualTo(post.getViews());
+        assertThat(schedulePostDetail.getLiked()).isEqualTo(post.getLiked());
+        assertThat(schedulePostDetail.getStartDate()).isEqualTo(post.getSchedule().getStartDate());
+        assertThat(schedulePostDetail.getEndDate()).isEqualTo(post.getSchedule().getEndDate());
+        assertThat(schedulePostDetail.getGender()).isEqualTo(post.getMember().getGender());
+        assertThat(schedulePostDetail.getNickname()).isEqualTo(post.getMember().getNickname());
+        assertThat(schedulePostDetail.getAges()).isEqualTo(Ages.from(post.getMember().getBirth()));
+
+        // TODO: 2021.12.10 Teru - equals method를 오버라이드 하지 않고, 그냥 DTO의 toString() 을 통해서 String 비교로 검증하도록 수정.
+        Assertions.assertArrayEquals(
+                schedulePostDetail.getDailyScheduleSpots().toArray(),
+                post.getSchedule().getDailyScheduleSpots().stream()
+                        .map(DailyScheduleSpotResponse::from)
+                        .toArray()
+                );
     }
 }
