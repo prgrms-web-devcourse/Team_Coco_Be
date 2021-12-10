@@ -191,7 +191,11 @@ public class SchedulePostService {
     public void modifySchedulePost(Long memberId, SchedulePostUpdateRequest request) {
         Long requestedSchedulePostId = request.getScheduleId();
         SchedulePost schedulePost = validateAuthorities(memberId, requestedSchedulePostId);
-        schedulePost.applyUpdate(request);
+
+        schedulePost.updateTitle(request.getTitle());
+        schedulePost.updateContent(request.getContent());
+        schedulePost.updateCity(City.from(request.getCity()));
+
         schedulePostRepository.save(schedulePost);
     }
 }
