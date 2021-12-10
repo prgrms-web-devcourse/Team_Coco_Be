@@ -13,7 +13,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query(value =
             "SELECT s " +
             "FROM Schedule s " +
-                "JOIN FETCH s.scheduleThemes " +
+                "JOIN FETCH s.scheduleThema " +
                 "JOIN s.scheduleMembers sm " +
             "WHERE sm.memberId = :memberId"
     )

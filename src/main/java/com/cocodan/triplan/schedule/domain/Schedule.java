@@ -31,7 +31,7 @@ public class Schedule {
     private Long memberId;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScheduleTheme> scheduleThemes = new ArrayList<>();
+    private List<ScheduleTheme> scheduleThema = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memo> memos = new ArrayList<>();
@@ -81,8 +81,8 @@ public class Schedule {
         return endDate;
     }
 
-    public List<ScheduleTheme> getScheduleThemes() {
-        return scheduleThemes;
+    public List<ScheduleTheme> getScheduleThema() {
+        return scheduleThema;
     }
 
     public List<Memo> getMemos() {
