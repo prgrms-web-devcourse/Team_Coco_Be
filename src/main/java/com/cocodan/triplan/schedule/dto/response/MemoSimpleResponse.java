@@ -7,9 +7,10 @@ import lombok.Getter;
 public class MemoSimpleResponse {
 
     private final Long id;
-    private final String title;
-    private final String content;
 
+    private final String title;
+
+    private final String content;
 
     @Builder
     public MemoSimpleResponse(Long id, String title, String content) {

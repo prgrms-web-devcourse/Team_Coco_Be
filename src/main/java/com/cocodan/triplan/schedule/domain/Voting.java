@@ -56,7 +56,7 @@ public class Voting {
         return votingContents.stream()
                 .filter(votingContent -> votingContent.getId().equals(contentId))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException(""));
     }
 
     private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {

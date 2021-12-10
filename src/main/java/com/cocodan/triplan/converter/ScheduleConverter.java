@@ -152,7 +152,7 @@ public class ScheduleConverter {
                 .content(memo.getContent())
                 .ownerId(member.getId())
                 .ownerNickname(member.getNickname())
-                .ownerGender(member.getGender().getTypeStr())
+                .ownerGender(member.getGender())
                 .ownerAge(convertAge(member.getBirth()))
                 .build();
     }
