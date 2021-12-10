@@ -116,9 +116,9 @@ public class ScheduleService {
     }
 
     private void validateScheduleMember(Long scheduleId, Long memberId) {
-        boolean flag = scheduleRepository.existsByIdAndMemberId(scheduleId, memberId);
+        boolean notExists = !scheduleRepository.existsByIdAndMemberId(scheduleId, memberId);
 
-        if (!flag) {
+        if (notExists) {
             throw new RuntimeException("");
         }
     }
@@ -167,6 +167,8 @@ public class ScheduleService {
     // 메모
     @Transactional
     public Long saveMemo(Long scheduleId, MemoRequest memoRequest, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+
         Memo memo = scheduleRepository.findById(scheduleId)
                 .map(schedule -> createMemo(memoRequest, schedule, memberId))
                 .orElseThrow(() -> new RuntimeException(""));
@@ -188,10 +190,8 @@ public class ScheduleService {
     public List<MemoSimpleResponse> getMemos(Long scheduleId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
 
-        return scheduleRepository.findScheduleMemosById(scheduleId)
-                .map(Schedule::getMemos)
+        return memoRepository.findByScheduleId(scheduleId)
                 .stream()
-                .flatMap(Collection::stream)
                 .map(MemoSimpleResponse::from)
                 .collect(Collectors.toList());
     }
@@ -213,14 +213,9 @@ public class ScheduleService {
     }
 
     private void validateScheduleMemo(Long scheduleId, Long memoId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException());
+        boolean notExists = !memoRepository.existsByIdAndScheduleId(memoId, scheduleId);
 
-        boolean flag = schedule.getMemos().stream()
-                .map(Memo::getId)
-                .noneMatch(id -> id.equals(memoId));
-
-        if (flag) {
+        if (notExists) {
             throw new RuntimeException("");
         }
     }
@@ -247,7 +242,9 @@ public class ScheduleService {
 
     // 체크리스트
     @Transactional
-    public Long saveChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest) {
+    public Long saveChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+
         Checklist checklist = scheduleRepository.findById(scheduleId)
                 .map(schedule -> createChecklist(checklistCreationRequest, schedule))
                 .orElseThrow(() -> new RuntimeException(""));
@@ -284,14 +281,9 @@ public class ScheduleService {
     }
 
     private void validateScheduleChecklist(Long scheduleId, Long checklistId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException());
+        boolean notExists = !checklistRepository.existsByIdAndScheduleId(checklistId, scheduleId);
 
-        boolean flag = schedule.getChecklists().stream()
-                .map(Checklist::getId)
-                .noneMatch(id -> id.equals(checklistId));
-
-        if (flag) {
+        if (notExists) {
             throw new RuntimeException("");
         }
     }
@@ -308,6 +300,8 @@ public class ScheduleService {
     // 투표
     @Transactional
     public Long saveVoting(Long scheduleId, VotingCreationRequest votingCreationRequest, Long memberId) {
+        validateScheduleMember(scheduleId, memberId);
+
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException(""));
 
@@ -328,9 +322,8 @@ public class ScheduleService {
     }
 
     private void createVotingContents(VotingCreationRequest votingCreationRequest, Voting voting) {
-        votingCreationRequest.getContents().stream()
-                .map(content -> createVotingContent(voting, content))
-                .collect(Collectors.toList());
+        votingCreationRequest.getContents()
+                .forEach(content -> createVotingContent(voting, content));
     }
 
     private VotingContent createVotingContent(Voting voting, String v) {
@@ -349,26 +342,21 @@ public class ScheduleService {
     }
 
     private void validateScheduleVoting(Long scheduleId, Long votingId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException());
+        boolean notExists = !votingRepository.existsByIdAndScheduleId(votingId, scheduleId);
 
-        boolean flag = schedule.getVotingList().stream()
-                .map(Voting::getId)
-                .noneMatch(id -> id.equals(votingId));
-
-        if (flag) {
+        if (notExists) {
             throw new RuntimeException("");
         }
     }
 
     @Transactional(readOnly = true)
-    public List<VotingSimpleResponse> getVotingList(Long scheduleId) {
-        return scheduleRepository.findById(scheduleId)
-                .map(Schedule::getVotingList)
-                .map(votingList -> votingList.stream()
-                        .map(VotingSimpleResponse::from)
-                ).map(votingSimpleResponseStream -> votingSimpleResponseStream.collect(Collectors.toList()))
-                .orElseThrow(() -> new RuntimeException(""));
+    public List<VotingSimpleResponse> getVotingList(Long scheduleId, Long memberId) {
+        validateScheduleMember(scheduleId,memberId);
+
+        return votingRepository.findByScheduleId(scheduleId)
+                .stream()
+                .map(VotingSimpleResponse::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -385,7 +373,6 @@ public class ScheduleService {
                 .orElseThrow(() -> new RuntimeException());
 
         return VotingDetailResponse.of(voting, owner, memberId);
-
     }
 
     @Transactional
