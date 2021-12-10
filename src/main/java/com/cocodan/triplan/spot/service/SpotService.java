@@ -1,6 +1,5 @@
 package com.cocodan.triplan.spot.service;
 
-import com.cocodan.triplan.converter.SpotConverter;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.spot.domain.Spot;
 import com.cocodan.triplan.spot.repository.SpotRepository;
@@ -13,8 +12,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SpotService {
-
-    private final SpotConverter spotConverter;
 
     private final SpotRepository spotRepository;
 
@@ -30,8 +27,20 @@ public class SpotService {
 
     @Transactional
     public void createSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
-        Spot spot = spotConverter.convertSpot(dailyScheduleSpotCreationRequest);
+        Spot spot = convertSpot(dailyScheduleSpotCreationRequest);
 
         spotRepository.save(spot);
+    }
+
+    public Spot convertSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+        return Spot.builder()
+                .id(dailyScheduleSpotCreationRequest.getSpotId())
+                .placeName(dailyScheduleSpotCreationRequest.getPlaceName())
+                .phone(dailyScheduleSpotCreationRequest.getPhone())
+                .addressName(dailyScheduleSpotCreationRequest.getAddressName())
+                .roadAddressName(dailyScheduleSpotCreationRequest.getRoadAddressName())
+                .latitude(dailyScheduleSpotCreationRequest.getPosition().getLat())
+                .longitude((dailyScheduleSpotCreationRequest.getPosition().getLng()))
+                .build();
     }
 }

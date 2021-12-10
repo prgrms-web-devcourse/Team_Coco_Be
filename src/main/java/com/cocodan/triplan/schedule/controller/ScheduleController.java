@@ -44,7 +44,8 @@ public class ScheduleController {
 
     @GetMapping("/{scheduleId}")
     public ResponseEntity<ScheduleDetailResponse> getSchedule(@PathVariable Long scheduleId) {
-        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId);
+        Member member = getMember();
+        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId, member.getId());
 
         return new ResponseEntity<>(schedule, HttpStatus.OK);
     }
@@ -111,6 +112,14 @@ public class ScheduleController {
         Long savedId = scheduleService.createChecklist(scheduleId, checklistCreationRequest);
 
         return new ResponseEntity<>(savedId, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{scheduleId}/checklists")
+    public ResponseEntity<List<ChecklistResponse>> getChecklists(@PathVariable Long scheduleId) {
+        Member member = getMember();
+        List<ChecklistResponse> checklistResponses = scheduleService.getChecklists(scheduleId, member.getId());
+
+        return new ResponseEntity<>(checklistResponses, HttpStatus.OK);
     }
 
     @PatchMapping("/{scheduleId}/checklists/{checklistId}")
