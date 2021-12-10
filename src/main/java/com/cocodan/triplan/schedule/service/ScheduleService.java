@@ -11,7 +11,6 @@ import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.repository.VotingRepository;
 import com.cocodan.triplan.spot.domain.Spot;
-import com.cocodan.triplan.spot.repository.SpotRepository;
 import com.cocodan.triplan.spot.service.SpotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,13 +37,13 @@ public class ScheduleService {
         Schedule schedule = scheduleConverter.convertSchedule(scheduleCreationRequest, memberId);
 
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
-                .filter(this::doesNotSavedSpot)
+                .filter(this::isNotSavedSpot)
                 .forEach(spotService::createSpot);
 
         return scheduleRepository.save(schedule).getId();
     }
 
-    private boolean doesNotSavedSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+    private boolean isNotSavedSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
         return !spotService.existsById(dailyScheduleSpotCreationRequest.getSpotId());
     }
 
