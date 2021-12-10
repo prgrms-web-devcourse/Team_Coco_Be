@@ -15,7 +15,7 @@ public enum GenderType {
 
     public static GenderType of(String genderType) {
         return Arrays.stream(GenderType.values())
-                .filter(v -> v.typeStr.equals(genderType))
+                .filter(content -> content.typeStr.equals(genderType))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("성별 정보를 확인하세요"));
     }

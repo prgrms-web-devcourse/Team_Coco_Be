@@ -332,7 +332,7 @@ public class ScheduleService {
 
     private void createVotingContents(VotingCreationRequest votingCreationRequest, Voting voting) {
         votingCreationRequest.getContents().stream()
-                .map(v -> createVotingContent(voting, v))
+                .map(content -> createVotingContent(voting, content))
                 .collect(Collectors.toList());
     }
 
@@ -401,12 +401,4 @@ public class ScheduleService {
 
         voting.vote(votingRequest.getVotingMap(), memberId);
     }
-    
-    // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
-
-    public Schedule findById(Long id) {
-        return scheduleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("There is no such member with ID : " + id));
-    }
-
 }
