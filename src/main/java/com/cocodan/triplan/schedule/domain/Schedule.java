@@ -1,5 +1,6 @@
 package com.cocodan.triplan.schedule.domain;
 
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Schedule {
+public class Schedule extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)

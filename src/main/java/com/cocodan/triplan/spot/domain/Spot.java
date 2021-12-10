@@ -1,5 +1,6 @@
 package com.cocodan.triplan.spot.domain;
 
+import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Spot {
+public class Spot extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)
