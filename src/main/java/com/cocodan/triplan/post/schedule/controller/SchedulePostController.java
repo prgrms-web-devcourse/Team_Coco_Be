@@ -1,10 +1,13 @@
 package com.cocodan.triplan.post.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreatieRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreateRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
+import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
+import com.cocodan.triplan.schedule.domain.vo.Thema;
+import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,19 +35,28 @@ public class SchedulePostController {
     }
 
     @GetMapping("/schedules")
-    public ResponseEntity<List<SchedulePostResponse>> scheduleList(@RequestParam(defaultValue = "0") Integer pageIndex) {
-        // 1. 단순 전체조회로 시작 (최신순)
-        List<SchedulePostResponse> posts = schedulePostService.getRecentSchedulePostList(pageIndex);
-        return new ResponseEntity<>(posts, HttpStatus.OK);
+    public ResponseEntity<List<SchedulePostResponse>> scheduleList(
+            @RequestParam(defaultValue = "0") Integer pageIndex,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "전체") String searchingCity,
+            @RequestParam(defaultValue = "ALL") String searchingTheme,
+            @RequestParam(defaultValue = "최신순") String sorting
+    ) {
+        City city = City.of(searchingCity);
+        Thema theme = Thema.valueOf(searchingTheme);
+        SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
 
-        // 2. 검색 조건 추가
-        // 3. 검색 효율성 개선
+        List<SchedulePostResponse> schedulePostList
+                = schedulePostService.getSchedulePostList(search, city, theme, sortRule, pageIndex);
+
+        return new ResponseEntity<>(schedulePostList, HttpStatus.OK);
+        // TODO: 검색 효율성 개선
     }
 
     @PostMapping("/schedules")
-    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostCreatieRequest request) {
+    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostCreateRequest request) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long postId = schedulePostService.createSchedulePost(member, request);
+        Long postId = schedulePostService.createSchedulePost(member.getId(), request);
         return new ResponseEntity<>(SchedulePostCreateResponse.from(postId), HttpStatus.OK);
     }
 

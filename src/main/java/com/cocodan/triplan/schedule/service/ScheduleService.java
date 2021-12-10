@@ -216,13 +216,6 @@ public class ScheduleService {
         votingRepository.deleteById(votingId);
     }
 
-    // TODO: 2021.12.08 Teru - Remove after checking its usage and use Henry's code if necessary.
-
-    public Schedule findById(Long id) {
-        return scheduleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("There is no such member with ID : " + id));
-    }
-
     public void doVote(Long scheduleId, Long votingId, VotingRequest votingRequest, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
 

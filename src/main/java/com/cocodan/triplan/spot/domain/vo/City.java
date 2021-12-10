@@ -6,7 +6,8 @@ public enum City {
     SEOUL("서울"),
     BUSAN("부산"),
     INCHEON("인천"),
-    JEJU("제주");
+    JEJU("제주"),
+    ALL("전체"); // 검색 전용
 
     private final String city;
 
