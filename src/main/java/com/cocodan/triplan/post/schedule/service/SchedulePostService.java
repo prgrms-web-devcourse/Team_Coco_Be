@@ -163,15 +163,22 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public void validateOwnership(Long memberId, Long schedulePostId) {
-        // existence 와 ownership 두 가지를 한번에 검증하고 있는데 분리하는게 나을까요?
-        SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
-                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
-        );
+    public void validateRemovable(Long memberId, Long schedulePostId) {
+        SchedulePost schedulePost = validateExistence(schedulePostId);
+        validateOwnership(memberId, schedulePost);
+    }
 
+    private void validateOwnership(Long memberId, SchedulePost schedulePost) {
         if (!memberId.equals(schedulePost.getMember().getId())) {
             throw new RuntimeException("Invalid access for schedule post. Only owner can access to it");
         }
+    }
+
+    private SchedulePost validateExistence(Long schedulePostId) {
+        return schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
+        );
+
     }
 
     public void deleteSchedulePost(Long schedulePostId) {

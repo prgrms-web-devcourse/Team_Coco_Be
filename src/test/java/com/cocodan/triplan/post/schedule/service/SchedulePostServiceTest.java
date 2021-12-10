@@ -208,16 +208,16 @@ class SchedulePostServiceTest {
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
 
-        // 게시글 작성자인지 검증하기
-        Assertions.assertThrows(RuntimeException.class,
-                () -> schedulePostService.validateOwnership(-999L, post.getId())
-        );
-        schedulePostService.validateOwnership(testMemberId, post.getId());
-
         // 게시글 생성 확인
         assertThat(schedulePostService.findById(createdSchedulePostId).getId()).isEqualTo(createdScheduleId);
 
+        // 게시글 제거 가능여부 검증
+        Assertions.assertThrows(RuntimeException.class,
+                () -> schedulePostService.validateRemovable(-999L, post.getId())
+        );
+
         // 게시글 삭제하기
+        schedulePostService.validateRemovable(testMemberId, createdSchedulePostId);
         schedulePostService.deleteSchedulePost(createdScheduleId);
 
         // 게시글이 삭제되었는지 검증하기

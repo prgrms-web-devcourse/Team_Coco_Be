@@ -72,7 +72,7 @@ public class SchedulePostController {
     @DeleteMapping("/schedules/{schedulePostId}")
     public ResponseEntity<Void> deleteSchedulePost(@PathVariable Long schedulePostId) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        schedulePostService.validateOwnership(member.getId(), schedulePostId);
+        schedulePostService.validateRemovable(member.getId(), schedulePostId);
         schedulePostService.deleteSchedulePost(schedulePostId);
         return ResponseEntity.ok().build();
     }
