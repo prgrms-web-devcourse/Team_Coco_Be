@@ -161,4 +161,27 @@ public class SchedulePostService {
             return SchedulePostResponse.from(memberResponse, schedule, city, themes, title);
         }).collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public void validateRemovable(Long memberId, Long schedulePostId) {
+        SchedulePost schedulePost = validateExistence(schedulePostId);
+        validateOwnership(memberId, schedulePost);
+    }
+
+    private void validateOwnership(Long memberId, SchedulePost schedulePost) {
+        if (!memberId.equals(schedulePost.getMember().getId())) {
+            throw new RuntimeException("Invalid access for schedule post. Only owner can access to it");
+        }
+    }
+
+    private SchedulePost validateExistence(Long schedulePostId) {
+        return schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
+        );
+
+    }
+
+    public void deleteSchedulePost(Long schedulePostId) {
+        schedulePostRepository.deleteById(schedulePostId);
+    }
 }

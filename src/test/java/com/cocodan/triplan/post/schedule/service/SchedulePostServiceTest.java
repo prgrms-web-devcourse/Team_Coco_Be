@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -187,5 +186,44 @@ class SchedulePostServiceTest {
                         .map(DailyScheduleSpotResponse::from)
                         .toArray()
                 );
+    }
+
+    @Test
+    @DisplayName("생성된 공유 게시글을 삭제할 수 있다")
+    @Transactional
+    void deleteSchedulePost() {
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
+        SchedulePostCreateRequest request = SchedulePostCreateRequest.builder()
+                .title("1번 여행!")
+                .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
+                        "\n" +
+                        "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
+                        "\n" +
+                        "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
+                        "\n" +
+                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]")
+                .city("서울")
+                .scheduleId(createdScheduleId)
+                .build();
+        Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
+        SchedulePost post = schedulePostService.findById(createdSchedulePostId);
+
+        // 게시글 생성 확인
+        assertThat(schedulePostService.findById(createdSchedulePostId).getId()).isEqualTo(createdScheduleId);
+
+        // 게시글 제거 가능여부 검증
+        Assertions.assertThrows(RuntimeException.class,
+                () -> schedulePostService.validateRemovable(-999L, post.getId())
+        );
+
+        // 게시글 삭제하기
+        schedulePostService.validateRemovable(testMemberId, createdSchedulePostId);
+        schedulePostService.deleteSchedulePost(createdScheduleId);
+
+        // 게시글이 삭제되었는지 검증하기
+        Assertions.assertThrows(RuntimeException.class,
+                () -> schedulePostService.findById(createdSchedulePostId)
+        );
     }
 }
