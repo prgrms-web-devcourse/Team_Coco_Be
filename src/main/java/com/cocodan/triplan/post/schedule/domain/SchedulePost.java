@@ -2,7 +2,6 @@ package com.cocodan.triplan.post.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostUpdateRequest;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.AccessLevel;

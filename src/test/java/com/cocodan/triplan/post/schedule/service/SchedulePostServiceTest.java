@@ -3,7 +3,7 @@ package com.cocodan.triplan.post.schedule.service;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostUpdateRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.vo.Ages;
@@ -73,7 +73,7 @@ class SchedulePostServiceTest {
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         // 여행 공유 게시글 생성
-        SchedulePostUpdateRequest request = SchedulePostUpdateRequest.builder()
+        SchedulePostRequest request = SchedulePostRequest.builder()
                 .title("1번 여행 게시글")
                 .content("1번 여행 게시글 본문")
                 .city("서울")
@@ -116,7 +116,7 @@ class SchedulePostServiceTest {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
-        SchedulePostUpdateRequest request = SchedulePostUpdateRequest.builder()
+        SchedulePostRequest request = SchedulePostRequest.builder()
                 .title("1번 여행!")
                 .content("어디로든 갔다옴~")
                 .city("서울")
@@ -227,7 +227,7 @@ class SchedulePostServiceTest {
     void modifySchedulePost() {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long createdScheduleId = scheduleService.createSchedule(scheduleCreationRequest, testMemberId);
-        SchedulePostUpdateRequest createRequest = SchedulePostUpdateRequest.builder()
+        SchedulePostRequest createRequest = SchedulePostRequest.builder()
                 .title("1번 여행!")
                 .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
                         "\n" +
@@ -242,7 +242,7 @@ class SchedulePostServiceTest {
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, createRequest);
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
 
-        SchedulePostUpdateRequest modifyRequest = SchedulePostUpdateRequest.builder()
+        SchedulePostRequest modifyRequest = SchedulePostRequest.builder()
                 .title("가자 우주로!")
                 .content("삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
                         "\n" +

@@ -4,7 +4,7 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostUpdateRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
@@ -50,7 +50,7 @@ public class SchedulePostService {
         );
     }
 
-    public Long createSchedulePost(Long memberId, SchedulePostUpdateRequest request) {
+    public Long createSchedulePost(Long memberId, SchedulePostRequest request) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException("Invalid User Detected")
         );
@@ -188,7 +188,7 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public void modifySchedulePost(Long memberId, SchedulePostUpdateRequest request) {
+    public void modifySchedulePost(Long memberId, SchedulePostRequest request) {
         Long requestedSchedulePostId = request.getScheduleId();
         SchedulePost schedulePost = validateAuthorities(memberId, requestedSchedulePostId);
 

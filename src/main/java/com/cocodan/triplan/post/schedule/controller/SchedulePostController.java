@@ -1,7 +1,7 @@
 package com.cocodan.triplan.post.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostUpdateRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
@@ -57,7 +57,7 @@ public class SchedulePostController {
     }
 
     @PostMapping("/schedules")
-    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostUpdateRequest request) {
+    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostRequest request) {
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long postId = schedulePostService.createSchedulePost(member.getId(), request);
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
@@ -77,7 +77,7 @@ public class SchedulePostController {
     }
 
     @PutMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<Void> modifySchedulePost(@PathVariable Long schedulePostId, @RequestBody SchedulePostUpdateRequest request) {
+    public ResponseEntity<Void> modifySchedulePost(@PathVariable Long schedulePostId, @RequestBody SchedulePostRequest request) {
         // TODO: 2021.12.10 Teru - 별도의 Util class 를 만들어 요청을 보내는 유저 정보 받아오는 메서드 작성하기
         Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         schedulePostService.modifySchedulePost(member.getId(), request);

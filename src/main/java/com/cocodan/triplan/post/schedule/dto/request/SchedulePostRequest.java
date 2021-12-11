@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Builder
-public class SchedulePostUpdateRequest {
+public class SchedulePostRequest {
 
     @NotBlank
     public String title;
