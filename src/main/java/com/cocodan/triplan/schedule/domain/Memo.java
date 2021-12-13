@@ -11,6 +11,12 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Memo extends BaseEntity {
 
+    public static final int TITLE_MIN_LENGTH = 1;
+    public static final int TITLE_MAX_LENGTH = 16;
+
+    public static final int CONTENT_MIN_LENGTH = 1;
+    public static final int CONTENT_MAX_LENGTH = 255;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,12 +48,12 @@ public class Memo extends BaseEntity {
         return id;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
     public String getContent() {
         return content;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public Long getMemberId() {

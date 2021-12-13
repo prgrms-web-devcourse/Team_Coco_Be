@@ -13,6 +13,9 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VotingContent extends BaseEntity {
 
+    public static final int MIN_LENGTH = 1;
+    public static final int MAX_LENGTH = 16;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +41,7 @@ public class VotingContent extends BaseEntity {
     public void vote(Long memberId) {
         for (VotingContentMember votingContentMember : votingContentMembers) {
             if (votingContentMember.getMemberId().equals(memberId)) {
-                return ;
+                return;
             }
         }
 

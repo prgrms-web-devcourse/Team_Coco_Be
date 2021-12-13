@@ -12,6 +12,9 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Checklist extends BaseEntity {
 
+    public static final int MIN_LENGTH = 1;
+    public static final int MAX_LENGTH = 16;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +24,8 @@ public class Checklist extends BaseEntity {
     @JoinColumn(name = "schedule_id", referencedColumnName = "id")
     private Schedule schedule;
 
-    @Column(name = "content", nullable = false)
-    private String content;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     @Column(name = "checked", columnDefinition = "boolean default false")
     private boolean checked;
@@ -31,9 +34,9 @@ public class Checklist extends BaseEntity {
     private LocalDate date;
 
     @Builder
-    public Checklist(Schedule schedule, String content, LocalDate date) {
+    public Checklist(Schedule schedule, String title, LocalDate date) {
         this.schedule = schedule;
-        this.content = content;
+        this.title = title;
         this.date = date;
         schedule.getChecklists().add(this);
     }
@@ -47,7 +50,7 @@ public class Checklist extends BaseEntity {
     }
 
     public String getContent() {
-        return content;
+        return title;
     }
 
     public boolean isChecked() {

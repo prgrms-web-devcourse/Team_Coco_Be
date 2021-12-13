@@ -239,7 +239,7 @@ class ScheduleServiceTest {
                 .map((MemoSimpleResponse::getId))
                 .collect(Collectors.toList());
 
-        
+
         // Then
         assertThat(ids).containsExactly(memo1, memo2, memo3);
         assertThat(titles).containsExactlyInAnyOrder("memotitle1", "memotitle2", "memotitle3");

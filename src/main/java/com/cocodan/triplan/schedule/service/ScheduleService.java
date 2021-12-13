@@ -254,7 +254,7 @@ public class ScheduleService {
 
     private Checklist createChecklist(ChecklistCreationRequest checklistCreationRequest, Schedule schedule) {
         return Checklist.builder()
-                .content(checklistCreationRequest.getContent())
+                .title(checklistCreationRequest.getTitle())
                 .schedule(schedule)
                 .date(checklistCreationRequest.getDate())
                 .build();
@@ -326,10 +326,10 @@ public class ScheduleService {
                 .forEach(content -> createVotingContent(voting, content));
     }
 
-    private void createVotingContent(Voting voting, String v) {
+    private void createVotingContent(Voting voting, String votingContentName) {
         VotingContent.builder()
-                .content(v)
                 .voting(voting)
+                .content(votingContentName)
                 .build();
     }
 
