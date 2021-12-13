@@ -1,5 +1,6 @@
 package com.cocodan.triplan.schedule.domain;
 
+import com.cocodan.triplan.common.BaseEntity;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ScheduleTheme {
+public class ScheduleTheme extends BaseEntity {
 
     @Id
     @Column(name = "id", nullable = false)

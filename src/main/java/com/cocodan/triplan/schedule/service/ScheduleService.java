@@ -40,10 +40,7 @@ public class ScheduleService {
         Schedule schedule = convertSchedule(scheduleCreationRequest, memberId);
 
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
-                .filter(this::doesNotSavedSpot)
-                .forEach(spotService::createSpot);
-        scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
-                .filter(this::doesNotSavedSpot)
+                .filter(this::isNotSavedSpot)
                 .forEach(spotService::createSpot);
 
         return scheduleRepository.save(schedule).getId();
@@ -89,7 +86,7 @@ public class ScheduleService {
                 .build();
     }
 
-    private boolean doesNotSavedSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+    private boolean isNotSavedSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
         return !spotService.existsById(dailyScheduleSpotCreationRequest.getSpotId());
     }
 
