@@ -4,7 +4,6 @@ import com.cocodan.triplan.exception.common.NotIncludeException;
 import lombok.Getter;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class ExceptionResponse {

@@ -13,8 +13,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestControllerAdvice
 @Slf4j
@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
         log.warn("Method Argument Not Valid.");
-        Map<String, String> errorMap = new ConcurrentHashMap<>();
+        Map<String, String> errorMap = new HashMap<>();
         exception.getBindingResult()
                 .getAllErrors()
                 .forEach(error -> putError(error, errorMap));
