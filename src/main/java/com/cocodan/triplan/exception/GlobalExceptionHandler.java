@@ -3,6 +3,7 @@ package com.cocodan.triplan.exception;
 import com.cocodan.triplan.exception.common.ForbiddenException;
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
+import com.cocodan.triplan.util.ExceptionMessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +21,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
         log.warn("Method Argument Not Valid.");
         Map<String, String> errorMap = new ConcurrentHashMap<>();
         exception.getBindingResult()
                 .getAllErrors()
                 .forEach(error -> putError(error, errorMap));
 
-        return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ExceptionResponse.from(
+                        ExceptionMessageUtils.getMessage("exception.argument_not_valid"),
+                        errorMap)
+        );
     }
 
     private void putError(ObjectError error, Map<String, String> errors) {
@@ -38,14 +43,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleNotFound(NotFoundException exception) {
+    public ResponseEntity<ExceptionResponse> handleNotFound(NotFoundException exception) {
         log.warn("{} Not Found. Id : {}", exception.getClazz().getSimpleName(), exception.getId());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleNotInclude(NotIncludeException exception) {
+    public ResponseEntity<ExceptionResponse> handleNotInclude(NotIncludeException exception) {
         log.warn("{} (id :{}) is not included {} (id:{})",
                 exception.getPart().getSimpleName(),
                 exception.getPartId(),
@@ -53,11 +58,11 @@ public class GlobalExceptionHandler {
                 exception.getEntireId()
         );
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleForbidden(ForbiddenException exception) {
+    public ResponseEntity<ExceptionResponse> handleForbidden(ForbiddenException exception) {
         log.warn("{} (id :{}) can not access {} (id:{})",
                 exception.getAccessor().getSimpleName(),
                 exception.getAccessorId(),
@@ -65,7 +70,7 @@ public class GlobalExceptionHandler {
                 exception.getResourceId()
         );
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ExceptionResponse.from(exception.getMessage()));
     }
 
 }
