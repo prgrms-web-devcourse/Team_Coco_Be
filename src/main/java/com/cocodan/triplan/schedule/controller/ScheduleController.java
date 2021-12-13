@@ -64,7 +64,9 @@ public class ScheduleController {
     @ApiOperation("일정 수정")
     @PutMapping("/{scheduleId}")
     public ResponseEntity<Void> modifySchedule(@PathVariable Long scheduleId, @RequestBody @Valid ScheduleModificationRequest scheduleModificationRequest) {
-        scheduleService.modifySchedule(scheduleId, scheduleModificationRequest);
+//        Member member = getMember();
+//        scheduleService.modifySchedule(scheduleId, scheduleModificationRequest, member.getId());
+        scheduleService.modifySchedule(scheduleId, scheduleModificationRequest, MEMBER_ID);
 
         return ResponseEntity.ok().build();
     }

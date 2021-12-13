@@ -11,6 +11,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ScheduleModificationRequest {
 
+    private String title;
+
+    private List<String> themeList;
+
     private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
 
 }

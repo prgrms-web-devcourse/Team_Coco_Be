@@ -3,6 +3,7 @@ package com.cocodan.triplan.schedule.service;
 import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.*;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.repository.ChecklistRepository;
@@ -67,9 +68,17 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("여행 일정을 생성한다.")
     void createSchedule() {
+        // Given
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
 
-        scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
+        // When
+        Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
+
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+
+        // Then
+        assertThat(schedule.getId()).isEqualTo(scheduleId);
+        assertThat(schedule.getCreatedDate()).isNotNull();
     }
 
     private ScheduleCreationRequest createScheduleCreation() {
@@ -88,8 +97,20 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("일정 목록을 조회한다.")
     void getSchedules() {
-        //TODO: 멤버 엔티티 추가되면 test 실행
+        // Given
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
+
+        // When
         List<ScheduleSimpleResponse> schedules = scheduleService.getSchedules(MEMBER_ID);
+        ScheduleSimpleResponse scheduleSimpleResponse = schedules.get(0);
+
+        // Then
+        assertThat(scheduleSimpleResponse.getId()).isEqualTo(scheduleId);
+        assertThat(scheduleSimpleResponse.getTitle()).isEqualTo("title");
+        assertThat(scheduleSimpleResponse.getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
+        assertThat(scheduleSimpleResponse.getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
+        assertThat(scheduleSimpleResponse.getThema()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
     }
 
     @Test
@@ -106,7 +127,7 @@ class ScheduleServiceTest {
         assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(response.getScheduleSimpleResponse().getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
         assertThat(response.getScheduleSimpleResponse().getTitle()).isEqualTo("title");
-        assertThat(response.getScheduleSimpleResponse().getThemes()).contains("ACTIVITY", "FOOD");
+        assertThat(response.getScheduleSimpleResponse().getThema()).contains(Theme.ACTIVITY, Theme.FOOD);
 
         List<Long> memberIds = response.getMemberSimpleResponses().stream()
                 .map(MemberSimpleResponse::getId)
@@ -135,7 +156,7 @@ class ScheduleServiceTest {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long schedule = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
-        ScheduleModificationRequest scheduleModificationRequest = new ScheduleModificationRequest(
+        ScheduleModificationRequest scheduleModificationRequest = new ScheduleModificationRequest("updated Title", List.of("NATURE"),
                 List.of(
                         new DailyScheduleSpotCreationRequest(5L, "address1", "roadAddress1", "010-1111-2222", "불국사1", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 22), 1),
                         new DailyScheduleSpotCreationRequest(6L, "address2", "roadAddress2", "010-1111-2223", "불국사2", new Position(37.1234, 125.3333), LocalDate.of(2021, 12, 22), 2),
@@ -147,7 +168,7 @@ class ScheduleServiceTest {
                 ));
 
         // When
-        scheduleService.modifySchedule(schedule, scheduleModificationRequest);
+        scheduleService.modifySchedule(schedule, scheduleModificationRequest, MEMBER_ID);
 
         // Then
         Schedule updatedSchedule = scheduleRepository.findById(schedule).get();
@@ -456,6 +477,6 @@ class ScheduleServiceTest {
         Optional<Voting> actual = votingRepository.findById(voting);
 
         // Then
-        assertThat(actual).isEqualTo(Optional.empty());
+        assertThat(actual).isNotPresent();
     }
 }
