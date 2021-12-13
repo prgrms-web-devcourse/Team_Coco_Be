@@ -6,6 +6,7 @@ import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -21,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
+@Getter
 @Table(name = "schedule_posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SchedulePost extends BaseEntity {
@@ -65,35 +67,15 @@ public class SchedulePost extends BaseEntity {
         this.city = city;
     }
 
-    public Long getId() {
-        return id;
+    public void updateTitle(String title) {
+        this.title = title;
     }
 
-    public Member getMember() {
-        return member;
+    public void updateContent(String content) {
+        this.content = content;
     }
 
-    public Schedule getSchedule() {
-        return schedule;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Long getViews() {
-        return views;
-    }
-
-    public Long getLiked() {
-        return liked;
-    }
-
-    public City getCity() {
-        return city;
+    public void updateCity(City city) {
+        this.city = city;
     }
 }

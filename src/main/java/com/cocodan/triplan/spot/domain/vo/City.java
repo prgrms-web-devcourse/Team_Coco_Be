@@ -15,7 +15,7 @@ public enum City {
         this.city = city;
     }
 
-    public static City of(String city) {
+    public static City from(String city) {
         return Arrays.stream(values())
                 .filter(iter -> iter.isEqualTo(city))
                 .findAny()
