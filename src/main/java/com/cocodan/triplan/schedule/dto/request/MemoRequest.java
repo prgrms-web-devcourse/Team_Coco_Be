@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class MemoRequest {
 
     private String title;
+
     private String content;
 }

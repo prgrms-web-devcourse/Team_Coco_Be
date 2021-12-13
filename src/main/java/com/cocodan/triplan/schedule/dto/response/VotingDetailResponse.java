@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.dto.response;
 
 import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.schedule.domain.Voting;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class VotingDetailResponse {
 
     private final String ownerNickname;
 
-    private final String ownerGender;
+    private final GenderType ownerGender;
 
     private final int ownerAge;
 
@@ -42,7 +43,7 @@ public class VotingDetailResponse {
                 .ownerId(member.getId())
                 .ownerNickname(member.getNickname())
                 .ownerAge(member.getAge())
-                .ownerGender(member.getGender().getTypeStr())
+                .ownerGender(member.getGender())
                 .votingContentResponses(votingContentResponses)
                 .build();
     }

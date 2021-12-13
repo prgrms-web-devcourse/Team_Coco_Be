@@ -22,7 +22,7 @@ public class ScheduleSimpleResponse {
 
     private final LocalDate endDate;
 
-    private final List<String> themes;
+    private final List<Theme> thema;
 
     public static ScheduleSimpleResponse from(Schedule schedule) {
         return ScheduleSimpleResponse.builder()
@@ -30,14 +30,13 @@ public class ScheduleSimpleResponse {
                 .title(schedule.getTitle())
                 .startDate(schedule.getStartDate())
                 .endDate(schedule.getEndDate())
-                .themes(getThemes(schedule))
+                .thema(getThemes(schedule))
                 .build();
     }
 
-    public static List<String> getThemes(Schedule schedule) {
+    public static List<Theme> getThemes(Schedule schedule) {
         return schedule.getScheduleThema().stream()
                 .map(ScheduleTheme::getTheme)
-                .map(Theme::toString)
                 .collect(Collectors.toList());
     }
 }
