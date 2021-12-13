@@ -1,6 +1,7 @@
 package com.cocodan.triplan.post.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
@@ -9,6 +10,9 @@ import com.cocodan.triplan.post.schedule.service.SchedulePostService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +29,7 @@ import java.util.List;
 
 import static com.cocodan.triplan.post.schedule.controller.SchedulePostController.schedulePostBaseUri;
 
+@Api(tags = "Schedule Post")
 @RequestMapping(schedulePostBaseUri)
 @RestController
 public class SchedulePostController {
@@ -37,6 +42,7 @@ public class SchedulePostController {
         this.schedulePostService = schedulePostService;
     }
 
+    @ApiOperation("여행 일정 공유 게시글 (조건별)목록 조회")
     @GetMapping("/schedules")
     public ResponseEntity<List<SchedulePostResponse>> schedulePostList(
             @RequestParam(defaultValue = "0") Integer pageIndex,
@@ -56,30 +62,43 @@ public class SchedulePostController {
         // TODO: 검색 효율성 개선
     }
 
+    @ApiOperation("여행 일정 공유 게시글 작성")
     @PostMapping("/schedules")
     public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostRequest request) {
-        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
         Long postId = schedulePostService.createSchedulePost(member.getId(), request);
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
     }
 
+    @ApiOperation("특정 여행 일정 공유 게시글 상세조회")
     @GetMapping("/schedules/{schedulePostId}")
     public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable Long schedulePostId) {
         SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(schedulePostId);
         return ResponseEntity.ok(schedulePostDetail);
     }
 
+    @ApiOperation("(자신이 작성한)특정 여행 공유 게시글 삭제")
     @DeleteMapping("/schedules/{schedulePostId}")
     public ResponseEntity<Void> deleteSchedulePost(@PathVariable Long schedulePostId) {
-        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
         schedulePostService.deleteSchedulePost(member.getId(), schedulePostId);
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation("여행 공유 게시글 수정")
     @PutMapping("/schedules/{schedulePostId}")
     public ResponseEntity<Void> modifySchedulePost(@PathVariable Long schedulePostId, @RequestBody SchedulePostRequest request) {
         // TODO: 2021.12.10 Teru - 별도의 Util class 를 만들어 요청을 보내는 유저 정보 받아오는 메서드 작성하기
-        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
         schedulePostService.modifySchedulePost(member.getId(), request);
         return ResponseEntity.ok().build();
     }
