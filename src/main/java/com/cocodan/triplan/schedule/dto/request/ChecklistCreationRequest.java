@@ -12,5 +12,6 @@ import java.time.LocalDate;
 public class ChecklistCreationRequest {
 
     private LocalDate date;
+
     private String content;
 }

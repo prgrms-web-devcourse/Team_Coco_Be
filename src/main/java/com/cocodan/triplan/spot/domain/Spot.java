@@ -51,7 +51,7 @@ public class Spot extends BaseEntity implements Persistable<Long> {
 
     @Override
     public boolean isNew() {
-        return super.getCreatedDate() == null ;
+        return getCreatedDate() == null ;
     }
 
     public String getPlaceName() {

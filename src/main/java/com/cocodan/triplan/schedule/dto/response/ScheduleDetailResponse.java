@@ -4,17 +4,17 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.spot.domain.Spot;
-import com.cocodan.triplan.spot.dto.response.SpotResponse;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Builder
 public class ScheduleDetailResponse {
+
+    private final Long id;
 
     private final ScheduleSimpleResponse scheduleSimpleResponse;
 
@@ -24,6 +24,7 @@ public class ScheduleDetailResponse {
 
     public static ScheduleDetailResponse of(Schedule schedule, List<Spot> spotList, List<Member> members) {
         return ScheduleDetailResponse.builder()
+                .id(schedule.getId())
                 .scheduleSimpleResponse(ScheduleSimpleResponse.from(schedule))
                 .spotResponseList(getScheduleSpots(schedule.getDailyScheduleSpots(), spotList))
                 .memberSimpleResponses(getMemberSimpleResponse(members))
@@ -31,17 +32,21 @@ public class ScheduleDetailResponse {
     }
 
     private static List<ScheduleSpotResponse> getScheduleSpots(List<DailyScheduleSpot> dailyScheduleSpots, List<Spot> spots) {
-        List<ScheduleSpotResponse> result = new ArrayList<>();
+        return dailyScheduleSpots.stream()
+                .sorted(ScheduleDetailResponse::sortByDateAndOrder)
+                .flatMap(dailyScheduleSpot -> spots.stream()
+                        .filter(spot -> spot.getId().equals(dailyScheduleSpot.getSpotId()))
+                        .map(spot -> ScheduleSpotResponse.of(spot, dailyScheduleSpot)))
+                .collect(Collectors.toList());
+    }
 
-        dailyScheduleSpots.forEach(
-                dailyScheduleSpot -> spots.forEach(
-                        spot -> {
-                            if (dailyScheduleSpot.getSpotId().equals(spot.getId())) {
-                                result.add(ScheduleSpotResponse.of(spot, dailyScheduleSpot));
-                            }
-                        }));
+    private static int sortByDateAndOrder(DailyScheduleSpot o1, DailyScheduleSpot o2) {
+        int compareResult = o1.getDate().compareTo(o2.getDate());
+        if (compareResult == 0) {
+            return o1.getOrder() - o2.getOrder();
+        }
 
-        return result;
+        return compareResult;
     }
 
     private static List<MemberSimpleResponse> getMemberSimpleResponse(List<Member> members) {

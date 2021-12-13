@@ -12,6 +12,8 @@ import java.util.List;
 public class VotingCreationRequest {
 
     private String title;
+
     private List<String> contents;
+
     private boolean multipleFlag;
 }
