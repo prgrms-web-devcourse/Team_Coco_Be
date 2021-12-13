@@ -1,5 +1,8 @@
 package com.cocodan.triplan.schedule.service;
 
+import com.cocodan.triplan.exception.common.ForbiddenException;
+import com.cocodan.triplan.exception.common.NotFoundException;
+import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.schedule.domain.*;
@@ -16,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,8 +80,8 @@ public class ScheduleService {
                 .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
     }
 
-    private DailyScheduleSpot createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
-        return DailyScheduleSpot.builder()
+    private void createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+        DailyScheduleSpot.builder()
                 .spotId(dailyScheduleSpotCreationRequest.getSpotId())
                 .date(dailyScheduleSpotCreationRequest.getDate())
                 .order(dailyScheduleSpotCreationRequest.getOrder())
@@ -100,11 +102,9 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public ScheduleDetailResponse getSchedule(Long scheduleId, Long memberId) {
+    public ScheduleDetailResponse getSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
-                .orElseThrow(() -> new RuntimeException(""));
-
-        validateScheduleMember(scheduleId, memberId);
+                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
 
         List<Long> scheduleMemberIds = getMemberIds(schedule);
 
@@ -119,7 +119,7 @@ public class ScheduleService {
         boolean notExists = !scheduleRepository.existsByIdAndMemberId(scheduleId, memberId);
 
         if (notExists) {
-            throw new RuntimeException("");
+            throw new ForbiddenException(Schedule.class, Member.class, scheduleId, memberId);
         }
     }
 
@@ -145,7 +145,7 @@ public class ScheduleService {
                     convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
                     return schedule;
                 })
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
     }
 
     private void convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
@@ -171,7 +171,7 @@ public class ScheduleService {
 
         Memo memo = scheduleRepository.findById(scheduleId)
                 .map(schedule -> createMemo(memoRequest, schedule, memberId))
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
 
         return memoRepository.save(memo).getId();
     }
@@ -202,12 +202,12 @@ public class ScheduleService {
         validateScheduleMemo(scheduleId, memoId);
 
         Memo memo = memoRepository.findById(memoId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new NotFoundException(Memo.class, memoId));
 
         Long ownerId = memo.getMemberId();
 
         Member member = memberRepository.findById(ownerId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new NotFoundException(Member.class, memberId));
 
         return MemoDetailResponse.of(memo, member);
     }
@@ -216,7 +216,7 @@ public class ScheduleService {
         boolean notExists = !memoRepository.existsByIdAndScheduleId(memoId, scheduleId);
 
         if (notExists) {
-            throw new RuntimeException("");
+            throw new NotIncludeException(Schedule.class, Memo.class, scheduleId, memoId);
         }
     }
 
@@ -227,7 +227,7 @@ public class ScheduleService {
         validateScheduleMemo(scheduleId, memoId);
 
         Memo memo = memoRepository.findById(memoId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(Memo.class, memoId));
 
         memo.modify(memoRequest.getTitle(), memoRequest.getContent());
     }
@@ -247,7 +247,7 @@ public class ScheduleService {
 
         Checklist checklist = scheduleRepository.findById(scheduleId)
                 .map(schedule -> createChecklist(checklistCreationRequest, schedule))
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
 
         return checklistRepository.save(checklist).getId();
     }
@@ -275,7 +275,7 @@ public class ScheduleService {
         validateScheduleChecklist(scheduleId, checklistId);
 
         Checklist checklist = checklistRepository.findById(checklistId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(Checklist.class, checklistId));
 
         checklist.check(flag);
     }
@@ -284,7 +284,7 @@ public class ScheduleService {
         boolean notExists = !checklistRepository.existsByIdAndScheduleId(checklistId, scheduleId);
 
         if (notExists) {
-            throw new RuntimeException("");
+            throw new NotIncludeException(Schedule.class, Checklist.class, scheduleId, checklistId);
         }
     }
 
@@ -303,7 +303,7 @@ public class ScheduleService {
         validateScheduleMember(scheduleId, memberId);
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
 
         Voting voting = createVoting(votingCreationRequest, memberId, schedule);
 
@@ -326,8 +326,8 @@ public class ScheduleService {
                 .forEach(content -> createVotingContent(voting, content));
     }
 
-    private VotingContent createVotingContent(Voting voting, String v) {
-        return VotingContent.builder()
+    private void createVotingContent(Voting voting, String v) {
+        VotingContent.builder()
                 .content(v)
                 .voting(voting)
                 .build();
@@ -345,13 +345,13 @@ public class ScheduleService {
         boolean notExists = !votingRepository.existsByIdAndScheduleId(votingId, scheduleId);
 
         if (notExists) {
-            throw new RuntimeException("");
+            throw new NotIncludeException(Schedule.class, Voting.class, scheduleId, votingId);
         }
     }
 
     @Transactional(readOnly = true)
     public List<VotingSimpleResponse> getVotingList(Long scheduleId, Long memberId) {
-        validateScheduleMember(scheduleId,memberId);
+        validateScheduleMember(scheduleId, memberId);
 
         return votingRepository.findByScheduleId(scheduleId)
                 .stream()
@@ -365,12 +365,12 @@ public class ScheduleService {
         validateScheduleVoting(scheduleId, votingId);
 
         Voting voting = votingRepository.findById(votingId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new NotFoundException(Voting.class, votingId));
 
         Long ownerId = voting.getMemberId();
 
         Member owner = memberRepository.findById(ownerId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new NotFoundException(Member.class, memberId));
 
         return VotingDetailResponse.of(voting, owner, memberId);
     }
@@ -381,7 +381,7 @@ public class ScheduleService {
         validateScheduleVoting(scheduleId, votingId);
 
         Voting voting = votingRepository.findById(votingId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(Voting.class, votingId));
 
         voting.vote(votingRequest.getVotingMap(), memberId);
     }
