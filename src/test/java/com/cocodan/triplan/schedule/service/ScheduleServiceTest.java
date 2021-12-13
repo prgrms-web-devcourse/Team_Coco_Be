@@ -170,7 +170,7 @@ class ScheduleServiceTest {
         scheduleService.deleteSchedule(schedule, MEMBER_ID);
 
         // Then
-        assertThat(scheduleRepository.findById(schedule)).isEqualTo(Optional.empty());
+        assertThat(scheduleRepository.findById(schedule)).isNotPresent();
     }
 
     @Test
@@ -214,7 +214,13 @@ class ScheduleServiceTest {
                 .map((MemoSimpleResponse::getContent))
                 .collect(Collectors.toList());
 
+        List<Long> ids = memos.stream()
+                .map((MemoSimpleResponse::getId))
+                .collect(Collectors.toList());
+
+        
         // Then
+        assertThat(ids).containsExactly(memo1, memo2, memo3);
         assertThat(titles).containsExactlyInAnyOrder("memotitle1", "memotitle2", "memotitle3");
         assertThat(contents).containsExactlyInAnyOrder("JIFEOgoiioghiohgieogio1", "JIFEOgoiioghiohgieogio2", "JIFEOgoiioghiohgieogio3");
     }
@@ -251,6 +257,7 @@ class ScheduleServiceTest {
         // Then
         Memo updated = memoRepository.findById(memo).get();
         assertThat(updated.getContent()).isEqualTo(updateRequest.getContent());
+        assertThat(updated.getTitle()).isEqualTo(updateRequest.getTitle());
     }
 
     @Test
@@ -277,7 +284,7 @@ class ScheduleServiceTest {
         ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
 
         // When
-        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest);
+        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
 
         // Then
         assertThat(checklist).isEqualTo(1L);
@@ -290,7 +297,7 @@ class ScheduleServiceTest {
         // Given
         Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
-        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest);
+        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
 
         // When
         scheduleService.doCheck(schedule, checklist, MEMBER_ID, flag);
@@ -306,7 +313,7 @@ class ScheduleServiceTest {
         // Given
         Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
         ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
-        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest);
+        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
 
         // When
         scheduleService.deleteChecklist(schedule, checklist, MEMBER_ID);
@@ -351,7 +358,7 @@ class ScheduleServiceTest {
         Long voting2 = scheduleService.saveVoting(schedule, votingCreationRequest2, MEMBER_ID);
 
         // When
-        List<VotingSimpleResponse> votingList = scheduleService.getVotingList(schedule);
+        List<VotingSimpleResponse> votingList = scheduleService.getVotingList(schedule, MEMBER_ID);
 
         List<String> titles = votingList.stream()
                 .map(VotingSimpleResponse::getTitle)
