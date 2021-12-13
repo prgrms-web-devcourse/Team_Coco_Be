@@ -116,4 +116,14 @@ public class SchedulePostController {
         return ResponseEntity.ok(new SchedulePostLikeResponse(likeCount));
     }
 
+    @ApiOperation("좋아요 누른 게시글만 조회")
+    @GetMapping("/schedules/liked")
+    public ResponseEntity<List<SchedulePostResponse>> likedSchedulePostList() {
+        // TODO: 2021.12.14 Teru - Pageable 적용 여부 고민... 한다면 어떻게?
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
+        return ResponseEntity.ok(schedulePostService.getLikedSchedulePosts(member.getId()));
+    }
 }
