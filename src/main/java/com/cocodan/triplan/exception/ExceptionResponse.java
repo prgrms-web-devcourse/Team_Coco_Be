@@ -20,7 +20,7 @@ public class ExceptionResponse {
         this.errors = errors;
     }
 
-    public static ExceptionResponse from(String message, Map<String, String> errors) {
+    public static ExceptionResponse of(String message, Map<String, String> errors) {
         return new ExceptionResponse(message, errors);
     }
 
