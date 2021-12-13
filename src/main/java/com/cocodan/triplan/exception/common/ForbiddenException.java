@@ -8,19 +8,16 @@ public class ForbiddenException extends RuntimeException {
 
     private Class<?> resource;
 
-    private Class<?> accessor;
-
     private Long resourceId;
 
     private Long accessorId;
 
-    public ForbiddenException(Class<?> resource, Class<?> accessor, Long resourceId, Long accessorId) {
+    public ForbiddenException(Class<?> resource, Long resourceId, Long accessorId) {
         super(ExceptionMessageUtils.getMessage(
                 "exception.forbidden",
                 new Object[]{ExceptionMessageUtils.getMessage(resource.getSimpleName())}
         ));
         this.resource = resource;
-        this.accessor = accessor;
         this.resourceId = resourceId;
         this.accessorId = accessorId;
     }

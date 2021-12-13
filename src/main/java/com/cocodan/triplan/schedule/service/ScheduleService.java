@@ -120,14 +120,6 @@ public class ScheduleService {
         return ScheduleDetailResponse.of(schedule, spots, members);
     }
 
-    private void validateScheduleMember(Long scheduleId, Long memberId) {
-        boolean notExists = !scheduleRepository.existsByIdAndMemberId(scheduleId, memberId);
-
-        if (notExists) {
-            throw new ForbiddenException(Schedule.class, Member.class, scheduleId, memberId);
-        }
-    }
-
     private List<Long> getMemberIds(Schedule schedule) {
         return schedule.getScheduleMembers().stream()
                 .map(ScheduleMember::getMemberId)
@@ -142,20 +134,28 @@ public class ScheduleService {
 
     @Transactional
     public void modifySchedule(Long scheduleId, ScheduleModificationRequest scheduleModificationRequest, Long memberId) {
+        Schedule schedule = findScheduleById(scheduleId);
+
         validateScheduleMember(scheduleId, memberId);
 
         scheduleModificationRequest.getDailyScheduleSpotCreationRequests()
                 .forEach(this::saveSpot);
 
-        scheduleRepository.findById(scheduleId)
-                .map(schedule -> {
-                    schedule.updateTitle(scheduleModificationRequest.getTitle());
-                    schedule.updateThemes(scheduleModificationRequest.getThemes());
-                    schedule.removeAllSpots();
-                    convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
-                    return schedule;
-                })
+        schedule.updateTitle(scheduleModificationRequest.getTitle());
+        schedule.updateThemes(scheduleModificationRequest.getThemes());
+        schedule.removeAllSpots();
+        convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
+    }
+
+    private Schedule findScheduleById(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
+    }
+
+    private void validateScheduleMember(Long scheduleId, Long memberId) {
+        if (!scheduleRepository.existsByScheduleIdAndMemberId(scheduleId, memberId)) {
+            throw new ForbiddenException(Schedule.class, scheduleId, memberId);
+        }
     }
 
     private void convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
@@ -165,23 +165,26 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Long scheduleId, Long memberId) {
-        scheduleRepository.findById(scheduleId)
-                .filter(schedule -> isOwner(schedule, memberId))
-                .ifPresent(scheduleRepository::delete);
+        Schedule schedule = findScheduleById(scheduleId);
+
+        validateScheduleOwner(schedule, memberId);
+
+        scheduleRepository.delete(schedule);
     }
 
-    private boolean isOwner(Schedule schedule, Long memberId) {
-        return schedule.getMemberId().equals(memberId);
+    private void validateScheduleOwner(Schedule schedule, Long memberId) {
+        if (!schedule.getMemberId().equals(memberId)) {
+            throw new ForbiddenException(Schedule.class, schedule.getId(), memberId);
+        }
     }
 
-    // 메모
     @Transactional
     public Long saveMemo(Long scheduleId, MemoRequest memoRequest, Long memberId) {
+        Schedule schedule = findScheduleById(scheduleId);
+
         validateScheduleMember(scheduleId, memberId);
 
-        Memo memo = scheduleRepository.findById(scheduleId)
-                .map(schedule -> createMemo(memoRequest, schedule, memberId))
-                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
+        Memo memo = createMemo(memoRequest, schedule, memberId);
 
         return memoRepository.save(memo).getId();
     }
@@ -198,6 +201,8 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<MemoSimpleResponse> getMemos(Long scheduleId, Long memberId) {
+        findScheduleById(scheduleId);
+
         validateScheduleMember(scheduleId, memberId);
 
         return memoRepository.findByScheduleId(scheduleId)
@@ -208,18 +213,29 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public MemoDetailResponse getMemo(Long scheduleId, Long memoId, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
+        findScheduleById(scheduleId);
+
+        Memo memo = findMemoById(memoId);
+
         validateScheduleMemo(scheduleId, memoId);
 
-        Memo memo = memoRepository.findById(memoId)
-                .orElseThrow(() -> new NotFoundException(Memo.class, memoId));
+        validateScheduleMember(scheduleId, memberId);
 
         Long ownerId = memo.getMemberId();
 
-        Member member = memberRepository.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException(Member.class, memberId));
+        Member member = findMemberById(ownerId);
 
         return MemoDetailResponse.of(memo, member);
+    }
+
+    private Member findMemberById(Long ownerId) {
+        return memberRepository.findById(ownerId)
+                .orElseThrow(() -> new NotFoundException(Member.class, ownerId));
+    }
+
+    private Memo findMemoById(Long memoId) {
+        return memoRepository.findById(memoId)
+                .orElseThrow(() -> new NotFoundException(Memo.class, memoId));
     }
 
     private void validateScheduleMemo(Long scheduleId, Long memoId) {
@@ -233,31 +249,44 @@ public class ScheduleService {
 
     @Transactional
     public void modifyMemo(Long scheduleId, Long memoId, MemoRequest memoRequest, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
+        findScheduleById(scheduleId);
+
+        Memo memo = findMemoById(memoId);
+
         validateScheduleMemo(scheduleId, memoId);
 
-        Memo memo = memoRepository.findById(memoId)
-                .orElseThrow(() -> new NotFoundException(Memo.class, memoId));
+        validateMemoOwner(memo, memberId);
 
         memo.modify(memoRequest.getTitle(), memoRequest.getContent());
     }
 
+    private void validateMemoOwner(Memo memo, Long memberId) {
+        if (!memo.getMemberId().equals(memberId)) {
+            throw new ForbiddenException(Memo.class, memo.getId(), memberId);
+        }
+    }
+
     @Transactional
     public void deleteMemo(Long scheduleId, Long memoId, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
+        findScheduleById(scheduleId);
+
+        Memo memo = findMemoById(memoId);
+
         validateScheduleMemo(scheduleId, memoId);
 
-        memoRepository.deleteById(memoId);
+        validateMemoOwner(memo, memberId);
+
+        memoRepository.delete(memo);
     }
 
     // 체크리스트
     @Transactional
     public Long saveChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest, Long memberId) {
+        Schedule schedule = findScheduleById(scheduleId);
+
         validateScheduleMember(scheduleId, memberId);
 
-        Checklist checklist = scheduleRepository.findById(scheduleId)
-                .map(schedule -> createChecklist(checklistCreationRequest, schedule))
-                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
+        Checklist checklist = createChecklist(checklistCreationRequest, schedule);
 
         return checklistRepository.save(checklist).getId();
     }
@@ -272,6 +301,8 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<ChecklistResponse> getChecklists(Long scheduleId, Long memberId) {
+        findScheduleById(scheduleId);
+
         validateScheduleMember(scheduleId, memberId);
 
         return checklistRepository.findByScheduleId(scheduleId).stream()
@@ -281,13 +312,20 @@ public class ScheduleService {
 
     @Transactional
     public void doCheck(Long scheduleId, Long checklistId, Long memberId, boolean flag) {
-        validateScheduleMember(scheduleId, memberId);
+        findScheduleById(scheduleId);
+
+        Checklist checklist = findChecklistById(checklistId);
+
         validateScheduleChecklist(scheduleId, checklistId);
 
-        Checklist checklist = checklistRepository.findById(checklistId)
-                .orElseThrow(() -> new NotFoundException(Checklist.class, checklistId));
+        validateScheduleMember(scheduleId, memberId);
 
         checklist.check(flag);
+    }
+
+    private Checklist findChecklistById(Long checklistId) {
+        return checklistRepository.findById(checklistId)
+                .orElseThrow(() -> new NotFoundException(Checklist.class, checklistId));
     }
 
     private void validateScheduleChecklist(Long scheduleId, Long checklistId) {
@@ -300,20 +338,24 @@ public class ScheduleService {
 
     @Transactional
     public void deleteChecklist(Long scheduleId, Long checklistId, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
+        findScheduleById(scheduleId);
+
+        Checklist checklist = findChecklistById(checklistId);
+
         validateScheduleChecklist(scheduleId, checklistId);
 
-        checklistRepository.deleteById(checklistId);
+        validateScheduleMember(scheduleId, memberId);
+
+        checklistRepository.delete(checklist);
     }
 
 
     // 투표
     @Transactional
     public Long saveVoting(Long scheduleId, VotingCreationRequest votingCreationRequest, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
+        Schedule schedule = findScheduleById(scheduleId);
 
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
+        validateScheduleMember(scheduleId, memberId);
 
         Voting voting = createVoting(votingCreationRequest, memberId, schedule);
 
@@ -343,14 +385,6 @@ public class ScheduleService {
                 .build();
     }
 
-    @Transactional
-    public void deleteVoting(Long scheduleId, Long votingId, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
-        validateScheduleVoting(scheduleId, votingId);
-
-        votingRepository.deleteById(votingId);
-    }
-
     private void validateScheduleVoting(Long scheduleId, Long votingId) {
         boolean notExists = !votingRepository.existsByIdAndScheduleId(votingId, scheduleId);
 
@@ -361,6 +395,8 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<VotingSimpleResponse> getVotingList(Long scheduleId, Long memberId) {
+        findScheduleById(scheduleId);
+
         validateScheduleMember(scheduleId, memberId);
 
         return votingRepository.findByScheduleId(scheduleId)
@@ -371,28 +407,56 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public VotingDetailResponse getVoting(Long scheduleId, Long votingId, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
+        findScheduleById(scheduleId);
+
+        Voting voting = findVotingById(votingId);
+
         validateScheduleVoting(scheduleId, votingId);
 
-        Voting voting = votingRepository.findById(votingId)
-                .orElseThrow(() -> new NotFoundException(Voting.class, votingId));
+        validateScheduleMember(scheduleId, memberId);
 
         Long ownerId = voting.getMemberId();
 
-        Member owner = memberRepository.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException(Member.class, memberId));
+        Member owner = findMemberById(ownerId);
 
         return VotingDetailResponse.of(voting, owner, memberId);
     }
 
+    private Voting findVotingById(Long votingId) {
+        return votingRepository.findById(votingId)
+                .orElseThrow(() -> new NotFoundException(Voting.class, votingId));
+    }
+
     @Transactional
     public void doVote(Long scheduleId, Long votingId, VotingRequest votingRequest, Long memberId) {
-        validateScheduleMember(scheduleId, memberId);
+        findScheduleById(scheduleId);
+
+        Voting voting = findVotingById(votingId);
+
         validateScheduleVoting(scheduleId, votingId);
 
-        Voting voting = votingRepository.findById(votingId)
-                .orElseThrow(() -> new NotFoundException(Voting.class, votingId));
+        validateScheduleMember(scheduleId, memberId);
 
         voting.vote(votingRequest.getVotingMap(), memberId);
     }
+
+    @Transactional
+    public void deleteVoting(Long scheduleId, Long votingId, Long memberId) {
+        findScheduleById(scheduleId);
+
+        Voting voting = findVotingById(votingId);
+
+        validateScheduleVoting(scheduleId, votingId);
+
+        validateVotingOwner(voting, memberId);
+
+        votingRepository.delete(voting);
+    }
+
+    private void validateVotingOwner(Voting voting, Long memberId) {
+        if (!voting.getMemberId().equals(memberId)) {
+            throw new ForbiddenException(Voting.class, voting.getId(), memberId);
+        }
+    }
+
 }
