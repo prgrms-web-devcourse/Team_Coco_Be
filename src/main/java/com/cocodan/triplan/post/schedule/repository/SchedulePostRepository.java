@@ -25,6 +25,6 @@ public interface SchedulePostRepository extends JpaRepository<SchedulePost, Long
     List<SchedulePost> findAllByCityAndTitleOrContentContainingOrderByViewsDesc(City city, String title, String content, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select sp from SchedulePost sp where sp.schedule.id = :schedulePostId")
+    @Query("select sp from SchedulePost sp where sp.id = :schedulePostId")
     Optional<SchedulePost> findByIdForLikedCountUpdate(Long schedulePostId);
 }

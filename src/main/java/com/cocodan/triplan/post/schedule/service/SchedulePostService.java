@@ -78,7 +78,7 @@ public class SchedulePostService {
                 .build();
 
         SchedulePost savedSchedulePost = schedulePostRepository.save(post);
-        return savedSchedulePost.getSchedule().getId();
+        return savedSchedulePost.getId();
     }
 
     @Transactional(readOnly = true)
