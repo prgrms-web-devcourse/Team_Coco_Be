@@ -4,8 +4,12 @@ import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 
+import javax.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
 
 public interface SchedulePostRepository extends JpaRepository<SchedulePost, Long> {
 
@@ -19,4 +23,8 @@ public interface SchedulePostRepository extends JpaRepository<SchedulePost, Long
     List<SchedulePost> findAllByCityOrderByViewsDesc(City city, Pageable pageable);
     List<SchedulePost> findAllByCityAndTitleOrContentContainingOrderByCreatedDateDesc(City city, String title, String content, Pageable pageable);
     List<SchedulePost> findAllByCityAndTitleOrContentContainingOrderByViewsDesc(City city, String title, String content, Pageable pageable);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select sp from SchedulePost sp where sp.schedule.id = :schedulePostId")
+    Optional<SchedulePost> findByIdForLikedCountUpdate(Long schedulePostId);
 }
