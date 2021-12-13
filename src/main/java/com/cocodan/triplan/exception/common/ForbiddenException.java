@@ -4,7 +4,7 @@ import com.cocodan.triplan.util.ExceptionMessageUtils;
 import lombok.Getter;
 
 @Getter
-public class ForbiddenException extends RuntimeException{
+public class ForbiddenException extends RuntimeException {
 
     private Class<?> resource;
 
@@ -15,7 +15,10 @@ public class ForbiddenException extends RuntimeException{
     private Long accessorId;
 
     public ForbiddenException(Class<?> resource, Class<?> accessor, Long resourceId, Long accessorId) {
-        super(ExceptionMessageUtils.getMessage("exception.forbidden"));
+        super(ExceptionMessageUtils.getMessage(
+                "exception.forbidden",
+                new Object[]{ExceptionMessageUtils.getMessage(resource.getSimpleName())}
+        ));
         this.resource = resource;
         this.accessor = accessor;
         this.resourceId = resourceId;
