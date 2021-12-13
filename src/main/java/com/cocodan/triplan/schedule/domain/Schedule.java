@@ -14,6 +14,11 @@ import java.util.List;
 @Entity
 public class Schedule extends BaseEntity {
 
+    public static final int TITLE_MIN_LENGTH = 1;
+    public static final int TITLE_MAX_LENGTH = 16;
+
+    public static final int THEME_MAX_COUNT = 6;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

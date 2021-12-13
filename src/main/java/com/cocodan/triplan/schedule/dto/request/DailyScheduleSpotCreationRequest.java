@@ -1,8 +1,10 @@
 package com.cocodan.triplan.schedule.dto.request;
 
+import com.cocodan.triplan.spot.domain.Spot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 
@@ -17,6 +19,7 @@ public class DailyScheduleSpotCreationRequest {
 
     private String roadAddressName;
 
+    @Length(min = Spot.PHONE_LENGTH, max = Spot.PHONE_LENGTH)
     private String phone;
 
     private String placeName;

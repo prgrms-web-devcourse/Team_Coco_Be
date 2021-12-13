@@ -9,11 +9,16 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Voting extends BaseEntity {
+
+    public static final int MIN_LENGTH = 1;
+    public static final int MAX_LENGTH = 16;
+
+    public static final int CONTENT_MAX = 10;
+    public static final int CONTENT_MIN = 2;
 
     @Id
     @Column(name = "id", nullable = false)

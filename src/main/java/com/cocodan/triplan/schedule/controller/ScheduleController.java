@@ -56,7 +56,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleDetailResponse> getSchedule(@PathVariable Long scheduleId) {
 //        Member member = getMember();
 //        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId, member.getId());
-        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId, MEMBER_ID);
+        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId);
 
         return ResponseEntity.ok(schedule);
     }

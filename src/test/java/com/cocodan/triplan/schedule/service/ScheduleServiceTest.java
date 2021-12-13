@@ -121,7 +121,7 @@ class ScheduleServiceTest {
         Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
-        ScheduleDetailResponse response = scheduleService.getSchedule(scheduleId, MEMBER_ID);
+        ScheduleDetailResponse response = scheduleService.getSchedule(scheduleId);
 
         // Then
         assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
@@ -239,7 +239,7 @@ class ScheduleServiceTest {
                 .map((MemoSimpleResponse::getId))
                 .collect(Collectors.toList());
 
-        
+
         // Then
         assertThat(ids).containsExactly(memo1, memo2, memo3);
         assertThat(titles).containsExactlyInAnyOrder("memotitle1", "memotitle2", "memotitle3");
