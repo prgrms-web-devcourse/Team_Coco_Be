@@ -66,7 +66,7 @@ public class ScheduleController {
     public ResponseEntity<Void> modifySchedule(@PathVariable Long scheduleId, @RequestBody @Valid ScheduleModificationRequest scheduleModificationRequest) {
         scheduleService.modifySchedule(scheduleId, scheduleModificationRequest);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation("일정 삭제")
@@ -76,7 +76,7 @@ public class ScheduleController {
 //        scheduleService.deleteSchedule(scheduleId, member.getId());
         scheduleService.deleteSchedule(scheduleId, MEMBER_ID);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     // 메모
@@ -118,7 +118,7 @@ public class ScheduleController {
 //        scheduleService.modifyMemo(scheduleId, memoId, memoRequest, member.getId());
         scheduleService.modifyMemo(scheduleId, memoId, memoRequest, MEMBER_ID);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation("메모 삭제")
@@ -128,7 +128,7 @@ public class ScheduleController {
 //        scheduleService.deleteMemo(scheduleId, memoId, member.getId());
         scheduleService.deleteMemo(scheduleId, memoId, MEMBER_ID);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     // 체크리스트
@@ -159,7 +159,7 @@ public class ScheduleController {
 //        scheduleService.doCheck(scheduleId, checklistId, member.getId(), flag);
         scheduleService.doCheck(scheduleId, checklistId, MEMBER_ID, flag);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation("체크리스트 삭제")
@@ -169,7 +169,7 @@ public class ScheduleController {
 //        scheduleService.deleteChecklist(scheduleId, checklistId, member.getId());
         scheduleService.deleteChecklist(scheduleId, checklistId, MEMBER_ID);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     // 투표
@@ -209,7 +209,7 @@ public class ScheduleController {
 //        scheduleService.doVote(scheduleId, votingId, votingRequest, member.getId());
         scheduleService.doVote(scheduleId, votingId, votingRequest, MEMBER_ID);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation("투표 삭제")
@@ -219,6 +219,6 @@ public class ScheduleController {
 //        scheduleService.deleteVoting(scheduleId, votingId, member.getId());
         scheduleService.deleteVoting(scheduleId, votingId, MEMBER_ID);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 }
