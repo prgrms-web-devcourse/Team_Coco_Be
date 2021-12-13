@@ -30,14 +30,14 @@ public class Checklist extends BaseEntity {
     @Column(name = "checked", columnDefinition = "boolean default false")
     private boolean checked;
 
-    @Column(name = "trip_date")
-    private LocalDate date;
+    @Column(name = "day")
+    private int day;
 
     @Builder
-    public Checklist(Schedule schedule, String title, LocalDate date) {
+    public Checklist(Schedule schedule, String title, int day) {
         this.schedule = schedule;
         this.title = title;
-        this.date = date;
+        this.day = day;
         schedule.getChecklists().add(this);
     }
 
@@ -57,7 +57,7 @@ public class Checklist extends BaseEntity {
         return checked;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public int getDay() {
+        return day;
     }
 }

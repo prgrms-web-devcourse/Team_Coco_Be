@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter
@@ -13,19 +15,24 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class DailyScheduleSpotCreationRequest {
 
-    private Long spotId;
+    private long spotId;
 
+    @NotBlank
     private String addressName;
 
+    @NotBlank
     private String roadAddressName;
 
-    @Length(min = Spot.PHONE_LENGTH, max = Spot.PHONE_LENGTH)
+    @Length(min = Spot.PHONE_MIN_LENGTH, max = Spot.PHONE_MAX_LENGTH)
     private String phone;
 
+    @NotBlank
     private String placeName;
 
+    @NotNull
     private Position position;
 
+    @NotNull
     private LocalDate date;
 
     private int order;

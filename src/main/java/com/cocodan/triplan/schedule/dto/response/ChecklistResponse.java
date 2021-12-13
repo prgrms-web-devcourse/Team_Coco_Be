@@ -14,14 +14,14 @@ public class ChecklistResponse {
 
     private boolean checked;
 
-    private String date;
+    private int day;
 
     public static ChecklistResponse from(Checklist checklist) {
         return ChecklistResponse.builder()
                 .id(checklist.getId())
                 .content(checklist.getContent())
                 .checked(checklist.isChecked())
-                .date(checklist.getDate().toString())
+                .day(checklist.getDay())
                 .build();
     }
 }

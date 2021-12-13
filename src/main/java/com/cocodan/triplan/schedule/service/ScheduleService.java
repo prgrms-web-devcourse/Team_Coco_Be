@@ -266,7 +266,7 @@ public class ScheduleService {
         return Checklist.builder()
                 .title(checklistCreationRequest.getTitle())
                 .schedule(schedule)
-                .date(checklistCreationRequest.getDate())
+                .day(checklistCreationRequest.getDay())
                 .build();
     }
 

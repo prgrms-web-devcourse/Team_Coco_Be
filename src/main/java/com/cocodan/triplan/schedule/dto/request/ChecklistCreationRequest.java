@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ChecklistCreationRequest {
 
-    private LocalDate date;
+    private int day;
 
     @Length(min = Checklist.MIN_LENGTH, max = Checklist.MAX_LENGTH)
     private String title;

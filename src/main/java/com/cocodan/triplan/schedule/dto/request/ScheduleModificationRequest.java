@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ScheduleModificationRequest {
     @Size(max = Schedule.THEME_MAX_COUNT)
     private List<String> themes;
 
+    @NotNull
     private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
 
 }

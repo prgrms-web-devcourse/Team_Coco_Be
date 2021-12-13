@@ -12,7 +12,8 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Spot extends BaseEntity implements Persistable<Long> {
 
-    public static final int PHONE_LENGTH = 11;
+    public static final int PHONE_MAX_LENGTH = 13;
+    public static final int PHONE_MIN_LENGTH = 10;
 
     @Id
     @Column(name = "id", nullable = false)
