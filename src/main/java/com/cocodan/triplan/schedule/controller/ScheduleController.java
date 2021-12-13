@@ -134,9 +134,10 @@ public class ScheduleController {
     // 체크리스트
     @ApiOperation("체크리스트 생성")
     @PostMapping("/{scheduleId}/checklists")
-    public ResponseEntity<Long> saveChecklist(@PathVariable Long
-                                                      scheduleId, @RequestBody @Valid ChecklistCreationRequest checklistCreationRequest) {
-        Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest);
+    public ResponseEntity<Long> saveChecklist(@PathVariable Long scheduleId, @RequestBody @Valid ChecklistCreationRequest checklistCreationRequest) {
+//        Member member = getMember();
+//        Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest, member.getId());
+        Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest, MEMBER_ID);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedId);
     }
@@ -153,8 +154,7 @@ public class ScheduleController {
 
     @ApiOperation("체크리스트 선택 및 해제")
     @PatchMapping("/{scheduleId}/checklists/{checklistId}")
-    public ResponseEntity<Void> doCheck(@PathVariable Long scheduleId, @PathVariable Long checklistId,
-                                        @RequestParam boolean flag) {
+    public ResponseEntity<Void> doCheck(@PathVariable Long scheduleId, @PathVariable Long checklistId, @RequestParam boolean flag) {
 //        Member member = getMember();
 //        scheduleService.doCheck(scheduleId, checklistId, member.getId(), flag);
         scheduleService.doCheck(scheduleId, checklistId, MEMBER_ID, flag);
@@ -186,7 +186,9 @@ public class ScheduleController {
     @ApiOperation("일정에 속한 투표 목록 조회")
     @GetMapping("/{scheduleId}/votings")
     public ResponseEntity<List<VotingSimpleResponse>> getVotingList(@PathVariable Long scheduleId) {
-        List<VotingSimpleResponse> votingSimpleResponses = scheduleService.getVotingList(scheduleId);
+//        Member member = getMember();
+//        List<VotingSimpleResponse> votingSimpleResponses = scheduleService.getVotingList(scheduleId, member.getId());
+        List<VotingSimpleResponse> votingSimpleResponses = scheduleService.getVotingList(scheduleId, MEMBER_ID);
 
         return ResponseEntity.ok(votingSimpleResponses);
     }
