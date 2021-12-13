@@ -110,7 +110,7 @@ class ScheduleServiceTest {
         assertThat(scheduleSimpleResponse.getTitle()).isEqualTo("title");
         assertThat(scheduleSimpleResponse.getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(scheduleSimpleResponse.getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
-        assertThat(scheduleSimpleResponse.getThema()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(scheduleSimpleResponse.getThemes()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
     }
 
     @Test
@@ -127,7 +127,7 @@ class ScheduleServiceTest {
         assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(response.getScheduleSimpleResponse().getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
         assertThat(response.getScheduleSimpleResponse().getTitle()).isEqualTo("title");
-        assertThat(response.getScheduleSimpleResponse().getThema()).contains(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(response.getScheduleSimpleResponse().getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
 
         List<Long> memberIds = response.getMemberSimpleResponses().stream()
                 .map(MemberSimpleResponse::getId)

@@ -42,17 +42,22 @@ public class ScheduleService {
     public Long saveSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
         Schedule schedule = convertSchedule(scheduleCreationRequest, memberId);
 
-        scheduleCreationRequest.getDailyScheduleSpotCreationRequests().stream()
-                .filter(this::isNotSavedSpot)
-                .forEach(spotService::createSpot);
+        scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
+                .forEach(this::saveSpot);
 
         return scheduleRepository.save(schedule).getId();
+    }
+
+    private void saveSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+        if (isNotSavedSpot(dailyScheduleSpotCreationRequest)) {
+            spotService.createSpot(dailyScheduleSpotCreationRequest);
+        }
     }
 
     private Schedule convertSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
         Schedule schedule = createSchedule(scheduleCreationRequest, memberId);
 
-        createScheduleThema(scheduleCreationRequest, schedule);
+        createScheduleThemes(scheduleCreationRequest, schedule);
 
         createScheduleDailySpots(scheduleCreationRequest, schedule);
 
@@ -68,8 +73,8 @@ public class ScheduleService {
                 .build();
     }
 
-    private void createScheduleThema(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
-        scheduleCreationRequest.getThemeList()
+    private void createScheduleThemes(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
+        scheduleCreationRequest.getThemes()
                 .stream()
                 .map(s -> Theme.valueOf(s.toUpperCase()))
                 .forEach(theme -> new ScheduleTheme(schedule, theme));
@@ -139,8 +144,13 @@ public class ScheduleService {
     public void modifySchedule(Long scheduleId, ScheduleModificationRequest scheduleModificationRequest, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
 
+        scheduleModificationRequest.getDailyScheduleSpotCreationRequests()
+                .forEach(this::saveSpot);
+
         scheduleRepository.findById(scheduleId)
                 .map(schedule -> {
+                    schedule.updateTitle(scheduleModificationRequest.getTitle());
+                    schedule.updateThemes(scheduleModificationRequest.getThemes());
                     schedule.removeAllSpots();
                     convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
                     return schedule;

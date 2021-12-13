@@ -30,7 +30,7 @@ public class SchedulePostResponse {
 
     private City city;
 
-    private List<Theme> thema;
+    private List<Theme> themes;
 
     private LocalDate startDate;
 
@@ -44,7 +44,7 @@ public class SchedulePostResponse {
                 .ages(Ages.from(member.getBirth()))
                 .genderType(member.getGender())
                 .city(city)
-                .thema(themes)
+                .themes(themes)
                 .startDate(schedule.getStartDate())
                 .endDate(schedule.getEndDate())
                 .build();

@@ -29,7 +29,7 @@ public class ScheduleTheme extends BaseEntity {
     public ScheduleTheme(Schedule schedule, Theme theme) {
         this.schedule = schedule;
         this.theme = theme;
-        this.schedule.getScheduleThema().add(this);
+        this.schedule.getScheduleThemes().add(this);
     }
 
     public Long getId() {

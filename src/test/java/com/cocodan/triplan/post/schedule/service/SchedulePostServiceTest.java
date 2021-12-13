@@ -91,7 +91,7 @@ class SchedulePostServiceTest {
         assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL);
         assertThat(posts.get(0).getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(posts.get(0).getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
-        assertThat(posts.get(0).getThema()).contains(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(posts.get(0).getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
 
         // TODO: 다양한 조건으로 테스트 추가
     }

@@ -23,7 +23,7 @@ public class ScheduleCreationRequest {
     private LocalDate endDate;
 
     @Size(max = Schedule.THEME_MAX_COUNT)
-    private List<String> themeList;
+    private List<String> themes;
 
     private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
 }

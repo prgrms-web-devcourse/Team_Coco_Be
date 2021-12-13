@@ -18,7 +18,7 @@ public class ScheduleModificationRequest {
     private String title;
 
     @Size(max = Schedule.THEME_MAX_COUNT)
-    private List<String> themeList;
+    private List<String> themes;
 
     private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
 
