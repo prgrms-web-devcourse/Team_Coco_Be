@@ -290,7 +290,7 @@ class SchedulePostServiceTest {
                 post.getSchedule().getDailyScheduleSpots().stream()
                         .map(DailyScheduleSpotResponse::from)
                         .toArray()
-                );
+        );
     }
 
     @Test
@@ -427,7 +427,7 @@ class SchedulePostServiceTest {
     }
 
     @Test
-    @DisplayName("작성항 댓글을 삭제할 수 있다")
+    @DisplayName("작성한 댓글을 삭제할 수 있다")
     @Transactional
     void deleteCommentFromSchedulePost() {
         // 댓글 작성
@@ -444,5 +444,27 @@ class SchedulePostServiceTest {
         // 댓글 삭제 확인
         List<SchedulePostCommentResponse> commentsAfterDeletion = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
         assertThat(commentsAfterDeletion.size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("작성한 댓글을 수정할 수 있다")
+    @Transactional
+    void modifyCommentOfASchedulePost() {
+        // 댓글 작성
+        Long createdSchedulePostId1 = createSchedulePost1();
+        SchedulePostCommentRequest comment1 = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        // 댓글 작성 확인
+        assertThat(comments.size()).isEqualTo(1);
+        assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        assertThat(comments.get(0).getNickname()).isEqualTo(NICKNAME);
+
+        // 댓글 수정
+        SchedulePostCommentRequest modifyRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        schedulePostService.modifySchedulePostComment(createdSchedulePostId1, comments.get(0).getId(), testMemberId, modifyRequest);
+        // 댓글 수정 확인
+        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        assertThat(schedulePostComments.size()).isEqualTo(1);
+        assertThat(schedulePostComments.get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
     }
 }

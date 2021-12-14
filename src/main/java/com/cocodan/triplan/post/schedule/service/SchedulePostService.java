@@ -188,9 +188,7 @@ public class SchedulePostService {
 
     @Transactional(readOnly = true)
     public List<SchedulePostCommentResponse> getSchedulePostComments(Long schedulePostId) {
-        if (schedulePostId == null) {
-            throw new RuntimeException("Invalid Request");
-        }
+        nullCheck(schedulePostId);
 
         SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
                 () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
@@ -231,9 +229,20 @@ public class SchedulePostService {
 
     @Transactional
     public void deleteSchedulePostComment(Long schedulePostId, Long commentId, Long memberId) {
-        if (schedulePostId == null || commentId == null || memberId == null) {
-            throw new RuntimeException("Invalid Request");
-        }
+        validateCommentOwnership(schedulePostId, commentId, memberId);
+        schedulePostCommentRepository.deleteById(commentId);
+    }
+
+    @Transactional
+    public void modifySchedulePostComment(Long schedulePostId, Long commentId, Long memberId, SchedulePostCommentRequest request) {
+        validateCommentOwnership(schedulePostId, commentId, memberId);
+        SchedulePostComment comment = schedulePostCommentRepository.getById(commentId);
+        comment.updateContent(request.getContent());
+        schedulePostCommentRepository.save(comment);
+    }
+
+    private void validateCommentOwnership(Long schedulePostId, Long commentId, Long memberId) {
+        nullCheck(schedulePostId, commentId, memberId);
 
         SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
                 () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
@@ -246,7 +255,13 @@ public class SchedulePostService {
         if (!memberId.equals(comment.getMemberId())) {
             throw new RuntimeException("Invalid Request. Only writer can delete a comment");
         }
+    }
 
-        schedulePostCommentRepository.delete(comment);
+    private void nullCheck(Object... args) {
+        for (Object obj : args) {
+            if (obj == null) {
+                throw new RuntimeException("Invalid Request");
+            }
+        }
     }
 }
