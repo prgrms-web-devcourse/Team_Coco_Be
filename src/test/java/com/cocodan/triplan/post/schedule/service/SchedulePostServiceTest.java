@@ -3,6 +3,7 @@ package com.cocodan.triplan.post.schedule.service;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
@@ -43,6 +44,9 @@ class SchedulePostServiceTest {
     MemberService memberService;
 
     private static Long testMemberId;
+
+    private static Long createdScheduleId;
+
     private static final String EMAIL = "KimLeePark@gmail.com";
     private static final String NAME = "김이박";
     private static final String PHONE = "01077775555";
@@ -109,6 +113,24 @@ class SchedulePostServiceTest {
                 ));
     }
 
+    private Long createSchedulePost1() {
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
+        SchedulePostRequest request = SchedulePostRequest.builder()
+                .title("1번 여행!")
+                .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
+                        "\n" +
+                        "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
+                        "\n" +
+                        "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
+                        "\n" +
+                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]")
+                .city("서울")
+                .scheduleId(createdScheduleId)
+                .build();
+        return schedulePostService.createSchedulePost(testMemberId, request);
+    }
+
     @Test
     @DisplayName("여행 공유 게시글 생성 로직이 정상적으로 동작한다.")
     @Transactional
@@ -142,22 +164,9 @@ class SchedulePostServiceTest {
     @DisplayName("여행 공유 게시글을 상세 조회 할 수 있다.")
     @Transactional
     void getSchedulePostDetail() {
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
-        SchedulePostRequest request = SchedulePostRequest.builder()
-                .title("1번 여행!")
-                .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
-                        "\n" +
-                        "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
-                        "\n" +
-                        "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
-                        "\n" +
-                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
-        Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
+        Long createdSchedulePostId = createSchedulePost1();
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
+        long initialViews = post.getViews();
 
         SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId);
 
@@ -172,6 +181,7 @@ class SchedulePostServiceTest {
         assertThat(schedulePostDetail.getCity()).isEqualTo(City.SEOUL);
         assertThat(schedulePostDetail.getCreatedAt()).isEqualTo(post.getCreatedDate());
         assertThat(schedulePostDetail.getViews()).isEqualTo(post.getViews());
+        assertThat(initialViews + 1).isEqualTo(post.getViews());
         assertThat(schedulePostDetail.getLiked()).isEqualTo(post.getLiked());
         assertThat(schedulePostDetail.getStartDate()).isEqualTo(post.getSchedule().getStartDate());
         assertThat(schedulePostDetail.getEndDate()).isEqualTo(post.getSchedule().getEndDate());
@@ -192,21 +202,7 @@ class SchedulePostServiceTest {
     @DisplayName("생성된 공유 게시글을 삭제할 수 있다")
     @Transactional
     void deleteSchedulePost() {
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
-        SchedulePostRequest request = SchedulePostRequest.builder()
-                .title("1번 여행!")
-                .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
-                        "\n" +
-                        "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
-                        "\n" +
-                        "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
-                        "\n" +
-                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
-        Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
+        Long createdSchedulePostId = createSchedulePost1();
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
 
         // 게시글 생성 확인
@@ -225,21 +221,7 @@ class SchedulePostServiceTest {
     @DisplayName("작성한 공유 게시글을 수정할 수 있다")
     @Transactional
     void modifySchedulePost() {
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
-        Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
-        SchedulePostRequest createRequest = SchedulePostRequest.builder()
-                .title("1번 여행!")
-                .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
-                        "\n" +
-                        "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
-                        "\n" +
-                        "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
-                        "\n" +
-                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
-        Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, createRequest);
+        Long createdSchedulePostId = createSchedulePost1();
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
 
         SchedulePostRequest modifyRequest = SchedulePostRequest.builder()
@@ -275,6 +257,27 @@ class SchedulePostServiceTest {
                 "\n" +
                 "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.");
         assertThat(modifiedPost.getCity()).isEqualTo(City.BUSAN);
+    }
 
+    @Test
+    @DisplayName("작성된 공유 게시글에 좋아요 토글을 할 수 있다")
+    @Transactional
+    void toggleSchedulePostLiked() {
+        Long createdSchedulePostId = createSchedulePost1();
+        SchedulePost post = schedulePostService.findById(createdSchedulePostId);
+        // 좋아요 누르기 전 좋아요 수
+        long beforeLiked = post.getLiked();
+
+        // 좋아요 누르기
+        SchedulePostLikeRequest doSchedulePostLike = new SchedulePostLikeRequest(createdSchedulePostId, true);
+        Long afterLiked = schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLike);
+        // 좋아요 취소
+        SchedulePostLikeRequest doSchedulePostLikeAgain = new SchedulePostLikeRequest(createdSchedulePostId, false);
+        Long afterLikedAgain = schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLikeAgain);
+
+        // 좋아요 누른 후 좋아요 수
+        assertThat(beforeLiked + 1).isEqualTo(afterLiked);
+        // 좋아요 취소된 후 좋아요 수
+        assertThat(beforeLiked).isEqualTo(afterLikedAgain);
     }
 }

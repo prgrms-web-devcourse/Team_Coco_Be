@@ -3,10 +3,13 @@ package com.cocodan.triplan.post.schedule.service;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
+import com.cocodan.triplan.post.schedule.domain.Like;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.repository.SchedulePostLikeRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
@@ -14,7 +17,6 @@ import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.ScheduleTheme;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
-import com.cocodan.triplan.schedule.service.ScheduleService;
 import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,12 +37,20 @@ public class SchedulePostService {
     private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
 
+    private final SchedulePostLikeRepository schedulePostLikeRepository;
+
     private final SchedulePostRepository schedulePostRepository;
 
-    public SchedulePostService(MemberService memberService, ScheduleService scheduleService, MemberRepository memberRepository, ScheduleRepository scheduleRepository, SchedulePostRepository schedulePostRepository) {
+    public SchedulePostService(
+            MemberService memberService,
+            MemberRepository memberRepository,
+            ScheduleRepository scheduleRepository,
+            SchedulePostLikeRepository schedulePostLikeRepository,
+            SchedulePostRepository schedulePostRepository) {
         this.memberService = memberService;
         this.memberRepository = memberRepository;
         this.scheduleRepository = scheduleRepository;
+        this.schedulePostLikeRepository = schedulePostLikeRepository;
         this.schedulePostRepository = schedulePostRepository;
     }
 
@@ -67,7 +78,7 @@ public class SchedulePostService {
                 .build();
 
         SchedulePost savedSchedulePost = schedulePostRepository.save(post);
-        return savedSchedulePost.getSchedule().getId();
+        return savedSchedulePost.getId();
     }
 
     @Transactional(readOnly = true)
@@ -145,7 +156,8 @@ public class SchedulePostService {
         SchedulePost schedulePost = schedulePostRepository.findById(postId).orElseThrow(
                 () -> new RuntimeException("No such post found (ID : " + postId + ")")
         );
-
+        // TODO: 2021.12.13 Teru - 조회수에 대한 동시성 문제를 어떻게 해야 잘 해결할 수 있을지 고민... 현재는 별다른 처리를 해두지 않은 상태
+        schedulePost.increaseViews();
         return SchedulePostDetailResponse.from(schedulePost);
     }
 
@@ -197,5 +209,30 @@ public class SchedulePostService {
         schedulePost.updateCity(City.from(request.getCity()));
 
         schedulePostRepository.save(schedulePost);
+    }
+
+    @Transactional
+    public Long toggleSchedulePostLiked(Long memberId, SchedulePostLikeRequest request) {
+        // TODO: 2021.12.13 Teru - 좋아요 수에 대한 동시성 문제를 어떻게하면 더 잘 해결할 수 있을지 고민...
+        Long schedulePostId = request.getSchedulePostId();
+        Optional<Like> likeData =
+                schedulePostLikeRepository.findByMemberIdAndSchedulePostId(memberId, schedulePostId);
+        SchedulePost post = schedulePostRepository.findByIdForLikedCountUpdate(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No such schedule post found (ID : " + schedulePostId + ")")
+        );
+
+        if (likeData.isEmpty() && request.getFlag()) {
+            Like like = new Like(memberId, post);
+            schedulePostLikeRepository.save(like);
+            return post.increaseLiked();
+        }
+
+        if (likeData.isPresent() && !request.getFlag()) {
+            schedulePostLikeRepository.delete(likeData.get());
+            return post.decreaseLiked();
+        }
+
+        // Invalid Like toggle
+        return post.getLiked();
     }
 }

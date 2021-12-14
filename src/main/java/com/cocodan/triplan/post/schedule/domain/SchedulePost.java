@@ -47,17 +47,17 @@ public class SchedulePost extends BaseEntity {
     private String content;
 
     @Column(name = "views", nullable = false)
-    private Long views;
+    private long views;
 
     @Column(name = "liked", nullable = false)
-    private Long liked;
+    private long liked;
 
     @Column(name = "city", nullable = false)
     @Enumerated(EnumType.STRING)
     private City city;
 
     @Builder
-    public SchedulePost(Member member, Schedule schedule, String title, String content, Long views, Long liked, City city) {
+    public SchedulePost(Member member, Schedule schedule, String title, String content, long views, long liked, City city) {
         this.member = member;
         this.schedule = schedule;
         this.title = title;
@@ -77,5 +77,17 @@ public class SchedulePost extends BaseEntity {
 
     public void updateCity(City city) {
         this.city = city;
+    }
+
+    public void increaseViews() {
+        views++;
+    }
+
+    public long increaseLiked() {
+        return ++liked;
+    }
+
+    public long decreaseLiked() {
+        return --liked;
     }
 }
