@@ -4,21 +4,24 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
+import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostLikeResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.service.SchedulePostSearchService;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,14 +45,17 @@ public class SchedulePostController {
 
     private final SchedulePostService schedulePostService;
 
-    public SchedulePostController(SchedulePostService schedulePostService) {
+    private final SchedulePostSearchService schedulePostSearchService;
+
+    public SchedulePostController(SchedulePostService schedulePostService, SchedulePostSearchService schedulePostSearchService) {
         this.schedulePostService = schedulePostService;
+        this.schedulePostSearchService = schedulePostSearchService;
     }
 
     @ApiOperation("여행 일정 공유 게시글 (조건별)목록 조회")
     @GetMapping("/schedules")
-    public ResponseEntity<List<SchedulePostResponse>> schedulePostList(
-            @RequestParam(defaultValue = "0") Integer pageIndex,
+    public ResponseEntity<Page<SchedulePostResponse>> schedulePostList(
+            Pageable pageable,
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "전체") String searchingCity,
             @RequestParam(defaultValue = "ALL") String searchingTheme,
@@ -58,12 +64,9 @@ public class SchedulePostController {
         City city = City.from(searchingCity);
         Theme theme = Theme.valueOf(searchingTheme);
         SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
+        Page<SchedulePostResponse> schedulePosts = schedulePostSearchService.getSchedulePosts(search, city, theme, sortRule, pageable);
 
-        List<SchedulePostResponse> schedulePostList
-                = schedulePostService.getSchedulePosts(search, city, theme, sortRule, pageIndex);
-
-        return ResponseEntity.ok(schedulePostList);
-        // TODO: 검색 효율성 개선
+        return ResponseEntity.ok(schedulePosts);
     }
 
     @ApiOperation("여행 일정 공유 게시글 작성")

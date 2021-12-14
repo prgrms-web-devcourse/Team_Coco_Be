@@ -1,6 +1,8 @@
 package com.cocodan.triplan.post.schedule.repository;
 
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
+import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +13,7 @@ import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
-public interface SchedulePostRepository extends JpaRepository<SchedulePost, Long> {
+public interface SchedulePostRepository extends JpaRepository<SchedulePost, Long> , CustomSchedulePostRepository{
 
     // TODO: 2021.12.09 Teru - List가 아니라 Page 형태로 반환하도록 수정하기
     List<SchedulePost> findAllByOrderByCreatedDateDesc(Pageable pageable);
