@@ -5,10 +5,14 @@ import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.post.schedule.domain.Like;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
+import com.cocodan.triplan.post.schedule.domain.SchedulePostComment;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.repository.SchedulePostCommentRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostLikeRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
@@ -39,6 +43,8 @@ public class SchedulePostService {
 
     private final SchedulePostLikeRepository schedulePostLikeRepository;
 
+    private final SchedulePostCommentRepository schedulePostCommentRepository;
+
     private final SchedulePostRepository schedulePostRepository;
 
     public SchedulePostService(
@@ -46,11 +52,14 @@ public class SchedulePostService {
             MemberRepository memberRepository,
             ScheduleRepository scheduleRepository,
             SchedulePostLikeRepository schedulePostLikeRepository,
-            SchedulePostRepository schedulePostRepository) {
+            SchedulePostCommentRepository schedulePostCommentRepository,
+            SchedulePostRepository schedulePostRepository
+    ) {
         this.memberService = memberService;
         this.memberRepository = memberRepository;
         this.scheduleRepository = scheduleRepository;
         this.schedulePostLikeRepository = schedulePostLikeRepository;
+        this.schedulePostCommentRepository = schedulePostCommentRepository;
         this.schedulePostRepository = schedulePostRepository;
     }
 
@@ -152,13 +161,22 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public SchedulePostDetailResponse getSchedulePostDetail(Long postId) {
-        SchedulePost schedulePost = schedulePostRepository.findById(postId).orElseThrow(
-                () -> new RuntimeException("No such post found (ID : " + postId + ")")
+    public SchedulePostDetailResponse getSchedulePostDetail(Long schedulePostId) {
+        SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No such post found (ID : " + schedulePostId + ")")
         );
         // TODO: 2021.12.13 Teru - 조회수에 대한 동시성 문제를 어떻게 해야 잘 해결할 수 있을지 고민... 현재는 별다른 처리를 해두지 않은 상태
         schedulePost.increaseViews();
-        return SchedulePostDetailResponse.from(schedulePost);
+        List<SchedulePostCommentResponse> comments = schedulePostCommentRepository.findAllBySchedulePostId(schedulePostId).stream()
+                .map(schedulePostComment -> {
+                    MemberGetOneResponse memberResponse = memberService.getOne(schedulePostComment.getMemberId());
+                    return SchedulePostCommentResponse.of(
+                            schedulePostComment,
+                            memberResponse,
+                            memberResponse.getId().equals(schedulePost.getMember().getId())
+                    );
+                }).collect(Collectors.toList());
+        return SchedulePostDetailResponse.of(schedulePost, comments);
     }
 
     private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
@@ -241,5 +259,47 @@ public class SchedulePostService {
         List<Like> likeData = schedulePostLikeRepository.findAllByMemberId(memberId);
         List<SchedulePost> schedulePosts = likeData.stream().map(Like::getSchedulePost).collect(Collectors.toList());
         return convertToSchedulePostResponseList(schedulePosts);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SchedulePostCommentResponse> getSchedulePostComments(Long schedulePostId) {
+        if (schedulePostId == null) {
+            throw new RuntimeException("Invalid Request");
+        }
+
+        SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
+        );
+
+        List<SchedulePostComment> schedulePostComments = schedulePostCommentRepository.findAllBySchedulePostId(schedulePostId);
+        return schedulePostComments.stream().map(comment -> {
+            MemberGetOneResponse memberResponse = memberService.getOne(comment.getMemberId());
+            return SchedulePostCommentResponse.of(
+                    comment,
+                    memberResponse,
+                    memberResponse.getId().equals(schedulePost.getId())
+            );
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<SchedulePostCommentResponse> writeSchedulePostComment(Long memberId, Long schedulePostId, SchedulePostCommentRequest request) {
+        if (memberId == null || schedulePostId == null) {
+            throw new RuntimeException("Invalid Request");
+        }
+
+        SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
+        );
+
+        SchedulePostComment comment = SchedulePostComment.builder()
+                .memberId(memberId)
+                .schedulePost(schedulePost)
+                .content(request.getContent())
+                .build();
+
+        schedulePostCommentRepository.save(comment);
+
+        return getSchedulePostComments(schedulePostId);
     }
 }

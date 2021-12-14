@@ -2,8 +2,10 @@ package com.cocodan.triplan.post.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostLikeResponse;
@@ -125,5 +127,23 @@ public class SchedulePostController {
         Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
         return ResponseEntity.ok(schedulePostService.getLikedSchedulePosts(member.getId()));
+    }
+
+    @ApiOperation("여행 공유 게시글에 작성된 댓글 조회하기")
+    @GetMapping("/schedules/{schedulePostId}/comments")
+    public ResponseEntity<List<SchedulePostCommentResponse>> getSchedulePostComments(@PathVariable("schedulePostId") Long schedulePostId) {
+        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.getSchedulePostComments(schedulePostId);
+        return ResponseEntity.ok(schedulePostComments);
+    }
+
+    @ApiOperation("여행 공유 게시글에 댓글 작성하기")
+    @PostMapping("/schedules/{schedulePostId}/comments")
+    public ResponseEntity<List<SchedulePostCommentResponse>> writeSchedulePostComment(@PathVariable("schedulePostId") Long schedulePostId, @RequestBody SchedulePostCommentRequest request) {
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
+        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(member.getId(), schedulePostId, request);
+        return ResponseEntity.ok(schedulePostComments);
     }
 }
