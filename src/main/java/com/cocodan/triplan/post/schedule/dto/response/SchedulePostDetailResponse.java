@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Builder
 public class SchedulePostDetailResponse {
 
+    private Long writerId;
+
     private String nickname;
 
     private Ages ages;
@@ -47,6 +49,7 @@ public class SchedulePostDetailResponse {
 
     public static SchedulePostDetailResponse of(SchedulePost schedulePost, List<SchedulePostCommentResponse> comments) {
         return SchedulePostDetailResponse.builder()
+                .writerId(schedulePost.getMember().getId())
                 .nickname(schedulePost.getMember().getNickname())
                 .ages(Ages.from(schedulePost.getMember().getBirth()))
                 .gender(schedulePost.getMember().getGender())
