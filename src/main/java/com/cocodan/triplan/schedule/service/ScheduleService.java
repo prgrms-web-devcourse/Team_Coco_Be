@@ -1,9 +1,11 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.exception.common.ForbiddenException;
+import com.cocodan.triplan.exception.common.NoFriendsException;
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
@@ -15,6 +17,7 @@ import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.repository.VotingRepository;
 import com.cocodan.triplan.spot.domain.Spot;
 import com.cocodan.triplan.spot.service.SpotService;
+import com.cocodan.triplan.util.ExceptionMessageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,15 +170,15 @@ public class ScheduleService {
     public void deleteSchedule(Long scheduleId, Long memberId) {
         Schedule schedule = findScheduleById(scheduleId);
 
-        validateScheduleOwner(schedule, memberId);
+        if (!isConstructor(schedule, memberId)) {
+            throw new ForbiddenException(Schedule.class, schedule.getId(), memberId);
+        }
 
         scheduleRepository.delete(schedule);
     }
 
-    private void validateScheduleOwner(Schedule schedule, Long memberId) {
-        if (!schedule.getMemberId().equals(memberId)) {
-            throw new ForbiddenException(Schedule.class, schedule.getId(), memberId);
-        }
+    private boolean isConstructor(Schedule schedule, Long memberId) {
+        return schedule.getMemberId().equals(memberId);
     }
 
     @Transactional
@@ -459,4 +462,70 @@ public class ScheduleService {
         }
     }
 
+    // 여행 멤버
+    @Transactional
+    public void addScheduleMember(Long scheduleId, ScheduleMemberRequest scheduleMemberRequest, Long memberId) {
+        Schedule schedule = findScheduleById(scheduleId);
+
+        validateScheduleMember(scheduleId, memberId);
+
+        validateFriends(scheduleMemberRequest, memberId);
+
+        schedule.addMember(scheduleMemberRequest.getFriendId());
+    }
+
+    private void validateFriends(ScheduleMemberRequest scheduleMemberRequest, Long memberId) {
+        if (!memberRepository.existsByIdAndFriendId(memberId, scheduleMemberRequest.getFriendId())) {
+            throw new NoFriendsException(scheduleMemberRequest.getFriendId(), memberId);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<MemberSimpleResponse> getScheduleMembers(Long scheduleId, Long memberId) {
+        Schedule schedule = findScheduleById(scheduleId);
+
+        validateScheduleMember(scheduleId, memberId);
+
+        List<Long> ids = schedule.getScheduleMembers().stream()
+                .map(ScheduleMember::getMemberId)
+                .collect(Collectors.toList());
+
+        return memberRepository.findByIdIn(ids)
+                .stream()
+                .map(MemberSimpleResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteScheduleMember(Long scheduleId, Long deletedId, Long memberId) {
+        Schedule schedule = findScheduleById(scheduleId);
+
+        validateScheduleMember(scheduleId, memberId);
+
+        if (isConstructor(schedule, deletedId)) {
+            throw new IllegalArgumentException(ExceptionMessageUtils.getMessage("exception.bad_request"));
+        }
+
+        ScheduleMember deletedMember = findDeletedMember(schedule, deletedId);
+
+        schedule.deleteScheduleMember(deletedMember);
+    }
+
+    private ScheduleMember findDeletedMember(Schedule schedule, Long deletedId) {
+        return schedule.getScheduleMembers().stream()
+                .filter(scheduleMember -> scheduleMember.getMemberId().equals(deletedId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("exception.bad_request"));
+    }
+
+    @Transactional
+    public void exitSchedule(Long scheduleId, Long memberId) {
+        Schedule schedule = findScheduleById(scheduleId);
+
+        validateScheduleMember(scheduleId, memberId);
+
+        ScheduleMember deletedMember = findDeletedMember(schedule, memberId);
+
+        schedule.deleteScheduleMember(deletedMember);
+    }
 }

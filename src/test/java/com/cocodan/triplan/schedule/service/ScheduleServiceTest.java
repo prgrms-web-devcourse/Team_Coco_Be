@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
+import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.*;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
@@ -260,7 +261,7 @@ class ScheduleServiceTest {
         // Then
         assertThat(actual.getTitle()).isEqualTo("memotitle1");
         assertThat(actual.getContent()).isEqualTo("JIFEOgoiioghiohgieogio1");
-        assertThat(actual.getOwnerId()).isEqualTo(MEMBER_ID);
+        assertThat(actual.getMemberSimpleResponse().getId()).isEqualTo(MEMBER_ID);
     }
 
     @Test
@@ -414,7 +415,7 @@ class ScheduleServiceTest {
         assertThat(response.getId()).isEqualTo(voting);
         assertThat(response.getTitle()).isEqualTo("무슨 요일날 갈까요?");
         assertThat(response.getNumOfTotalParticipants()).isZero();
-        assertThat(response.getOwnerId()).isEqualTo(MEMBER_ID);
+        assertThat(response.getMemberSimpleResponse().getId()).isEqualTo(MEMBER_ID);
         assertThat(contents).containsExactly("월", "화", "수", "목");
     }
 
