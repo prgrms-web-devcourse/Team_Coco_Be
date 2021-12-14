@@ -171,6 +171,7 @@ public class SchedulePostService {
                 .map(schedulePostComment -> {
                     MemberGetOneResponse memberResponse = memberService.getOne(schedulePostComment.getMemberId());
                     return SchedulePostCommentResponse.of(
+                            schedulePostComment.getId(),
                             schedulePostComment,
                             memberResponse,
                             memberResponse.getId().equals(schedulePost.getMember().getId())
@@ -272,10 +273,11 @@ public class SchedulePostService {
         );
 
         List<SchedulePostComment> schedulePostComments = schedulePostCommentRepository.findAllBySchedulePostId(schedulePostId);
-        return schedulePostComments.stream().map(comment -> {
-            MemberGetOneResponse memberResponse = memberService.getOne(comment.getMemberId());
+        return schedulePostComments.stream().map(schedulePostComment -> {
+            MemberGetOneResponse memberResponse = memberService.getOne(schedulePostComment.getMemberId());
             return SchedulePostCommentResponse.of(
-                    comment,
+                    schedulePostComment.getId(),
+                    schedulePostComment,
                     memberResponse,
                     memberResponse.getId().equals(schedulePost.getId())
             );
@@ -301,5 +303,26 @@ public class SchedulePostService {
         schedulePostCommentRepository.save(comment);
 
         return getSchedulePostComments(schedulePostId);
+    }
+
+    @Transactional
+    public void deleteSchedulePostComment(Long schedulePostId, Long commentId, Long memberId) {
+        if (schedulePostId == null || commentId == null || memberId == null) {
+            throw new RuntimeException("Invalid Request");
+        }
+
+        SchedulePost schedulePost = schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
+        );
+
+        SchedulePostComment comment = schedulePostCommentRepository.findById(commentId).orElseThrow(
+                () -> new RuntimeException("No comment found (ID : " + commentId + ")")
+        );
+
+        if (!memberId.equals(comment.getMemberId())) {
+            throw new RuntimeException("Invalid Request. Only writer can delete a comment");
+        }
+
+        schedulePostCommentRepository.delete(comment);
     }
 }

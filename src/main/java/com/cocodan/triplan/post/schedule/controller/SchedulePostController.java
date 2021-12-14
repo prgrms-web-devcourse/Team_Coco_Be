@@ -146,4 +146,15 @@ public class SchedulePostController {
         List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(member.getId(), schedulePostId, request);
         return ResponseEntity.ok(schedulePostComments);
     }
+
+    @ApiOperation("여행 공유 게시글에 작성된 댓글 삭제하기")
+    @DeleteMapping("/schedules/{schedulePostId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteSchedulePostComment(@PathVariable("schedulePostId") Long schedulePostId, @PathVariable("commentId") Long commentId) {
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
+        schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, member.getId());
+        return ResponseEntity.ok().build();
+    }
 }
