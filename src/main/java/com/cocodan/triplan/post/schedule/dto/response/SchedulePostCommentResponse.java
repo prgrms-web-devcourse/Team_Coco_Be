@@ -23,11 +23,14 @@ public class SchedulePostCommentResponse {
 
     private LocalDateTime createdAt;
 
+    private Long memberId;
+
     private boolean schedulePostWriter;
 
     public static SchedulePostCommentResponse of(SchedulePostComment comment, MemberGetOneResponse member, boolean schedulePostWriter) {
         return SchedulePostCommentResponse.builder()
                 .nickname(member.getNickname())
+                .memberId(member.getId())
                 .ages(Ages.from(member.getBirth()))
                 .gender(member.getGender())
                 .content(comment.getContent())

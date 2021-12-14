@@ -106,7 +106,7 @@ public class SchedulePostController {
         // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
         Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
-        schedulePostService.modifySchedulePost(member.getId(), request);
+        schedulePostService.modifySchedulePost(member.getId(), schedulePostId, request);
         return ResponseEntity.ok().build();
     }
 

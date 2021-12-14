@@ -143,9 +143,8 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public void modifySchedulePost(Long memberId, SchedulePostRequest request) {
-        Long requestedSchedulePostId = request.getScheduleId();
-        SchedulePost schedulePost = validateAuthorities(memberId, requestedSchedulePostId);
+    public void modifySchedulePost(Long memberId, Long schedulePostId, SchedulePostRequest request) {
+        SchedulePost schedulePost = validateAuthorities(memberId, schedulePostId);
 
         schedulePost.updateTitle(request.getTitle());
         schedulePost.updateContent(request.getContent());
