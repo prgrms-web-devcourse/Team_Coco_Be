@@ -110,7 +110,7 @@ class ScheduleServiceTest {
         assertThat(scheduleSimpleResponse.getTitle()).isEqualTo("title");
         assertThat(scheduleSimpleResponse.getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(scheduleSimpleResponse.getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
-        assertThat(scheduleSimpleResponse.getThema()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(scheduleSimpleResponse.getThemes()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
     }
 
     @Test
@@ -127,7 +127,7 @@ class ScheduleServiceTest {
         assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
         assertThat(response.getScheduleSimpleResponse().getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
         assertThat(response.getScheduleSimpleResponse().getTitle()).isEqualTo("title");
-        assertThat(response.getScheduleSimpleResponse().getThema()).contains(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(response.getScheduleSimpleResponse().getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
 
         List<Long> memberIds = response.getMemberSimpleResponses().stream()
                 .map(MemberSimpleResponse::getId)
@@ -302,7 +302,7 @@ class ScheduleServiceTest {
     void createChecklist() {
         // Given
         Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(0, "밥 먹을 사람");
 
         // When
         Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
@@ -317,7 +317,7 @@ class ScheduleServiceTest {
     void doCheck(boolean flag) {
         // Given
         Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(1, "밥 먹을 사람");
         Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
 
         // When
@@ -333,7 +333,7 @@ class ScheduleServiceTest {
     void deleteChecklist() {
         // Given
         Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(LocalDate.of(2021, 12, 5), "밥 먹을 사람");
+        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(1, "밥 먹을 사람");
         Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
 
         // When

@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -37,7 +39,7 @@ public class Schedule extends BaseEntity {
     private Long memberId;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScheduleTheme> scheduleThema = new ArrayList<>();
+    private List<ScheduleTheme> scheduleThemes = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memo> memos = new ArrayList<>();
@@ -87,8 +89,8 @@ public class Schedule extends BaseEntity {
         return endDate;
     }
 
-    public List<ScheduleTheme> getScheduleThema() {
-        return scheduleThema;
+    public List<ScheduleTheme> getScheduleThemes() {
+        return scheduleThemes;
     }
 
     public List<Memo> getMemos() {
@@ -117,5 +119,16 @@ public class Schedule extends BaseEntity {
 
     public void removeAllSpots() {
         getDailyScheduleSpots().clear();
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateThemes(List<String> themes) {
+        this.scheduleThemes.clear();
+        themes.stream()
+                .map(Theme::valueOf)
+                .forEach(theme -> new ScheduleTheme(this, theme));
     }
 }
