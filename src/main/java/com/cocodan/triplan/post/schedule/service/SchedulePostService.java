@@ -1,6 +1,7 @@
 package com.cocodan.triplan.post.schedule.service;
 
 import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.post.schedule.domain.Like;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
@@ -15,13 +16,22 @@ import com.cocodan.triplan.post.schedule.repository.SchedulePostCommentRepositor
 import com.cocodan.triplan.post.schedule.repository.SchedulePostLikeRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
+import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.domain.ScheduleTheme;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class SchedulePostService {
+
+    private final MemberService memberService;
 
     private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
@@ -162,6 +172,19 @@ public class SchedulePostService {
                     );
                 }).collect(Collectors.toList());
         return SchedulePostDetailResponse.of(schedulePost, comments);
+    }
+
+    private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
+        return schedulePosts.stream().map(schedulePost -> {
+            MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMember().getId());
+            Schedule schedule = schedulePost.getSchedule();
+            City city = schedulePost.getCity();
+            List<Theme> themes = schedule.getScheduleThemes().stream()
+                    .map(ScheduleTheme::getTheme).collect(Collectors.toList());
+            String title = schedulePost.getTitle();
+
+            return SchedulePostResponse.of(memberResponse, schedule, city, themes, title);
+        }).collect(Collectors.toList());
     }
 
     private SchedulePost validateAuthorities(Long memberId, Long schedulePostId) {

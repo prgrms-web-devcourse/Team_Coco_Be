@@ -39,8 +39,6 @@ public class SchedulePostResponse {
 
     private City city;
 
-    private long scheduleId;
-
     private List<Theme> themes;
 
     private LocalDate startDate;
@@ -68,9 +66,9 @@ public class SchedulePostResponse {
                 .nickname(member.getNickname())
                 .ages(Ages.from(member.getBirth()))
                 .genderType(member.getGender())
+                .postId(schedulePost.getId())
                 .title(schedulePost.getTitle())
                 .city(schedulePost.getCity())
-                .scheduleId(schedule.getId())
                 .themes(
                         schedule.getScheduleThemes()
                                 .stream()
