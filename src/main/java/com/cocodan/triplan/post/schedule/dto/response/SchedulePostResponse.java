@@ -36,7 +36,7 @@ public class SchedulePostResponse {
 
     private LocalDate endDate;
 
-    public static SchedulePostResponse from(MemberGetOneResponse member, Schedule schedule, City city, List<Theme> themes, String title) {
+    public static SchedulePostResponse of(MemberGetOneResponse member, Schedule schedule, City city, List<Theme> themes, String title) {
         return SchedulePostResponse.builder()
                 .profileImageUrl(member.getProfileImage())
                 .nickname(member.getNickname())

@@ -1,6 +1,7 @@
 package com.cocodan.triplan.post.schedule.service;
 
 import com.cocodan.triplan.member.domain.vo.GenderType;
+import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
@@ -9,6 +10,8 @@ import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
+import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.domain.ScheduleTheme;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.Position;
@@ -26,7 +29,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -129,6 +134,41 @@ class SchedulePostServiceTest {
                 .scheduleId(createdScheduleId)
                 .build();
         return schedulePostService.createSchedulePost(testMemberId, request);
+    }
+
+    private Long createSchedulePost2() {
+        ScheduleCreationRequest scheduleCreationRequest2 = createScheduleCreation();
+        Long createdScheduleId2 = scheduleService.saveSchedule(scheduleCreationRequest2, testMemberId);
+        SchedulePostRequest request2 = SchedulePostRequest.builder()
+                .title("2번 여행!")
+                .content("삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
+                        "\n" +
+                        "처음에는 이병철 창업주가 삼성물산이라는 이름으로 자본금 3만 원(현재가치 3억 원)에 지금의 삼성 그룹을 창립하였다.\n" +
+                        "\n" +
+                        "\"삼성 그룹\"이라는 상호의 회사는 실제로 존재하는 것이 아니며, 삼성전자를 중심으로, 삼성물산, 삼성생명 등 다수의 자회사를 두고 있다. 공정거래위원회는 삼성전자와 그 계열사를 1987년 대규모 기업집단으로 지정하였다.\n" +
+                        "\n" +
+                        "1938년에 이병철이 대구에서 삼성상회를 창립하였고 그 탓인지 삼성 라이온즈가 대구에서 창단될 당시 대구에 거점을 둔 삼성 그룹 계열사가 제일모직 밖에 없었던 것 때문에 김재하 전 대구 FC 단장 등[1] 임원들이 제일모직에서 삼성 라이온즈로 대거 차출됐으며 대구를 연고로 한 제일모직 축구단 선수 중 한 명이었던 김호는 뒷날 수원 삼성 블루윙즈 초대감독을 역임했는데 이 팀은 대구가 한때 연고지 물망에[2] 올랐었고 제일모직 부지 안에 잔디축구장이 조성된 데다[3] 대구시민운동장이 바로 옆에 붙어있었던 탓인지 제일모직 축구단은 제일모직 잔디축구장과 대구시민운동장을 모두 이용했다. 이후 \"삼성\"이라는 상호 아래 여러 계열사를 설립하면서 그 규모를 키웠으며, 1950년대 후반, 인수합병의 대표주자로 나서면서 오늘날 재계 서열 1위의 거대 기업집단으로 성장하였다.\n" +
+                        "\n" +
+                        "또한 삼성 그룹은 2013년 380조원 규모의 매출을 올렸다. 한국은행에 따르면 같은 해 대한민국의 명목 국내총생산(GDP)은 1428조 원이다.[4] 해외 매출 비중이 훨씬 큰 삼성의 매출액은 GDP와 직접 비교하기 어렵지만, 그럼에도 삼성의 매출액이 대한민국 GDP의 26.6%나 차지한다는 점은 시사하는 바가 크다.[4] 삼성의 수출은 2013년 1572억 달러로 한국 전체 수출액 6171억 달러의 25%에 해당한다.[4]\n" +
+                        "\n" +
+                        "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.")
+                .city("부산")
+                .scheduleId(createdScheduleId)
+                .build();
+        return schedulePostService.createSchedulePost(testMemberId, request2);
+    }
+
+    private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
+        return schedulePosts.stream().map(schedulePost -> {
+            MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMember().getId());
+            Schedule schedule = schedulePost.getSchedule();
+            City city = schedulePost.getCity();
+            List<Theme> themes = schedule.getScheduleThema().stream()
+                    .map(ScheduleTheme::getTheme).collect(Collectors.toList());
+            String title = schedulePost.getTitle();
+
+            return SchedulePostResponse.of(memberResponse, schedule, city, themes, title);
+        }).collect(Collectors.toList());
     }
 
     @Test
@@ -279,5 +319,42 @@ class SchedulePostServiceTest {
         assertThat(beforeLiked + 1).isEqualTo(afterLiked);
         // 좋아요 취소된 후 좋아요 수
         assertThat(beforeLiked).isEqualTo(afterLikedAgain);
+    }
+
+    @Test
+    @DisplayName("좋아요를 누른 게시글만 모아서 볼 수 있다")
+    @Transactional
+    void getLikedSchedulePostsOnly() {
+        Long createdSchedulePostId1 = createSchedulePost1();
+        Long createdSchedulePostId2 = createSchedulePost2();
+        // 좋아요 한 게시글 없음
+        List<SchedulePostResponse> emptySchedulePostList = schedulePostService.getLikedSchedulePosts(testMemberId);
+        // 1번 여행 좋아요!
+        SchedulePostLikeRequest doSchedulePostLike1 = new SchedulePostLikeRequest(createdSchedulePostId1, true);
+        schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLike1);
+        List<SchedulePostResponse> schedulePostListAfterLikeTrip1 = schedulePostService.getLikedSchedulePosts(testMemberId);
+        // 2번 여행도 좋아요!
+        SchedulePostLikeRequest doSchedulePostLike2 = new SchedulePostLikeRequest(createdSchedulePostId2, true);
+        schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLike2);
+        List<SchedulePostResponse> schedulePostListAfterLikeTrip2 = schedulePostService.getLikedSchedulePosts(testMemberId);
+
+        // then
+        assertThat(emptySchedulePostList).isEmpty();
+        assertThat(schedulePostListAfterLikeTrip1.size()).isEqualTo(1);
+        List<SchedulePost> post1 = new ArrayList<>();
+        post1.add(schedulePostService.findById(createdSchedulePostId1));
+        SchedulePostResponse response1 = convertToSchedulePostResponseList(post1).get(0);
+
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getProfileImageUrl()).isEqualTo(response1.getProfileImageUrl());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getNickname()).isEqualTo(response1.getNickname());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getTitle()).isEqualTo(response1.getTitle());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getAges()).isEqualTo(response1.getAges());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getGenderType()).isEqualTo(response1.getGenderType());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getCity()).isEqualTo(response1.getCity());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getThemes()).isEqualTo(response1.getThemes());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getStartDate()).isEqualTo(response1.getStartDate());
+        assertThat(schedulePostListAfterLikeTrip1.get(0).getEndDate()).isEqualTo(response1.getEndDate());
+
+        assertThat(schedulePostListAfterLikeTrip2.size()).isEqualTo(2);
     }
 }

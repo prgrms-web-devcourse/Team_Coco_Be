@@ -170,7 +170,7 @@ public class SchedulePostService {
                     .map(ScheduleTheme::getTheme).collect(Collectors.toList());
             String title = schedulePost.getTitle();
 
-            return SchedulePostResponse.from(memberResponse, schedule, city, themes, title);
+            return SchedulePostResponse.of(memberResponse, schedule, city, themes, title);
         }).collect(Collectors.toList());
     }
 
@@ -234,5 +234,12 @@ public class SchedulePostService {
 
         // Invalid Like toggle
         return post.getLiked();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SchedulePostResponse> getLikedSchedulePosts(Long memberId) {
+        List<Like> likeData = schedulePostLikeRepository.findAllByMemberId(memberId);
+        List<SchedulePost> schedulePosts = likeData.stream().map(Like::getSchedulePost).collect(Collectors.toList());
+        return convertToSchedulePostResponseList(schedulePosts);
     }
 }
