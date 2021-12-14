@@ -4,8 +4,10 @@ import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.vo.Ages;
@@ -356,5 +358,18 @@ class SchedulePostServiceTest {
         assertThat(schedulePostListAfterLikeTrip1.get(0).getEndDate()).isEqualTo(response1.getEndDate());
 
         assertThat(schedulePostListAfterLikeTrip2.size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("여행 공유 게시글에 댓글 작성 및 조회하기")
+    @Transactional
+    void writeCommentToSchedulePost() {
+        Long createdSchedulePostId1 = createSchedulePost1();
+        SchedulePostCommentRequest comment1 = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+
+        assertThat(comments.size()).isEqualTo(1);
+        assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        assertThat(comments.get(0).getNickname()).isEqualTo(NICKNAME);
     }
 }

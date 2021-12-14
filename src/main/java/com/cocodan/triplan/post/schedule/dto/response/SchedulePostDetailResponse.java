@@ -12,7 +12,6 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -44,9 +43,9 @@ public class SchedulePostDetailResponse {
 
     private Long liked;
 
-    // TODO: 2021.12.09 Teru - Comment 추가
+    private List<SchedulePostCommentResponse> comments;
 
-    public static SchedulePostDetailResponse from(SchedulePost schedulePost) {
+    public static SchedulePostDetailResponse of(SchedulePost schedulePost, List<SchedulePostCommentResponse> comments) {
         return SchedulePostDetailResponse.builder()
                 .nickname(schedulePost.getMember().getNickname())
                 .ages(Ages.from(schedulePost.getMember().getBirth()))
@@ -63,6 +62,7 @@ public class SchedulePostDetailResponse {
                 .createdAt(schedulePost.getCreatedDate())
                 .views(schedulePost.getViews())
                 .liked(schedulePost.getLiked())
+                .comments(comments)
                 .build();
     }
 
