@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class ChecklistResponse {
 
     private Long id;
@@ -15,6 +14,14 @@ public class ChecklistResponse {
     private boolean checked;
 
     private int day;
+
+    @Builder
+    private ChecklistResponse(Long id, String content, boolean checked, int day) {
+        this.id = id;
+        this.content = content;
+        this.checked = checked;
+        this.day = day;
+    }
 
     public static ChecklistResponse from(Checklist checklist) {
         return ChecklistResponse.builder()
