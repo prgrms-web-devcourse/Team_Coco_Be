@@ -29,6 +29,8 @@ public class VotingDetailResponse {
 
     private final int ownerAge;
 
+    private final boolean multipleFlag;
+
     public static VotingDetailResponse of(Voting voting, Member member, Long memberId) {
         int numOfTotalParticipants = voting.getNumOfTotalParticipants();
 
@@ -45,6 +47,7 @@ public class VotingDetailResponse {
                 .ownerAge(member.getAge())
                 .ownerGender(member.getGender())
                 .votingContentResponses(votingContentResponses)
+                .multipleFlag(voting.isMultipleFlag())
                 .build();
     }
 }

@@ -28,8 +28,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     )
     Optional<Schedule> findOneWithSpotsById(Long id);
 
-    boolean existsByIdAndMemberId(Long id, Long memberId);
-
-    @Query(value = "SELECT s FROM Schedule s JOIN FETCH s.scheduleMembers WHERE s.id = :id")
-    Optional<Schedule> findScheduleMemosById(Long id);
+    @Query(value =
+            "SELECT count(0) > 0 " +
+            "FROM schedule_member sm " +
+            "WHERE sm.schedule_id = :scheduleId AND sm.member_id = :memberId"
+            , nativeQuery = true)
+    boolean existsByScheduleIdAndMemberId(Long scheduleId, Long memberId);
 }
