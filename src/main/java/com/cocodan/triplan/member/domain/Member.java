@@ -7,9 +7,9 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 
 @Entity
@@ -17,7 +17,6 @@ import java.util.Calendar;
 @DynamicInsert
 @DynamicUpdate
 public class Member extends BaseEntity {
-
     private static final int BASIC_AGE = 1;
 
     @Id
@@ -27,6 +26,9 @@ public class Member extends BaseEntity {
 
     @Column(name = "email", nullable = false)
     private String email;
+
+    @Column(name = "passwd")
+    private String password;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -47,8 +49,12 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image", nullable = true)
     private String profileImage;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "group_id")
+    private Group group;
+
     @Builder
-    public Member(String email, String name, String phoneNumber, String birth, GenderType gender, String nickname, String profileImage) {
+    public Member(String email, String name, String phoneNumber, String birth, GenderType gender, String nickname, String profileImage, String passwd, Group group) {
         this.email = email;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -56,6 +62,8 @@ public class Member extends BaseEntity {
         this.gender = gender;
         this.nickname = nickname;
         this.profileImage = profileImage;
+        this.password = passwd;
+        this.group = group;
     }
 
     @Builder
@@ -107,6 +115,15 @@ public class Member extends BaseEntity {
 
     public String getProfileImage() {
         return profileImage;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void checkPassword(PasswordEncoder passwordEncoder, String credentials) {
+        if (!passwordEncoder.matches(credentials, password))
+            throw new IllegalArgumentException("Bad credential");
     }
 
 
