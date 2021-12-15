@@ -53,18 +53,20 @@ class ScheduleServiceTest {
     @Autowired
     private MemberService memberService;
 
-//    @PostConstruct
-//    void postConstruct() {
-//        MemberCreateResponse memberCreateResponse = memberService.create(
-//                "ffff@naver.com",
-//                "taehyun",
-//                "01011111111",
-//                "1994-12-16",
-//                "남성",
-//                "henry",
-//                "");
-//        MEMBER_ID = memberCreateResponse.getId();
-//    }
+    @PostConstruct
+    void postConstruct() {
+        MemberCreateResponse memberCreateResponse = memberService.create(
+                "ffff@naver.com",
+                "taehyun",
+                "01011111111",
+                "1994-12-16",
+                "남성",
+                "henry",
+                "",
+                "asdf123",
+                1L);
+        MEMBER_ID = memberCreateResponse.getId();
+    }
 
     @Test
     @DisplayName("여행 일정을 생성한다.")
