@@ -102,7 +102,7 @@ public final class Jwt {
 
         public Map<String, Object> asMap() {
             Map<String, Object> map = new HashMap<>();
-            map.put("username", id);
+            map.put("id", id);
             map.put("roles", roles);
             map.put("iat", iat());
             map.put("exp", exp());
