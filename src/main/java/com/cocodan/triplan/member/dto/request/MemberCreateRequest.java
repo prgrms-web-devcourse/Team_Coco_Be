@@ -1,12 +1,15 @@
 package com.cocodan.triplan.member.dto.request;
 
+import com.cocodan.triplan.schedule.domain.Checklist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Getter
@@ -17,6 +20,12 @@ public class MemberCreateRequest {
     @NotBlank(message = "이메일은 공백이 아니여야 합니다")
     @Email
     private String email;
+
+    @NotNull
+    @Length(min = 3)
+    private String password;
+
+    private Long groupId;
 
     @Pattern(regexp="^[ㄱ-ㅎ|가-힣|a-z|A-Z|]{2,20}$", message="이름은 공백없는 2~20자이어야 합니다")
     private String name;

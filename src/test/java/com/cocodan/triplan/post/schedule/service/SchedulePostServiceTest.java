@@ -68,18 +68,18 @@ class SchedulePostServiceTest {
     private static final String NICKNAME = "TestNickname";
     private static final String PROFILE_IMAGE = "https://wwww.someonesownserver.org/img/1";
 
-    @BeforeAll
-    void setup() {
-        testMemberId = memberService.create(
-                EMAIL,
-                NAME,
-                PHONE,
-                BIRTH,
-                GENDER,
-                NICKNAME,
-                PROFILE_IMAGE
-        ).getId();
-    }
+//    @BeforeAll
+//    void setup() {
+//        testMemberId = memberService.create(
+//                EMAIL,
+//                NAME,
+//                PHONE,
+//                BIRTH,
+//                GENDER,
+//                NICKNAME,
+//                PROFILE_IMAGE
+//        ).getId();
+//    }
 
     @Test
     @DisplayName("생성된 여행 공유 게시글 리스트를 정상적으로 조회 할 수 있다.")
