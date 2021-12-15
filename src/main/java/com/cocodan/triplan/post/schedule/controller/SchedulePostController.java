@@ -10,7 +10,6 @@ import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentRespons
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostLikeResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostNestedCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.service.SchedulePostSearchService;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
@@ -83,14 +82,14 @@ public class SchedulePostController {
 
     @ApiOperation("특정 여행 일정 공유 게시글 상세조회")
     @GetMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable Long schedulePostId) {
+    public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable("schedulePostId") Long schedulePostId) {
         SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(schedulePostId);
         return ResponseEntity.ok(schedulePostDetail);
     }
 
     @ApiOperation("(자신이 작성한)특정 여행 공유 게시글 삭제")
     @DeleteMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<Void> deleteSchedulePost(@PathVariable Long schedulePostId) {
+    public ResponseEntity<Void> deleteSchedulePost(@PathVariable("schedulePostId") Long schedulePostId) {
         // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
         Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
@@ -101,7 +100,10 @@ public class SchedulePostController {
 
     @ApiOperation("여행 공유 게시글 수정")
     @PutMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<Void> modifySchedulePost(@PathVariable Long schedulePostId, @RequestBody SchedulePostRequest request) {
+    public ResponseEntity<Void> modifySchedulePost(
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @RequestBody SchedulePostRequest request
+    ) {
         // TODO: 2021.12.10 Teru - 별도의 Util class 를 만들어 요청을 보내는 유저 정보 받아오는 메서드 작성하기
         // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
@@ -167,6 +169,9 @@ public class SchedulePostController {
         // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
         Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
+        // TODO: 2021.12.15 Teru - 댓글에 대댓글이 작성되어 있는 상태에서 댓글이 삭제되면 어떻게 할 것인지 고민
+        // 방법 1. 삭제된 댓글은 공란(삭제됨 표시)으로 두고, 아래 대댓글은 표시한다.
+        // 방법 2. 삭제된 댓글에 있던 대댓글도 모두 삭제한다.
         schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, member.getId());
         return ResponseEntity.ok().build();
     }
@@ -204,6 +209,49 @@ public class SchedulePostController {
                 request
         );
 
+        // 전체 댓글 및 대댓글 반환
         return ResponseEntity.ok(schedulePostCommentResponses);
+    }
+
+    @ApiOperation("대댓글 수정하기")
+    @PutMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments/{nestedCommentId}")
+    public ResponseEntity<Void> modifySchedulePostNestedComment(
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @PathVariable("commentId") Long commentId,
+            @PathVariable("nestedCommentId") Long nestedCommentId,
+            SchedulePostCommentRequest request
+    ) {
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
+        schedulePostService.modifySchedulePostNestedComment(
+                member.getId(),
+                schedulePostId,
+                commentId,
+                nestedCommentId,
+                request
+        );
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("대댓글 삭제하기")
+    @DeleteMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments/{nestedCommentId}")
+    public ResponseEntity<Void> deleteSchedulePostNestedComment(
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @PathVariable("commentId") Long commentId,
+            @PathVariable("nestedCommentId") Long nestedCommentId
+    ) {
+        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+
+        schedulePostService.deleteSchedulePostNestedComment(
+                member.getId(),
+                schedulePostId,
+                commentId,
+                nestedCommentId
+        );
+        return ResponseEntity.ok().build();
     }
 }
