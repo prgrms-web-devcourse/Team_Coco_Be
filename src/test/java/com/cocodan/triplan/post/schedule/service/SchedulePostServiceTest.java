@@ -493,4 +493,71 @@ class SchedulePostServiceTest {
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().size()).isEqualTo(1);
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
     }
+
+    @Test
+    @DisplayName("대댓글을 수정할 수 있다")
+    @Transactional
+    void modifySchedulePostNestedComment() {
+        // 댓글 작성
+        Long createdSchedulePostId1 = createSchedulePost1();
+        SchedulePostCommentRequest commentRequest = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+
+        // 대댓글 작성
+        SchedulePostCommentRequest nestedCommentRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        comments = schedulePostService.writeNestedCommentToSchedulePostComment(
+                testMemberId,
+                createdSchedulePostId1,
+                comments.get(0).getId(),
+                nestedCommentRequest
+        );
+
+        // 대댓글 수정
+        SchedulePostCommentRequest nestedCommentModifyRequest = new SchedulePostCommentRequest("나랏말싸미 듕귁에달아 문자와로 서로 사맛디 아니할새 이런 젼챠로 어린 백셩이 니르고져 할 배 이셔도 못 할 노미 하니라");
+        schedulePostService.modifySchedulePostNestedComment(
+                testMemberId,
+                createdSchedulePostId1,
+                comments.get(0).getId(),
+                comments.get(0).getNestedComments().get(0).getId(),
+                nestedCommentModifyRequest
+        );
+
+        // 대댓글 확인
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1);
+        assertThat(schedulePostDetail.getComments().get(0).getNestedComments().get(0).getContent()).isEqualTo("나랏말싸미 듕귁에달아 문자와로 서로 사맛디 아니할새 이런 젼챠로 어린 백셩이 니르고져 할 배 이셔도 못 할 노미 하니라");
+    }
+
+    @Test
+    @DisplayName("대댓글을 삭제할 수 있다")
+    @Transactional
+    void deleteSchedulePostNestedComment() {
+        // 댓글 작성
+        Long createdSchedulePostId1 = createSchedulePost1();
+        SchedulePostCommentRequest commentRequest = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+
+        // 대댓글 작성
+        SchedulePostCommentRequest nestedCommentRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        comments = schedulePostService.writeNestedCommentToSchedulePostComment(
+                testMemberId,
+                createdSchedulePostId1,
+                comments.get(0).getId(),
+                nestedCommentRequest
+        );
+
+        // 작성된 대댓글 확인
+        assertThat(comments.get(0).getNestedComments().size()).isEqualTo(1);
+
+        // 대댓글 삭제
+        schedulePostService.deleteSchedulePostNestedComment(
+                testMemberId,
+                createdSchedulePostId1,
+                comments.get(0).getId(),
+                comments.get(0).getNestedComments().get(0).getId()
+        );
+
+        // 대댓글 삭제 확인
+        comments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        assertThat(comments.get(0).getNestedComments().size()).isEqualTo(0);
+    }
 }

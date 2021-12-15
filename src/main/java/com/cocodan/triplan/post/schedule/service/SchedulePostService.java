@@ -295,4 +295,44 @@ public class SchedulePostService {
         schedulePostNestedCommentRepository.save(nestedComment);
         return getSchedulePostComments(schedulePostId);
     }
+
+    @Transactional
+    public void modifySchedulePostNestedComment(
+            Long memberId,
+            Long schedulePostId,
+            Long commentId,
+            Long nestedCommentId,
+            SchedulePostCommentRequest request
+    ) {
+        validateNestedCommentOwnership(memberId, schedulePostId, commentId, nestedCommentId);
+        SchedulePostNestedComment nestedComment = schedulePostNestedCommentRepository.getById(nestedCommentId);
+        nestedComment.updateContent(request.getContent());
+    }
+
+    @Transactional
+    public void deleteSchedulePostNestedComment(Long memberId, Long schedulePostId, Long commentId, Long nestedCommentId) {
+        validateNestedCommentOwnership(memberId, schedulePostId, commentId, nestedCommentId);
+        SchedulePostNestedComment nestedComment = schedulePostNestedCommentRepository.getById(nestedCommentId);
+        schedulePostNestedCommentRepository.delete(nestedComment);
+    }
+
+    private void validateNestedCommentOwnership(Long memberId, Long schedulePostId, Long commentId, Long nestedCommentId) {
+        nullCheck(memberId, schedulePostId, commentId, nestedCommentId);
+
+        schedulePostRepository.findById(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
+        );
+
+        schedulePostCommentRepository.findById(commentId).orElseThrow(
+                () -> new RuntimeException("No comment found (ID : " + commentId + ")")
+        );
+
+        SchedulePostNestedComment nestedComment = schedulePostNestedCommentRepository.findById(nestedCommentId).orElseThrow(
+                () -> new RuntimeException("No nested comment found (ID : " + nestedCommentId + ")")
+        );
+
+        if (!memberId.equals(nestedComment.getMemberId())) {
+            throw new RuntimeException("Invalid Request. Only writer can delete a comment");
+        }
+    }
 }
