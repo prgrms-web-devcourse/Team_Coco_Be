@@ -301,10 +301,10 @@ class SchedulePostServiceTest {
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
 
         // 게시글 생성 확인
-        assertThat(schedulePostService.findById(createdSchedulePostId).getId()).isEqualTo(createdScheduleId);
+        assertThat(post.getId()).isEqualTo(createdSchedulePostId);
 
         // 게시글 삭제하기
-        schedulePostService.deleteSchedulePost(testMemberId, createdScheduleId);
+        schedulePostService.deleteSchedulePost(testMemberId, createdSchedulePostId);
 
         // 게시글이 삭제되었는지 검증하기
         Assertions.assertThrows(RuntimeException.class,
@@ -335,7 +335,7 @@ class SchedulePostServiceTest {
                 .city("부산")
                 .scheduleId(createdScheduleId)
                 .build();
-        schedulePostService.modifySchedulePost(testMemberId, modifyRequest);
+        schedulePostService.modifySchedulePost(testMemberId, post.getId(), modifyRequest);
 
         // assert
         SchedulePost modifiedPost = schedulePostService.findById(createdSchedulePostId);
