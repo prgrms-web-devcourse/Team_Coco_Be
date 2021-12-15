@@ -9,8 +9,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
-@AllArgsConstructor
-@Builder
 public class DailyScheduleSpotResponse {
 
     private Long spotId;
@@ -18,6 +16,13 @@ public class DailyScheduleSpotResponse {
     private LocalDate date;
 
     private int order;
+
+    @Builder
+    private DailyScheduleSpotResponse(Long spotId, LocalDate date, int order) {
+        this.spotId = spotId;
+        this.date = date;
+        this.order = order;
+    }
 
     public static DailyScheduleSpotResponse from(DailyScheduleSpot dailyScheduleSpot) {
         return DailyScheduleSpotResponse.builder()

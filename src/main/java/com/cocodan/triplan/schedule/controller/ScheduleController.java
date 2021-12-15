@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.controller;
 
 import com.cocodan.triplan.member.domain.Member;
+import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.*;
 import com.cocodan.triplan.schedule.service.ScheduleService;
@@ -225,4 +226,46 @@ public class ScheduleController {
 
         return ResponseEntity.ok().build();
     }
+
+    // 여행 멤버
+    @ApiOperation("여행 멤버 추가")
+    @PostMapping("/{scheduleId}/members")
+    public ResponseEntity<Void> addScheduleMember(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleMemberRequest scheduleMemberRequest) {
+//        Member member = getMember();
+//        scheduleService.addScheduleMember(scheduleId, scheduleMemberRequest, member.getId());
+        scheduleService.addScheduleMember(scheduleId, scheduleMemberRequest, MEMBER_ID);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("여행 멤버 목록 조회")
+    @GetMapping("/{scheduleId}/members")
+    public ResponseEntity<List<MemberSimpleResponse>> getScheduleMembers(@PathVariable Long scheduleId) {
+//        Member member = getMember();
+//        List<MemberSimpleResponse> memberSimpleResponses = scheduleService.getScheduleMembers(scheduleId, member.getId());
+        List<MemberSimpleResponse> memberSimpleResponses = scheduleService.getScheduleMembers(scheduleId, MEMBER_ID);
+
+        return ResponseEntity.ok(memberSimpleResponses);
+    }
+
+    @ApiOperation("여행 멤버 제외")
+    @DeleteMapping("/{scheduleId}/members/{memberId}")
+    public ResponseEntity<Void> deleteScheduleMember(@PathVariable Long scheduleId, @PathVariable(name = "memberId") Long deletedId) {
+//        Member member = getMember();
+//        scheduleService.deleteScheduleMember(scheduleId, deletedId, member.getId());
+        scheduleService.deleteScheduleMember(scheduleId, deletedId, MEMBER_ID);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("여행에서 나가기")
+    @DeleteMapping("/{scheduleId}/members/exit")
+    public ResponseEntity<Void> exitSchedule(@PathVariable Long scheduleId) {
+//        Member member = getMember();
+//        scheduleService.exitSchedule(scheduleId, member.getId());
+        scheduleService.exitSchedule(scheduleId, MEMBER_ID);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

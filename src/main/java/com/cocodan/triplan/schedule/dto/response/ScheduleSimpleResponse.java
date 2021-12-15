@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@Builder
 public class ScheduleSimpleResponse {
 
     private final Long id;
@@ -23,6 +22,15 @@ public class ScheduleSimpleResponse {
     private final LocalDate endDate;
 
     private final List<Theme> themes;
+
+    @Builder
+    private ScheduleSimpleResponse(Long id, String title, LocalDate startDate, LocalDate endDate, List<Theme> themes) {
+        this.id = id;
+        this.title = title;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.themes = themes;
+    }
 
     public static ScheduleSimpleResponse from(Schedule schedule) {
         return ScheduleSimpleResponse.builder()

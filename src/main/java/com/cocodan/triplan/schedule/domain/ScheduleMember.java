@@ -37,4 +37,24 @@ public class ScheduleMember extends BaseEntity {
     public Long getMemberId() {
         return memberId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ScheduleMember that = (ScheduleMember) o;
+
+        if (!id.equals(that.id)) return false;
+        if (!schedule.equals(that.schedule)) return false;
+        return memberId.equals(that.memberId);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + schedule.hashCode();
+        result = 31 * result + memberId.hashCode();
+        return result;
+    }
 }

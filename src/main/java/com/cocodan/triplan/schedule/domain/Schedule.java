@@ -131,4 +131,16 @@ public class Schedule extends BaseEntity {
                 .map(Theme::valueOf)
                 .forEach(theme -> new ScheduleTheme(this, theme));
     }
+
+    public void addMember(long friendId) {
+        // TODO : [henry] 여행 멤버 수 제한 6명 검증
+        ScheduleMember.builder()
+                .memberId(friendId)
+                .schedule(this)
+                .build();
+    }
+
+    public void deleteScheduleMember(ScheduleMember deletedMember) {
+        scheduleMembers.remove(deletedMember);
+    }
 }

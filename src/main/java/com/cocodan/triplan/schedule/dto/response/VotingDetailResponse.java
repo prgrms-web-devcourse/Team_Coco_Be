@@ -2,6 +2,7 @@ package com.cocodan.triplan.schedule.dto.response;
 
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
+import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.domain.Voting;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@Builder
 public class VotingDetailResponse {
 
     private final Long id;
@@ -21,15 +21,19 @@ public class VotingDetailResponse {
 
     private final List<VotingContentResponse> votingContentResponses;
 
-    private final Long ownerId;
-
-    private final String ownerNickname;
-
-    private final GenderType ownerGender;
-
-    private final int ownerAge;
+    private final MemberSimpleResponse memberSimpleResponse;
 
     private final boolean multipleFlag;
+
+    @Builder
+    private VotingDetailResponse(Long id, String title, int numOfTotalParticipants, List<VotingContentResponse> votingContentResponses, MemberSimpleResponse memberSimpleResponse, boolean multipleFlag) {
+        this.id = id;
+        this.title = title;
+        this.numOfTotalParticipants = numOfTotalParticipants;
+        this.votingContentResponses = votingContentResponses;
+        this.memberSimpleResponse = memberSimpleResponse;
+        this.multipleFlag = multipleFlag;
+    }
 
     public static VotingDetailResponse of(Voting voting, Member member, Long memberId) {
         int numOfTotalParticipants = voting.getNumOfTotalParticipants();
@@ -42,10 +46,9 @@ public class VotingDetailResponse {
                 .numOfTotalParticipants(numOfTotalParticipants)
                 .id(voting.getId())
                 .title(voting.getTitle())
-                .ownerId(member.getId())
-                .ownerNickname(member.getNickname())
-                .ownerAge(member.getAge())
-                .ownerGender(member.getGender())
+                .memberSimpleResponse(
+                        MemberSimpleResponse.from(member)
+                )
                 .votingContentResponses(votingContentResponses)
                 .multipleFlag(voting.isMultipleFlag())
                 .build();

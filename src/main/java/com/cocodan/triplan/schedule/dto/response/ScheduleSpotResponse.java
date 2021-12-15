@@ -9,7 +9,6 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-@Builder
 public class ScheduleSpotResponse {
 
     private final Long id;
@@ -19,6 +18,14 @@ public class ScheduleSpotResponse {
     private final LocalDate date;
 
     private final int order;
+
+    @Builder
+    private ScheduleSpotResponse(Long id, SpotResponse spotResponse, LocalDate date, int order) {
+        this.id = id;
+        this.spotResponse = spotResponse;
+        this.date = date;
+        this.order = order;
+    }
 
     public static ScheduleSpotResponse of(Spot spot, DailyScheduleSpot dailyScheduleSpot) {
         return ScheduleSpotResponse.builder()
