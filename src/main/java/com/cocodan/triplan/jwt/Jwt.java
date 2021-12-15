@@ -73,7 +73,7 @@ public final class Jwt {
         return jwtVerifier;
     }
 
-    static public class Claims {
+    public static class Claims {
         Long id;
         String[] roles;
         Date iat;

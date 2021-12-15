@@ -31,8 +31,11 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
+
     private final MemberService memberService;
     private final AuthenticationManager authenticationManager;
+
+    private static final long GROUP_ID = 1L;
 
     @ApiOperation("회원(Member) 신규 추가, 성공시 생성된 Member ID 반환")
     @PostMapping("/register")
@@ -46,7 +49,7 @@ public class MemberController {
                 request.getNickname(),
                 request.getProfileImage(),
                 request.getPassword(),
-                request.getGroupId()
+                GROUP_ID
         );
 
         return ResponseEntity.ok(response);

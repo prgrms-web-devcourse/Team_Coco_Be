@@ -74,7 +74,7 @@ public class SchedulePostController {
     public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostRequest request) {
         // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "1900-01-01", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
         Long postId = schedulePostService.createSchedulePost(member.getId(), request);
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
