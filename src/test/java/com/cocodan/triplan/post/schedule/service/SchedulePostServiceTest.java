@@ -414,7 +414,7 @@ class SchedulePostServiceTest {
     }
 
     @Test
-    @DisplayName("여행 공유 게시글에 댓글 작성 및 조회하기")
+    @DisplayName("여행 공유 게시글에 댓글 작성 및 조회할 수 있다.")
     @Transactional
     void writeCommentToSchedulePost() {
         Long createdSchedulePostId1 = createSchedulePost1();
@@ -424,5 +424,25 @@ class SchedulePostServiceTest {
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
         assertThat(comments.get(0).getNickname()).isEqualTo(NICKNAME);
+    }
+
+    @Test
+    @DisplayName("작성항 댓글을 삭제할 수 있다")
+    @Transactional
+    void deleteCommentFromSchedulePost() {
+        // 댓글 작성
+        Long createdSchedulePostId1 = createSchedulePost1();
+        SchedulePostCommentRequest comment1 = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        // 댓글 작성 확인
+        assertThat(comments.size()).isEqualTo(1);
+        assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        assertThat(comments.get(0).getNickname()).isEqualTo(NICKNAME);
+
+        // 댓글 삭제
+        schedulePostService.deleteSchedulePostComment(createdSchedulePostId1, comments.get(0).getId(), testMemberId);
+        // 댓글 삭제 확인
+        List<SchedulePostCommentResponse> commentsAfterDeletion = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        assertThat(commentsAfterDeletion.size()).isEqualTo(0);
     }
 }

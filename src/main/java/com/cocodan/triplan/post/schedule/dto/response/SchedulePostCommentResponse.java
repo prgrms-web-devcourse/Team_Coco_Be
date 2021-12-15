@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class SchedulePostCommentResponse {
 
+    private Long id;
+
     private String nickname;
 
     private Ages ages;
@@ -27,8 +29,9 @@ public class SchedulePostCommentResponse {
 
     private boolean schedulePostWriter;
 
-    public static SchedulePostCommentResponse of(SchedulePostComment comment, MemberGetOneResponse member, boolean schedulePostWriter) {
+    public static SchedulePostCommentResponse of(Long commentId, SchedulePostComment comment, MemberGetOneResponse member, boolean schedulePostWriter) {
         return SchedulePostCommentResponse.builder()
+                .id(commentId)
                 .nickname(member.getNickname())
                 .memberId(member.getId())
                 .ages(Ages.from(member.getBirth()))
