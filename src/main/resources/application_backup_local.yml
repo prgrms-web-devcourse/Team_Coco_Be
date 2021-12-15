@@ -1,0 +1,96 @@
+spring:
+  application:
+    name: spring security 09
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    cache-duration: PT1H
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  main.allow-circular-references: true
+#  jpa:
+#    database: h2
+#    open-in-view: false
+#    show-sql: false
+#    hibernate:
+#      ddl-auto: create
+#      use-new-id-generator-mappings: false
+#      naming:
+#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#    properties:
+#      hibernate.dialect: org.hibernate.dialect.H2Dialect
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+      dialect: org.hibernate.dialect.H2Dialect
+      hibernate.format_sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:~/triplan;DB_CLOSE_ON_EXIT=FALSE
+#    username: sa
+#    password:
+#    hikari:
+#      minimum-idle: 1
+#      maximum-pool-size: 5
+#      pool-name: H2_DB
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/triplan;MODE=MYSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  sql:
+    init:
+      platform: h2
+      data-locations: classpath:sql/data_new.sql
+      encoding: UTF-8
+      mode: always
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+jwt:
+  header: token
+  issuer: prgrms
+  client-secret: EENY5W0eegTf1naQB2eDeyCLl5kRS2b8xa5c4qLdS0hmVjtbvo8tOyhPMcAmtPuQ
+  expiry-seconds: 60
+
+#
+#spring:
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:~/triplan;DB_CLOSE_ON_EXIT=FALSE
+#    username: sa
+#    password:
+#  h2:
+#    console:
+#      enabled: true
+#  jpa:
+#    generate-ddl: true
+#    hibernate:
+#      ddl-auto: create
+#    show-sql: true
+#    open-in-view: false
+#    properties:
+#      hibernate:
+#      dialect: org.hibernate.dialect.H2Dialect
+#      hibernate.format_sql: true
+#    database-platform: org.hibernate.dialect.H2Dialect
+#    defer-datasource-initialization: true
+#server:
+#  servlet:
+#    encoding:
+#      charset: UTF-8
+#      enabled: true
+#      force: true
