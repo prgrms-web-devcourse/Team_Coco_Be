@@ -1,6 +1,5 @@
 package com.cocodan.triplan.member.service;
 
-import com.cocodan.triplan.member.domain.Group;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
@@ -30,8 +29,6 @@ class MemberServiceTest {
     private static final String GENDER = GenderType.MALE.getTypeStr();
     private static final String NICKNAME = "TTTaid";
     private static final String PROFILE_IMAGE = "/images/test";
-    private static final String PASSWORD = "asdf123";
-    private static final Long GROUP_ID = 1L;
 
     @InjectMocks
     MemberService memberService;
