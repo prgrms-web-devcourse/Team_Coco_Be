@@ -9,13 +9,21 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class MemberGetOneResponse {
+
     private final Long id;
+
     private final String email;
+
     private final String name;
+
     private final String phoneNumber;
+
     private final String birth;
+
     private final GenderType gender;
+
     private final String nickname;
+
     private final String profileImage;
 
     @Override

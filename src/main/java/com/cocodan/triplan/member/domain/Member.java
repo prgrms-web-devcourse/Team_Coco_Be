@@ -126,7 +126,6 @@ public class Member extends BaseEntity {
             throw new IllegalArgumentException("Bad credential");
     }
 
-
     public int getAge() {
         Calendar current = Calendar.getInstance();
         int currentYear = current.get(Calendar.YEAR);

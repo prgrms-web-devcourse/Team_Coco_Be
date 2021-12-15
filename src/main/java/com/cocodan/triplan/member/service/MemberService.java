@@ -25,15 +25,17 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+
     private final PasswordEncoder passwordEncoder;
 
     private final MemberRepository memberRepository;
+
     private final MemberConverter converter;
 
     @Transactional
     public MemberCreateResponse create(String email, String name, String phoneNumber, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {
-        Member orginMember = converter.toMemberEntity(email, name, phoneNumber, birth, gender, nickname, profileImage, passwordEncoder.encode(passwd), groupId);
-        Member memberEntity = memberRepository.save(orginMember);
+        Member originMember = converter.toMemberEntity(email, name, phoneNumber, birth, gender, nickname, profileImage, passwordEncoder.encode(passwd), groupId);
+        Member memberEntity = memberRepository.save(originMember);
 
         return converter.toMemberCreateResponse(memberEntity);
     }
@@ -75,12 +77,12 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Member login(String principal, String credentials) {
-        checkArgument(isNotEmpty(principal), "principal must be provided.");
+    public Member login(String email, String credentials) {
+        checkArgument(isNotEmpty(email), "principal must be provided.");
         checkArgument(isNotEmpty(credentials), "credentials must be provided.");
 
-        Member member = memberRepository.findByLoginId(principal)
-                .orElseThrow(() -> new UsernameNotFoundException("Could not found user for " + principal));
+        Member member = memberRepository.findByLoginId(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Could not found user for " + email));
 
         member.checkPassword(passwordEncoder, credentials);
 

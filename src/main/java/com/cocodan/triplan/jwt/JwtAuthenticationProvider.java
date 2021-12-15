@@ -34,7 +34,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         JwtAuthenticationToken jwtAuthentication = (JwtAuthenticationToken) authentication;
         return processUserAuthentication(
-                String.valueOf(jwtAuthentication.getPrincipal()),
+                (String) jwtAuthentication.getPrincipal(),
                 jwtAuthentication.getCredentials()
         );
     }

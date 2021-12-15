@@ -1,9 +1,15 @@
 package com.cocodan.triplan.jwt;
 
+import com.cocodan.triplan.config.JwtAuthenticationSuccessHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.log.LogMessage;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.GenericFilterBean;
@@ -12,6 +18,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,6 +38,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     private final String headerKey;
 
     private final Jwt jwt;
+
+    private final JwtAuthenticationSuccessHandler successHandler = new JwtAuthenticationSuccessHandler();
 
     public JwtAuthenticationFilter(String headerKey, Jwt jwt) {
         this.headerKey = headerKey;
@@ -53,11 +62,12 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                     Long id = claims.id;
                     List<GrantedAuthority> authorities = getAuthorities(claims); // 꺼내오는 코드
 
-                    if (id != 0 && authorities.size() > 0) {
+                    if (id != 0 && !authorities.isEmpty()) {
                         JwtAuthenticationToken authentication =
                                 new JwtAuthenticationToken(new JwtAuthentication(token, id), null, authorities);
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                        successfulAuthentication(request, response, chain, authentication);
                     }
                 } catch (Exception e) {
                     log.warn("Jwt processing failed: {}", e.getMessage());
@@ -95,4 +105,14 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 Arrays.stream(roles).map(SimpleGrantedAuthority::new).collect(toList());
     }
 
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authResult);
+        SecurityContextHolder.setContext(context);
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug(LogMessage.format("Set SecurityContextHolder to %s", authResult));
+        }
+        this.successHandler.onAuthenticationSuccess(request, response, authResult);
+    }
 }

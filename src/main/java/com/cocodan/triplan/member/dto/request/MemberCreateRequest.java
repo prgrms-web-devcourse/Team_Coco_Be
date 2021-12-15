@@ -31,7 +31,7 @@ public class MemberCreateRequest {
     @Pattern(regexp="[0-9]{3}[0-9]{3,4}[0-9]{4}", message="'-'없이 입력해 주세요")
     private String phoneNumber;
 
-    @Pattern(regexp="[0-9]{10}", message="'yyyy-mm-dd'형식으로 작성해주세요")
+    @Pattern(regexp="^\\d{4}-\\d{2}-\\d{2}$", message="'yyyy-mm-dd'형식으로 작성해주세요")
     private String birth;
 
     @Pattern(regexp="^[ㄱ-ㅎ|가-힣|a-z|A-Z]{1,10}$", message="성별은 1~10자이어야 합니다")
