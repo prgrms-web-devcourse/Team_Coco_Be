@@ -111,4 +111,17 @@ public class MemberController {
 
         return ResponseEntity.ok().build();
     }
+
+    @ApiOperation("내 프로필 조회")
+    @GetMapping("/profiles")
+    public ResponseEntity<MemberGetOneResponse> readProfile(@AuthenticationPrincipal JwtAuthentication authentication) {
+        Long memberId = authentication.getId();
+        if (memberId == 0)
+        {
+            throw new NotFoundException(Member.class, memberId);
+        }
+        MemberGetOneResponse response = memberService.getOne(memberId);
+
+        return ResponseEntity.ok(response);
+    }
 }
