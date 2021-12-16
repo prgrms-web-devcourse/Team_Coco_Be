@@ -1,15 +1,12 @@
 package com.cocodan.triplan.member.controller;
 
 import com.cocodan.triplan.exception.common.NotFoundException;
-import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.jwt.JwtAuthenticationToken;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.request.MemberCreateRequest;
 import com.cocodan.triplan.member.dto.request.MemberLoginRequest;
-import com.cocodan.triplan.member.dto.response.MemberLoginResponse;
 import com.cocodan.triplan.member.dto.request.MemberUpdateRequest;
-import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.dto.response.MemberUpdateResponse;
@@ -45,7 +42,6 @@ public class MemberController {
         memberService.create(
                 request.getEmail(),
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getBirth(),
                 request.getGender(),
                 request.getNickname(),
@@ -84,7 +80,6 @@ public class MemberController {
         MemberUpdateResponse response = memberService.update(
                 memberId,
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getNickname(),
                 request.getProfileImage()
         );

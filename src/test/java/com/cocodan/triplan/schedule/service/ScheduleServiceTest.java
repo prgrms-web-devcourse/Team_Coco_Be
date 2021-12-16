@@ -58,7 +58,6 @@ class ScheduleServiceTest {
         MemberCreateResponse memberCreateResponse = memberService.create(
                 "ffff@naver.com",
                 "taehyun",
-                "01011111111",
                 "1994-12-16",
                 "남성",
                 "henry",
