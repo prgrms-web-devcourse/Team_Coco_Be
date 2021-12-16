@@ -1,6 +1,5 @@
 package com.cocodan.triplan.member.service;
 
-import com.cocodan.triplan.config.WebSecurityConfigure;
 import com.cocodan.triplan.util.MemberConverter;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
@@ -52,8 +51,8 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MemberGetOneResponse> getAll(Pageable pageable){
-        return memberRepository.findAll(pageable)
+    public Page<MemberGetOneResponse> getAll(Pageable pageable, String nickname){
+        return memberRepository.findAllByNickname(pageable,nickname)
                 .map(converter::toMemberFindResponse);
     }
 

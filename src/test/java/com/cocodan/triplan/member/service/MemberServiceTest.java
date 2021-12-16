@@ -89,13 +89,13 @@ class MemberServiceTest {
     @Test
     void getAll() {
         // given
-        when(memberRepository.findAll(pageable)).thenReturn(members);
+        when(memberRepository.findAllByNickname(pageable,NICKNAME)).thenReturn(members);
 
         // when
-        memberService.getAll(pageable);
+        memberService.getAll(pageable, NICKNAME);
 
         // then
-        verify(memberRepository).findAll(pageable);
+        verify(memberRepository).findAllByNickname(pageable,NICKNAME);
     }
 
     @Test
