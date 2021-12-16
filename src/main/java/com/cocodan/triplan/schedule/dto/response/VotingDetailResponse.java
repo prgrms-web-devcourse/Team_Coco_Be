@@ -4,6 +4,7 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.domain.Voting;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class VotingDetailResponse {
 
     private final Long id;
@@ -24,16 +26,6 @@ public class VotingDetailResponse {
     private final MemberSimpleResponse memberSimpleResponse;
 
     private final boolean multipleFlag;
-
-    @Builder
-    private VotingDetailResponse(Long id, String title, int numOfTotalParticipants, List<VotingContentResponse> votingContentResponses, MemberSimpleResponse memberSimpleResponse, boolean multipleFlag) {
-        this.id = id;
-        this.title = title;
-        this.numOfTotalParticipants = numOfTotalParticipants;
-        this.votingContentResponses = votingContentResponses;
-        this.memberSimpleResponse = memberSimpleResponse;
-        this.multipleFlag = multipleFlag;
-    }
 
     public static VotingDetailResponse of(Voting voting, Member member, Long memberId) {
         int numOfTotalParticipants = voting.getNumOfTotalParticipants();

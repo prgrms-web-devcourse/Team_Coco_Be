@@ -145,8 +145,7 @@ class ScheduleServiceTest {
         assertThat(memberNicknames).containsExactly("henry");
 
         List<Long> spotIds = response.getSpotResponseList().stream()
-                .map(ScheduleSpotResponse::getSpotResponse)
-                .map(SpotResponse::getId)
+                .map(ScheduleSpotResponse::getSpotId)
                 .collect(Collectors.toList());
 
         assertThat(spotIds).containsExactly(11L, 21L, 31L, 41L, 51L, 61L, 71L, 81L);
