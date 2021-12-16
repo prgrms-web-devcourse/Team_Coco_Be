@@ -3,10 +3,12 @@ package com.cocodan.triplan.exception;
 import com.cocodan.triplan.exception.common.ForbiddenException;
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
+import com.cocodan.triplan.exception.common.UniqueEmailException;
 import com.cocodan.triplan.util.ExceptionMessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -89,6 +91,22 @@ public class GlobalExceptionHandler {
                         ExceptionMessageUtils.getMessage("exception")
                 )
         );
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleUniqueEmail(UniqueEmailException exception) {
+        log.warn("{} Unique email : {}", exception.getClazz().getSimpleName(), exception.getEmail());
+        loggingWarningStackTrace(exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleInvalidLogin(BadCredentialsException exception) {
+        log.warn("Invalid login data : {}", exception.getMessage());
+        loggingWarningStackTrace(exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     private void loggingErrorStackTrace(Exception exception) {

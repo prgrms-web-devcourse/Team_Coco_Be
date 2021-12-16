@@ -63,7 +63,7 @@ public class Member extends BaseEntity {
     }
 
     @Builder
-    public Member(Long id, String email, String name, String birth, GenderType gender, String nickname, String profileImage) {
+    private Member(Long id, String email, String name, String birth, GenderType gender, String nickname, String profileImage) {
         this.id = id;
         this.email = email;
         this.name = name;

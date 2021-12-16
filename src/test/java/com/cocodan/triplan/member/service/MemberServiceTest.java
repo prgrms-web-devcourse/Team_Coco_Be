@@ -1,5 +1,6 @@
 package com.cocodan.triplan.member.service;
 
+import com.cocodan.triplan.member.domain.Group;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
@@ -29,6 +30,8 @@ class MemberServiceTest {
     private static final String GENDER = GenderType.MALE.getTypeStr();
     private static final String NICKNAME = "TTTaid";
     private static final String PROFILE_IMAGE = "/images/test";
+    private static final String PASSWORD = "taid123";
+    private static final String PASSWORD_ENCODE = "$2b$10$lphz9oOi2pcyg3AAj/boz..IkwiUhlQw4FLaVs.t24sifJkawzpYq";
 
     @InjectMocks
     MemberService memberService;
@@ -45,7 +48,9 @@ class MemberServiceTest {
     @Mock
     List<Member> members;
 
-    Member member = new Member(MEMBER_ID, EMAIL, NAME, BIRTH, GenderType.of(GENDER), NICKNAME, PROFILE_IMAGE);
+    Group group = new Group(1L, "USER_GROUP");
+
+    Member member = new Member(EMAIL, NAME, BIRTH, GenderType.of(GENDER), NICKNAME, PROFILE_IMAGE, PASSWORD_ENCODE, group);
 
     MemberGetOneResponse findResponse = MemberGetOneResponse.builder()
             .id(MEMBER_ID)
@@ -60,14 +65,14 @@ class MemberServiceTest {
 //    @Test
 //    void create() {
 //        // given
-//        when(converter.toMemberEntity(EMAIL, NAME, PHONE_NUMBER, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L)).thenReturn(member);
+//        when(converter.toMemberEntity(EMAIL, NAME, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, memberService.getPasswordEncoder().encode(PASSWORD), 1L)).thenReturn(member);
 //        when(memberRepository.save(member)).thenReturn(member);
 //
 //        // when
-//        memberService.create(EMAIL, NAME, PHONE_NUMBER, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L);
+//        memberService.create(EMAIL, NAME, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L);
 //
 //        // then
-//        verify(converter).toMemberEntity(EMAIL, NAME, PHONE_NUMBER, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L);
+//        verify(converter).toMemberEntity(EMAIL, NAME, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, memberService.getPasswordEncoder().encode(PASSWORD), 1L);
 //        verify(memberRepository).save(member);
 //        verify(converter).toMemberCreateResponse(member);
 //    }

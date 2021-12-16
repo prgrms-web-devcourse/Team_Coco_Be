@@ -1,5 +1,6 @@
 package com.cocodan.triplan.member.service;
 
+import com.cocodan.triplan.exception.common.UniqueEmailException;
 import com.cocodan.triplan.member.dto.response.*;
 import com.cocodan.triplan.util.MemberConverter;
 import com.cocodan.triplan.member.domain.Member;
@@ -44,7 +45,7 @@ public class MemberService {
     @Transactional
     public MemberCreateResponse validCreate(String email, String name, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {
         if(memberRepository.findByEmail(email).isPresent())
-            return null;
+            throw new UniqueEmailException(MemberService.class, email);
 
         Member originMember = converter.toMemberEntity(email, name, birth, gender, nickname, profileImage, passwordEncoder.encode(passwd), groupId);
         Member memberEntity = memberRepository.save(originMember);

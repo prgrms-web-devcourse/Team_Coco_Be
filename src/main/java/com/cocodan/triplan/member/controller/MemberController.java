@@ -43,7 +43,7 @@ public class MemberController {
     @ApiOperation("회원(Member) 신규 추가, 성공시 생성된 Member ID 반환")
     @PostMapping("/register")
     public ResponseEntity<Void> signUp(@Valid @RequestBody MemberCreateRequest request) {
-        Optional<MemberCreateResponse> result = Optional.ofNullable(memberService.validCreate(
+        memberService.validCreate(
                 request.getEmail(),
                 request.getName(),
                 request.getBirth(),
@@ -52,11 +52,7 @@ public class MemberController {
                 request.getProfileImage(),
                 request.getPassword(),
                 GROUP_ID
-        ));
-        if (result.isEmpty())
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        );
 
         return ResponseEntity.ok().build();
     }
@@ -65,10 +61,6 @@ public class MemberController {
     @GetMapping(value = "/users/{memberId}")
     public ResponseEntity<MemberGetOneResponse> readSingleData(@AuthenticationPrincipal JwtAuthentication authentication) {
         Long memberId = authentication.getId();
-        if (memberId == 0)
-        {
-            throw new NotFoundException(Member.class, memberId);
-        }
         MemberGetOneResponse response = memberService.getOne(memberId);
 
         return ResponseEntity.ok(response);
