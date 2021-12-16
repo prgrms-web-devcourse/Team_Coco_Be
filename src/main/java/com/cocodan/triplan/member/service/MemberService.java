@@ -8,22 +8,18 @@ import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.dto.response.MemberUpdateResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Service
-@RequiredArgsConstructor
 public class MemberService {
 
     private final PasswordEncoder passwordEncoder;
@@ -31,6 +27,12 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     private final MemberConverter converter;
+
+    public MemberService(MemberRepository memberRepository, MemberConverter converter) {
+        this.passwordEncoder = new BCryptPasswordEncoder();
+        this.memberRepository = memberRepository;
+        this.converter = converter;
+    }
 
     @Transactional
     public MemberCreateResponse create(String email, String name, String phoneNumber, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {

@@ -71,11 +71,6 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public Jwt jwt() {
         return new Jwt(
                 jwtConfigure.getIssuer(),
