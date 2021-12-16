@@ -1,12 +1,9 @@
 package com.cocodan.triplan.post.schedule.dto.response;
 
 import com.cocodan.triplan.member.domain.vo.GenderType;
-import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.domain.SchedulePostComment;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostNestedComment;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SchedulePostNestedCommentResponse {
 
     private Long nestedCommentId;
