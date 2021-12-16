@@ -25,13 +25,13 @@ public class DailyScheduleSpot extends BaseEntity {
     private Long spotId;
 
     @Column(name = "trip_date", nullable = false)
-    private LocalDate date;
+    private int date;
 
     @Column(name = "trip_order", nullable = false)
     private int order;
 
     @Builder
-    public DailyScheduleSpot(Schedule schedule, Long spotId, LocalDate date, int order) {
+    public DailyScheduleSpot(Schedule schedule, Long spotId, int date, int order) {
         this.schedule = schedule;
         this.spotId = spotId;
         this.date = date;
@@ -47,7 +47,7 @@ public class DailyScheduleSpot extends BaseEntity {
         return spotId;
     }
 
-    public LocalDate getDate() {
+    public int getDate() {
         return date;
     }
 

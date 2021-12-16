@@ -49,7 +49,7 @@ public class ScheduleDetailResponse {
     }
 
     private static int sortByDateAndOrder(DailyScheduleSpot o1, DailyScheduleSpot o2) {
-        int compareResult = o1.getDate().compareTo(o2.getDate());
+        int compareResult = o1.getDate() - o2.getDate();
         if (compareResult == 0) {
             return o1.getOrder() - o2.getOrder();
         }

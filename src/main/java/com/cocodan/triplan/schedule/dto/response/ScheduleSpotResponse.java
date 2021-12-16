@@ -15,12 +15,12 @@ public class ScheduleSpotResponse {
 
     private final SpotResponse spotResponse;
 
-    private final LocalDate date;
+    private final int date;
 
     private final int order;
 
     @Builder
-    private ScheduleSpotResponse(Long id, SpotResponse spotResponse, LocalDate date, int order) {
+    private ScheduleSpotResponse(Long id, SpotResponse spotResponse, int date, int order) {
         this.id = id;
         this.spotResponse = spotResponse;
         this.date = date;

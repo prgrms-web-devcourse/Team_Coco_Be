@@ -13,12 +13,12 @@ public class DailyScheduleSpotResponse {
 
     private Long spotId;
 
-    private LocalDate date;
+    private int date;
 
     private int order;
 
     @Builder
-    private DailyScheduleSpotResponse(Long spotId, LocalDate date, int order) {
+    private DailyScheduleSpotResponse(Long spotId, int date, int order) {
         this.spotId = spotId;
         this.date = date;
         this.order = order;
@@ -37,6 +37,6 @@ public class DailyScheduleSpotResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DailyScheduleSpotResponse that = (DailyScheduleSpotResponse) o;
-        return spotId.equals(that.spotId) && date.equals(that.date) && order == that.order;
+        return spotId.equals(that.spotId) && date == that.date && order == that.order;
     }
 }
