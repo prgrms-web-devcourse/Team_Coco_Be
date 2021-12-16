@@ -12,9 +12,11 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,14 +26,17 @@ class MemberServiceTest {
     private static final Long MEMBER_ID = 1L;
     private static final String EMAIL = "ddkk94@naver.com";
     private static final String NAME =  "Taid";
-    private static final String PHONE_NUMBER = "01011223344";
     private static final String BIRTH = "20211015";
     private static final String GENDER = GenderType.MALE.getTypeStr();
     private static final String NICKNAME = "TTTaid";
     private static final String PROFILE_IMAGE = "/images/test";
+    private static final String PASSWORD = "asdf123";
 
     @InjectMocks
     MemberService memberService;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Mock
     MemberRepository memberRepository;
@@ -45,33 +50,34 @@ class MemberServiceTest {
     @Mock
     Page<Member> members;
 
-    Member member = new Member(MEMBER_ID, EMAIL, NAME, PHONE_NUMBER, BIRTH, GenderType.of(GENDER), NICKNAME, PROFILE_IMAGE);
+    Member member = new Member(MEMBER_ID, EMAIL, NAME, BIRTH, GenderType.of(GENDER), NICKNAME, PROFILE_IMAGE);
 
     MemberGetOneResponse findResponse = MemberGetOneResponse.builder()
             .id(MEMBER_ID)
             .email(EMAIL)
             .name(NAME)
-            .phoneNumber(PHONE_NUMBER)
             .birth(BIRTH)
             .gender(GenderType.of(GENDER))
             .nickname(NICKNAME)
             .profileImage(PROFILE_IMAGE)
             .build();
 
-//    @Test
-//    void create() {
+    @Test
+    void create() {
 //        // given
-//        when(converter.toMemberEntity(EMAIL, NAME, PHONE_NUMBER, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L)).thenReturn(member);
+//        when(memberRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+//        when(passwordEncoder.encode(PASSWORD)).thenReturn("temp");
+//        when(converter.toMemberEntity(EMAIL, NAME, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, passwordEncoder.encode(PASSWORD), 1L)).thenReturn(member);
 //        when(memberRepository.save(member)).thenReturn(member);
 //
 //        // when
-//        memberService.create(EMAIL, NAME, PHONE_NUMBER, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L);
+//        memberService.create(EMAIL, NAME, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L);
 //
 //        // then
-//        verify(converter).toMemberEntity(EMAIL, NAME, PHONE_NUMBER, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, PASSWORD, 1L);
+//        verify(converter).toMemberEntity(EMAIL, NAME, BIRTH, GENDER, NICKNAME, PROFILE_IMAGE, passwordEncoder.encode(PASSWORD), 1L);
 //        verify(memberRepository).save(member);
 //        verify(converter).toMemberCreateResponse(member);
-//    }
+    }
 
     @Test
     void getOne() {
@@ -104,7 +110,7 @@ class MemberServiceTest {
         when(memberRepository.findById(MEMBER_ID)).thenReturn(Optional.of(member));
 
         // when
-        memberService.update(MEMBER_ID, NAME, PHONE_NUMBER, NICKNAME, PROFILE_IMAGE);
+        memberService.update(MEMBER_ID, NAME, NICKNAME, PROFILE_IMAGE);
 
         // then
         verify(memberRepository).findById(MEMBER_ID);

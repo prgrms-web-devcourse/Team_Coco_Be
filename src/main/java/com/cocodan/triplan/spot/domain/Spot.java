@@ -12,9 +12,6 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Spot extends BaseEntity implements Persistable<Long> {
 
-    public static final int PHONE_MAX_LENGTH = 13;
-    public static final int PHONE_MIN_LENGTH = 10;
-
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
@@ -28,9 +25,6 @@ public class Spot extends BaseEntity implements Persistable<Long> {
     @Column(name = "road_address_name")
     private String roadAddressName;
 
-    @Column(name = "phone")
-    private String phone;
-
     @Column(name = "latitude", nullable = false)
     private double latitude;
 
@@ -38,12 +32,11 @@ public class Spot extends BaseEntity implements Persistable<Long> {
     private double longitude;
 
     @Builder
-    public Spot(Long id, String placeName, String addressName, String roadAddressName, String phone, double latitude, double longitude) {
+    public Spot(Long id, String placeName, String addressName, String roadAddressName, double latitude, double longitude) {
         this.id = id;
         this.placeName = placeName;
         this.addressName = addressName;
         this.roadAddressName = roadAddressName;
-        this.phone = phone;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -75,9 +68,5 @@ public class Spot extends BaseEntity implements Persistable<Long> {
 
     public String getRoadAddressName() {
         return roadAddressName;
-    }
-
-    public String getPhone() {
-        return phone;
     }
 }

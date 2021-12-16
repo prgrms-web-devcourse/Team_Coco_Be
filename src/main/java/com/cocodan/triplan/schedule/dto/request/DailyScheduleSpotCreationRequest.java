@@ -23,9 +23,6 @@ public class DailyScheduleSpotCreationRequest {
     @NotBlank
     private String roadAddressName;
 
-    @Length(min = Spot.PHONE_MIN_LENGTH, max = Spot.PHONE_MAX_LENGTH)
-    private String phone;
-
     @NotBlank
     private String placeName;
 

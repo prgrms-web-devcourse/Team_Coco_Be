@@ -18,12 +18,11 @@ public class MemberConverter {
     @Autowired
     GroupRepository groupRepository;
 
-    public Member toMemberEntity(String email, String name, String phoneNumber, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {
+    public Member toMemberEntity(String email, String name, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {
         Optional<Group> group = groupRepository.findById(groupId);
         return Member.builder()
                 .email(email)
                 .name(name)
-                .phoneNumber(phoneNumber)
                 .birth(birth)
                 .gender(GenderType.of(gender))
                 .nickname(nickname)
@@ -38,7 +37,6 @@ public class MemberConverter {
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
-                .phoneNumber(member.getPhoneNumber())
                 .birth(member.getBirth())
                 .gender(member.getGender())
                 .nickname(member.getNickname())
@@ -57,7 +55,6 @@ public class MemberConverter {
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
-                .phoneNumber(member.getPhoneNumber())
                 .birth(member.getBirth())
                 .gender(member.getGender())
                 .build();
@@ -68,7 +65,6 @@ public class MemberConverter {
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
-                .phoneNumber(member.getPhoneNumber())
                 .birth(member.getBirth())
                 .gender(member.getGender())
                 .build();

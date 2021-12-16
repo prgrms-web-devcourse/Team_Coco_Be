@@ -1,13 +1,11 @@
 package com.cocodan.triplan.member.controller;
 
 import com.cocodan.triplan.exception.common.NotFoundException;
-import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.jwt.JwtAuthenticationToken;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.request.MemberCreateRequest;
 import com.cocodan.triplan.member.dto.request.MemberLoginRequest;
-import com.cocodan.triplan.member.dto.response.MemberLoginResponse;
 import com.cocodan.triplan.member.dto.request.MemberUpdateRequest;
 import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
@@ -28,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Api(tags = "Member")
 @RestController
@@ -42,29 +41,27 @@ public class MemberController {
     @ApiOperation("회원(Member) 신규 추가, 성공시 생성된 Member ID 반환")
     @PostMapping("/register")
     public ResponseEntity<Void> signUp(@Valid @RequestBody MemberCreateRequest request) {
-        memberService.create(
+        Optional<MemberCreateResponse> result = Optional.ofNullable(memberService.create(
                 request.getEmail(),
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getBirth(),
                 request.getGender(),
                 request.getNickname(),
                 request.getProfileImage(),
                 request.getPassword(),
                 GROUP_ID
-        );
+        ));
+        if (result.isEmpty())
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
         return ResponseEntity.ok().build();
     }
 
     @ApiOperation("회원(Member) 단건 조회, 성공시 Member 정보 반환")
     @GetMapping(value = "/users/{memberId}")
-    public ResponseEntity<MemberGetOneResponse> readSingleData(@AuthenticationPrincipal JwtAuthentication authentication) {
-        Long memberId = authentication.getId();
-        if (memberId == 0)
-        {
-            throw new NotFoundException(Member.class, memberId);
-        }
+    public ResponseEntity<MemberGetOneResponse> readSingleData(@PathVariable Long memberId) {
         MemberGetOneResponse response = memberService.getOne(memberId);
 
         return ResponseEntity.ok(response);
@@ -84,7 +81,6 @@ public class MemberController {
         MemberUpdateResponse response = memberService.update(
                 memberId,
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getNickname(),
                 request.getProfileImage()
         );
@@ -100,6 +96,7 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    @ApiOperation("이메일과 비밀번호로 로그인")
     @PostMapping(path = "/login")
     public ResponseEntity<Void> login(@RequestBody MemberLoginRequest request, HttpServletResponse httpServletResponse) {
         JwtAuthenticationToken authToken = new JwtAuthenticationToken(request.getEmail(), request.getPassword());
@@ -109,5 +106,18 @@ public class MemberController {
         httpServletResponse.setHeader("token", authentication.getToken());
 
         return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("내 프로필 조회")
+    @GetMapping("/profiles")
+    public ResponseEntity<MemberGetOneResponse> readProfile(@AuthenticationPrincipal JwtAuthentication authentication) {
+        Long memberId = authentication.getId();
+        if (memberId == 0)
+        {
+            throw new NotFoundException(Member.class, memberId);
+        }
+        MemberGetOneResponse response = memberService.getOne(memberId);
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -36,7 +36,6 @@ public class SpotService {
         return Spot.builder()
                 .id(dailyScheduleSpotCreationRequest.getSpotId())
                 .placeName(dailyScheduleSpotCreationRequest.getPlaceName())
-                .phone(dailyScheduleSpotCreationRequest.getPhone())
                 .addressName(dailyScheduleSpotCreationRequest.getAddressName())
                 .roadAddressName(dailyScheduleSpotCreationRequest.getRoadAddressName())
                 .latitude(dailyScheduleSpotCreationRequest.getPosition().getLat())

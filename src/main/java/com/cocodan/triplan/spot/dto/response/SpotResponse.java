@@ -16,8 +16,6 @@ public class SpotResponse {
 
     private String roadAddressName;
 
-    private String phone;
-
     private double lat;
 
     private double lng;
@@ -28,7 +26,6 @@ public class SpotResponse {
                 .placeName(spot.getPlaceName())
                 .addressName(spot.getAddressName())
                 .roadAddressName(spot.getRoadAddressName())
-                .phone(spot.getPhone())
                 .lat(spot.getLatitude())
                 .lng(spot.getLongitude())
                 .build();
