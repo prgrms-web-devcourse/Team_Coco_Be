@@ -42,6 +42,17 @@ public class MemberService {
         return converter.toMemberCreateResponse(memberEntity);
     }
 
+    @Transactional
+    public MemberCreateResponse validCreate(String email, String name, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {
+        if(memberRepository.findByEmail(email).isPresent())
+            return null;
+
+        Member originMember = converter.toMemberEntity(email, name, birth, gender, nickname, profileImage, passwordEncoder.encode(passwd), groupId);
+        Member memberEntity = memberRepository.save(originMember);
+
+        return converter.toMemberCreateResponse(memberEntity);
+    }
+
     @Transactional(readOnly = true)
     public MemberGetOneResponse getOne(Long id) {
         return memberRepository.findById(id)
