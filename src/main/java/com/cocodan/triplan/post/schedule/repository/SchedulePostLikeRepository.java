@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface SchedulePostLikeRepository extends JpaRepository<Like, Long> {
 
-    @Query("select l from Like l where l.memberId = :memberId and l.schedulePost.id = :schedulePostId")
+    @Query("select l from Like l where l.member.id = :memberId and l.schedulePost.id = :schedulePostId")
     Optional<Like> findByMemberIdAndSchedulePostId(Long memberId, Long schedulePostId);
 
     List<Like> findAllByMemberId(Long memberId);

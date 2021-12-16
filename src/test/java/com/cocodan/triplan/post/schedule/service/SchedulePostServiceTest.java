@@ -218,16 +218,7 @@ class SchedulePostServiceTest {
     }
 
     private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
-        return schedulePosts.stream().map(schedulePost -> {
-            MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMember().getId());
-            Schedule schedule = schedulePost.getSchedule();
-            City city = schedulePost.getCity();
-            List<Theme> themes = schedule.getScheduleThemes().stream()
-                    .map(ScheduleTheme::getTheme).collect(Collectors.toList());
-            String title = schedulePost.getTitle();
-
-            return SchedulePostResponse.of(memberResponse, schedule, city, themes, title);
-        }).collect(Collectors.toList());
+        return schedulePosts.stream().map(SchedulePostResponse::from).collect(Collectors.toList());
     }
 
     @Test

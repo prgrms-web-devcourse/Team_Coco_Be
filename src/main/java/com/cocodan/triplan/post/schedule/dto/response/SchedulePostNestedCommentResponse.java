@@ -1,5 +1,6 @@
 package com.cocodan.triplan.post.schedule.dto.response;
 
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostComment;
@@ -35,7 +36,7 @@ public class SchedulePostNestedCommentResponse {
     public static SchedulePostNestedCommentResponse of(
             SchedulePostComment parentComment,
             SchedulePostNestedComment comment,
-            MemberGetOneResponse member,
+            Member member,
             boolean schedulePostWriter
     ) {
         return SchedulePostNestedCommentResponse.builder()

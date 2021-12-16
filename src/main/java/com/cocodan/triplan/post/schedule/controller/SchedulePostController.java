@@ -1,11 +1,8 @@
 package com.cocodan.triplan.post.schedule.controller;
 
 import com.cocodan.triplan.jwt.JwtAuthentication;
-import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
-import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
@@ -21,7 +18,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -76,7 +72,6 @@ public class SchedulePostController {
             @RequestBody SchedulePostRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         Long postId = schedulePostService.createSchedulePost(authentication.getId(), request);
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
     }
@@ -94,7 +89,6 @@ public class SchedulePostController {
             @PathVariable("schedulePostId") Long schedulePostId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         schedulePostService.deleteSchedulePost(authentication.getId(), schedulePostId);
         return ResponseEntity.ok().build();
     }
@@ -106,7 +100,6 @@ public class SchedulePostController {
             @RequestBody SchedulePostRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         schedulePostService.modifySchedulePost(authentication.getId(), schedulePostId, request);
         return ResponseEntity.ok().build();
     }
@@ -118,7 +111,6 @@ public class SchedulePostController {
             @RequestBody SchedulePostLikeRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), request);
         return ResponseEntity.ok(new SchedulePostLikeResponse(likeCount));
     }
@@ -126,7 +118,6 @@ public class SchedulePostController {
     @ApiOperation("좋아요 누른 게시글만 조회")
     @GetMapping("/schedules/liked")
     public ResponseEntity<List<SchedulePostResponse>> likedSchedulePostList(@AuthenticationPrincipal JwtAuthentication authentication) {
-
         return ResponseEntity.ok(schedulePostService.getLikedSchedulePosts(authentication.getId()));
     }
 
@@ -144,7 +135,6 @@ public class SchedulePostController {
             @RequestBody SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(authentication.getId(), schedulePostId, request);
         return ResponseEntity.ok(schedulePostComments);
     }
@@ -156,7 +146,6 @@ public class SchedulePostController {
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         // TODO: 2021.12.15 Teru - 댓글에 대댓글이 작성되어 있는 상태에서 댓글이 삭제되면 어떻게 할 것인지 고민
         // 방법 1. 삭제된 댓글은 공란(삭제됨 표시)으로 두고, 아래 대댓글은 표시한다.
         // 방법 2. 삭제된 댓글에 있던 대댓글도 모두 삭제한다.
@@ -172,7 +161,6 @@ public class SchedulePostController {
             @RequestBody SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         schedulePostService.modifySchedulePostComment(schedulePostId, commentId, authentication.getId(), request);
         return ResponseEntity.ok().build();
     }
@@ -185,14 +173,12 @@ public class SchedulePostController {
             @RequestBody SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         List<SchedulePostCommentResponse> schedulePostCommentResponses = schedulePostService.writeNestedCommentToSchedulePostComment(
                 authentication.getId(),
                 schedulePostId,
                 commentId,
                 request
         );
-
         // 전체 댓글 및 대댓글 반환
         return ResponseEntity.ok(schedulePostCommentResponses);
     }
@@ -206,7 +192,6 @@ public class SchedulePostController {
             SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         schedulePostService.modifySchedulePostNestedComment(
                 authentication.getId(),
                 schedulePostId,
@@ -225,7 +210,6 @@ public class SchedulePostController {
             @PathVariable("nestedCommentId") Long nestedCommentId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-
         schedulePostService.deleteSchedulePostNestedComment(
                 authentication.getId(),
                 schedulePostId,

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@AllArgsConstructor
 @Builder
 public class SchedulePostDetailResponse {
 
@@ -74,6 +73,6 @@ public class SchedulePostDetailResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SchedulePostDetailResponse that = (SchedulePostDetailResponse) o;
-        return nickname.equals(that.nickname) && ages == that.ages && gender == that.gender && city == that.city && startDate.equals(that.startDate) && endDate.equals(that.endDate) && title.equals(that.title) && content.equals(that.content) && dailyScheduleSpots.equals(that.dailyScheduleSpots) && createdAt.equals(that.createdAt) && views.equals(that.views) && liked.equals(that.liked);
+        return nickname.equals(that.nickname) && createdAt.equals(that.createdAt);
     }
 }

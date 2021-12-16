@@ -1,10 +1,12 @@
 package com.cocodan.triplan.post.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.cocodan.triplan.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,24 +24,29 @@ import javax.persistence.Table;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SchedulePostComment extends BaseEntity {
 
+    public static final int COMMENT_MIN_LENGTH = 1;
+    public static final int COMMENT_MAX_LENGTH = 255;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_post", referencedColumnName = "id")
     private SchedulePost schedulePost;
 
     @Column(name = "content", nullable = false)
+    @Length(min = COMMENT_MIN_LENGTH, max = COMMENT_MAX_LENGTH)
     private String content;
 
     @Builder
-    public SchedulePostComment(Long memberId, SchedulePost schedulePost, String content) {
-        this.memberId = memberId;
+    public SchedulePostComment(Member member, SchedulePost schedulePost, String content) {
+        this.member = member;
         this.schedulePost = schedulePost;
         this.content = content;
     }

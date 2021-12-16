@@ -19,9 +19,6 @@ import com.cocodan.triplan.post.schedule.repository.SchedulePostLikeRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostNestedCommentRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.member.service.MemberService;
-import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.ScheduleTheme;
-import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.spot.domain.vo.City;
 import org.springframework.stereotype.Service;
@@ -98,22 +95,31 @@ public class SchedulePostService {
         );
         // TODO: 2021.12.13 Teru - 조회수에 대한 동시성 문제를 어떻게 해야 잘 해결할 수 있을지 고민... 현재는 별다른 처리를 해두지 않은 상태
         schedulePost.increaseViews();
-
-        List<SchedulePostCommentResponse> schedulePostComments = getSchedulePostComments(schedulePostId);
-        return SchedulePostDetailResponse.of(schedulePost, schedulePostComments);
+        List<SchedulePostCommentResponse> comments = schedulePostCommentRepository.findAllBySchedulePostId(schedulePostId).stream()
+                .map(schedulePostComment -> {
+                    MemberGetOneResponse memberResponse = memberService.getOne(schedulePostComment.getMember().getId());
+                    List<SchedulePostNestedCommentResponse> nestedComments = schedulePostNestedCommentRepository.findAllByCommentId(schedulePostComment.getId()).stream()
+                            .map(nestedComment ->
+                                    SchedulePostNestedCommentResponse.of(
+                                            schedulePostComment,
+                                            nestedComment,
+                                            nestedComment.getMember(),
+                                            schedulePost.getMember().equals(nestedComment.getMember())
+                                    )
+                            ).collect(Collectors.toList());
+                    return SchedulePostCommentResponse.of(
+                            schedulePostComment.getId(),
+                            schedulePostComment,
+                            memberResponse,
+                            memberResponse.getId().equals(schedulePost.getMember().getId()),
+                            nestedComments
+                    );
+                }).collect(Collectors.toList());
+        return SchedulePostDetailResponse.of(schedulePost, comments);
     }
 
     private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
-        return schedulePosts.stream().map(schedulePost -> {
-            MemberGetOneResponse memberResponse = memberService.getOne(schedulePost.getMember().getId());
-            Schedule schedule = schedulePost.getSchedule();
-            City city = schedulePost.getCity();
-            List<Theme> themes = schedule.getScheduleThemes().stream()
-                    .map(ScheduleTheme::getTheme).collect(Collectors.toList());
-            String title = schedulePost.getTitle();
-
-            return SchedulePostResponse.of(memberResponse, schedule, city, themes, title);
-        }).collect(Collectors.toList());
+        return schedulePosts.stream().map(SchedulePostResponse::from).collect(Collectors.toList());
     }
 
     private SchedulePost validateAuthorities(Long memberId, Long schedulePostId) {
@@ -163,7 +169,10 @@ public class SchedulePostService {
         );
 
         if (likeData.isEmpty() && request.getFlag()) {
-            Like like = new Like(memberId, post);
+            Member member = memberRepository.findById(memberId).orElseThrow(
+                    () -> new RuntimeException("No such member found (ID : " + memberId + ")")
+            );
+            Like like = new Like(member, post);
             schedulePostLikeRepository.save(like);
             return post.increaseLiked();
         }
@@ -194,16 +203,16 @@ public class SchedulePostService {
 
         List<SchedulePostComment> schedulePostComments = schedulePostCommentRepository.findAllBySchedulePostId(schedulePostId);
         return schedulePostComments.stream().map(schedulePostComment -> {
-            MemberGetOneResponse memberResponse = memberService.getOne(schedulePostComment.getMemberId());
+            MemberGetOneResponse memberResponse = memberService.getOne(schedulePostComment.getMember().getId());
             List<SchedulePostNestedCommentResponse> nestedComments = schedulePostNestedCommentRepository.findAllByCommentId(schedulePostComment.getId()).stream()
-                    .map(nestedComment -> {
-                        return SchedulePostNestedCommentResponse.of(
-                                schedulePostComment,
-                                nestedComment,
-                                memberResponse,
-                                schedulePost.getMember().getId().equals(nestedComment.getMemberId())
-                        );
-                    }).collect(Collectors.toList());
+                    .map(nestedComment ->
+                            SchedulePostNestedCommentResponse.of(
+                                    schedulePostComment,
+                                    nestedComment,
+                                    nestedComment.getMember(),
+                                    schedulePost.getMember().equals(nestedComment.getMember())
+                            )
+                    ).collect(Collectors.toList());
             return SchedulePostCommentResponse.of(
                     schedulePostComment.getId(),
                     schedulePostComment,
@@ -224,8 +233,12 @@ public class SchedulePostService {
                 () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
         );
 
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException("No member found. (ID " + memberId + ")")
+        );
+
         SchedulePostComment comment = SchedulePostComment.builder()
-                .memberId(memberId)
+                .member(member)
                 .schedulePost(schedulePost)
                 .content(request.getContent())
                 .build();
@@ -260,7 +273,7 @@ public class SchedulePostService {
                 () -> new RuntimeException("No comment found (ID : " + commentId + ")")
         );
 
-        if (!memberId.equals(comment.getMemberId())) {
+        if (!memberId.equals(comment.getMember().getId())) {
             throw new RuntimeException("Invalid Request. Only writer can delete a comment");
         }
     }
@@ -286,9 +299,13 @@ public class SchedulePostService {
                 () -> new RuntimeException("No comment found (ID : " + commentId + ")")
         );
 
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException("No Member found (ID : " + memberId + ")")
+        );
+
         SchedulePostNestedComment nestedComment = SchedulePostNestedComment.builder()
                 .comment(comment)
-                .memberId(memberId)
+                .member(member)
                 .content(request.getContent())
                 .build();
 
@@ -331,7 +348,7 @@ public class SchedulePostService {
                 () -> new RuntimeException("No nested comment found (ID : " + nestedCommentId + ")")
         );
 
-        if (!memberId.equals(nestedComment.getMemberId())) {
+        if (!memberId.equals(nestedComment.getMember().getId())) {
             throw new RuntimeException("Invalid Request. Only writer can delete a comment");
         }
     }
