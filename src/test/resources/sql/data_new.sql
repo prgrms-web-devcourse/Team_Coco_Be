@@ -3,7 +3,7 @@ VALUES (1, 'ROLE_USER'),
        (2, 'ROLE_ADMIN')
 ;
 
-INSERT INTO groups(id, name)
+INSERT INTO access_group(id, name)
 VALUES (1, 'USER_GROUP'),
        (2, 'ADMIN_GROUP')
 ;

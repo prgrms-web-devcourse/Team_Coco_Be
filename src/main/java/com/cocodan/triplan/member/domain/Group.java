@@ -12,7 +12,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Entity
-@Table(name = "groups")
+@Table(name = "access_group")
 public class Group {
 
     @Id
