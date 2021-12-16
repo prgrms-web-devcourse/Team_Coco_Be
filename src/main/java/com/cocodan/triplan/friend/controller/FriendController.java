@@ -40,4 +40,12 @@ public class FriendController {
 
         return ResponseEntity.ok(memberSimpleResponses);
     }
+
+    @ApiOperation("친구 삭제")
+    @DeleteMapping("/{deletedFriendId}")
+    public ResponseEntity<Void> deleteFollowing(@PathVariable Long deletedFriendId, @AuthenticationPrincipal JwtAuthentication authentication) {
+        friendService.deleteFollowing(deletedFriendId, authentication.getId());
+
+        return ResponseEntity.ok().build();
+    }
 }

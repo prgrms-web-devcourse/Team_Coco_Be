@@ -1,5 +1,6 @@
 package com.cocodan.triplan.friend.service;
 
+import com.cocodan.triplan.exception.common.NoFriendsException;
 import com.cocodan.triplan.friend.domain.Friend;
 import com.cocodan.triplan.friend.repository.FriendRepository;
 import com.cocodan.triplan.member.domain.Member;
@@ -21,10 +22,10 @@ public class FriendService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void addFollowing(Long followerId, Long followingId) {
+    public Long addFollowing(Long followerId, Long followingId) {
         Friend friend = new Friend(followerId, followingId);
 
-        friendRepository.save(friend);
+        return friendRepository.save(friend).getId();
     }
 
     @Transactional(readOnly = true)
@@ -37,5 +38,13 @@ public class FriendService {
         return followings.stream()
                 .map(MemberSimpleResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteFollowing(Long toId, Long fromId) {
+        Friend friend = friendRepository.findByFromIdAndToId(fromId, toId)
+                .orElseThrow(() -> new NoFriendsException(toId, fromId));
+
+        friendRepository.delete(friend);
     }
 }
