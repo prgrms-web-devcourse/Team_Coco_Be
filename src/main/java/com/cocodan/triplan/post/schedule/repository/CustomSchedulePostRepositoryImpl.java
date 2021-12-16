@@ -26,7 +26,7 @@ public class CustomSchedulePostRepositoryImpl implements CustomSchedulePostRepos
     }
 
     @Override
-    public List<SchedulePost> search(String search, City city, Theme theme, SchedulePostSortingRule sortRule, Pageable pageable) {
+    public List<SchedulePost> search(String search, City city, Theme theme, SchedulePostSortingRule sortRule) {
         JPAQuery<SchedulePost> query = queryFactory
                 .select(schedulePost)
                 .from(schedulePost)
@@ -45,8 +45,6 @@ public class CustomSchedulePostRepositoryImpl implements CustomSchedulePostRepos
         sortRule.sort(query);
 
         return query
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
     }
 

@@ -1,17 +1,15 @@
 package com.cocodan.triplan.member.controller;
 
 import com.cocodan.triplan.exception.common.NotFoundException;
-import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.jwt.JwtAuthenticationToken;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.request.MemberCreateRequest;
 import com.cocodan.triplan.member.dto.request.MemberLoginRequest;
-import com.cocodan.triplan.member.dto.response.MemberLoginResponse;
 import com.cocodan.triplan.member.dto.request.MemberUpdateRequest;
-import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
+import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.dto.response.MemberUpdateResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import io.swagger.annotations.Api;
@@ -28,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 @Api(tags = "Member")
 @RestController
@@ -70,10 +69,10 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @ApiOperation("모든 회원(Member) 조회, 성공시 Member Page 반환")
+    @ApiOperation("닉네임으로 회원 조회, Member Page 반환")
     @GetMapping("/users")
-    public ResponseEntity<Page<MemberGetOneResponse>> readPage(Pageable pageable) {
-        Page<MemberGetOneResponse> responses = memberService.getAll(pageable);
+    public ResponseEntity<List<MemberSimpleResponse>> findMemberByNickname(@RequestParam String nickname) {
+        List<MemberSimpleResponse> responses = memberService.findMemberByNickname(nickname);
 
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
@@ -110,4 +109,5 @@ public class MemberController {
 
         return ResponseEntity.ok().build();
     }
+
 }

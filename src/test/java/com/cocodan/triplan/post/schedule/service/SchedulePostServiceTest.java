@@ -150,16 +150,16 @@ class SchedulePostServiceTest {
         };
 
         // 여행 공유 게시글 조회
-        Page<SchedulePostResponse> posts = postSearchService.getSchedulePosts("1", City.ALL, Theme.ALL, SchedulePostSortingRule.RECENT, pageable);
-        assertThat(posts.getSize()).isEqualTo(3);
+        List<SchedulePostResponse> posts = postSearchService.getSchedulePosts("1", City.ALL, Theme.ALL, SchedulePostSortingRule.RECENT);
+        assertThat(posts.size()).isEqualTo(1);
 //        assertThat(posts.getContent().get(0).getProfileImageUrl()).isEqualTo(PROFILE_IMAGE);
-        assertThat(posts.getContent().get(0).getNickname()).isEqualTo(NICKNAME);
-        assertThat(posts.getContent().get(0).getTitle()).isEqualTo("1번 여행 게시글");
-        assertThat(posts.getContent().get(0).getGenderType().getTypeStr()).isEqualTo(GENDER);
-        assertThat(posts.getContent().get(0).getCity()).isEqualTo(City.SEOUL);
-        assertThat(posts.getContent().get(0).getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
-        assertThat(posts.getContent().get(0).getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
-        assertThat(posts.getContent().get(0).getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(posts.get(0).getNickname()).isEqualTo(NICKNAME);
+        assertThat(posts.get(0).getTitle()).isEqualTo("1번 여행 게시글");
+        assertThat(posts.get(0).getGenderType().getTypeStr()).isEqualTo(GENDER);
+        assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL);
+        assertThat(posts.get(0).getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
+        assertThat(posts.get(0).getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
+        assertThat(posts.get(0).getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
 
         // TODO: 다양한 조건으로 테스트 추가
     }

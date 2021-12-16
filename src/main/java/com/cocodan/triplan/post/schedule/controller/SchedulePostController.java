@@ -56,8 +56,7 @@ public class SchedulePostController {
 
     @ApiOperation("여행 일정 공유 게시글 (조건별)목록 조회")
     @GetMapping("/schedules")
-    public ResponseEntity<Page<SchedulePostResponse>> schedulePostList(
-            Pageable pageable,
+    public ResponseEntity<List<SchedulePostResponse>> schedulePostList(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "전체") String searchingCity,
             @RequestParam(defaultValue = "ALL") String searchingTheme,
@@ -66,7 +65,7 @@ public class SchedulePostController {
         City city = City.from(searchingCity);
         Theme theme = Theme.valueOf(searchingTheme);
         SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
-        Page<SchedulePostResponse> schedulePosts = schedulePostSearchService.getSchedulePosts(search, city, theme, sortRule, pageable);
+        List<SchedulePostResponse> schedulePosts = schedulePostSearchService.getSchedulePosts(search, city, theme, sortRule);
 
         return ResponseEntity.ok(schedulePosts);
     }

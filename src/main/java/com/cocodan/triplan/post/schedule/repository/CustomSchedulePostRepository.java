@@ -13,6 +13,6 @@ public interface CustomSchedulePostRepository {
     List<SchedulePost> search(String search,
                               City city,
                               Theme theme,
-                              SchedulePostSortingRule sortRule,
-                              Pageable pageable);
+                              SchedulePostSortingRule sortRule
+    );
 }
