@@ -52,11 +52,7 @@ public class MemberController {
                 request.getProfileImage(),
                 request.getPassword(),
                 GROUP_ID
-        ));
-        if (result.isEmpty())
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        );
 
         return ResponseEntity.ok().build();
     }
