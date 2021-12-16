@@ -14,7 +14,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder()
+@Builder(access = AccessLevel.PRIVATE)
 public class SchedulePostCommentResponse {
 
     private Long commentId;
