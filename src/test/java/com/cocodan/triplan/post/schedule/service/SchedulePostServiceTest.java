@@ -549,4 +549,44 @@ class SchedulePostServiceTest {
         comments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
         assertThat(comments.get(0).getNestedComments().size()).isEqualTo(0);
     }
+
+    @Test
+    @DisplayName("특정 사용자가 작성한 여행 공유 게시글을 모아 볼 수 있다")
+    @Transactional
+    void getSchedulePostListOfACertainMember() {
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
+
+        // 게시글 생성1
+        SchedulePostRequest request1 = SchedulePostRequest.builder()
+                .title("1번 여행 넘모 신나요~")
+                .content("신나씐나신나씐나")
+                .city("서울")
+                .scheduleId(createdScheduleId)
+                .build();
+        Long createdSchedulePostId1 = schedulePostService.createSchedulePost(testMemberId, request1);
+        SchedulePost post1 = schedulePostService.findById(createdSchedulePostId1);
+
+        // 생성된 게시글 디테일 확인
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).size()).isEqualTo(1);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getTitle()).isEqualTo("1번 여행 넘모 신나요~");
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getPostId()).isEqualTo(createdSchedulePostId1);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getCity()).isEqualTo(City.SEOUL);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getWriterId()).isEqualTo(testMemberId);
+
+        // 게시글 생성 2
+        SchedulePostRequest request2 = SchedulePostRequest.builder()
+                .title("1번 여행 다녀왔어요~")
+                .content("갔다왔어요~")
+                .city("서울")
+                .scheduleId(createdScheduleId)
+                .build();
+        Long createdSchedulePostId2 = schedulePostService.createSchedulePost(testMemberId, request2);
+        SchedulePost post2 = schedulePostService.findById(createdSchedulePostId2);
+
+        // 생성된 게시글 갯수 확인
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).size()).isEqualTo(2);
+        // 존재하지 않는 유저 게시글 조회 요청
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(-1L).size()).isEqualTo(0);
+    }
 }

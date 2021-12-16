@@ -76,6 +76,21 @@ public class SchedulePostController {
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
     }
 
+    @ApiOperation("자신이 작성한 여행 공유 게시글 모아보기")
+    @GetMapping("/schedules/me")
+    public ResponseEntity<List<SchedulePostResponse>> getMySchedulePostList(@AuthenticationPrincipal JwtAuthentication authentication) {
+        Long memberId = authentication.getId();
+        List<SchedulePostResponse> schedulePosts = schedulePostService.getCertainMemberSchedulePostList(memberId);
+        return ResponseEntity.ok(schedulePosts);
+    }
+
+    @ApiOperation("특정 멤버가 작성한 여행 공유 게시글 모아보기")
+    @GetMapping("/schedules/writers/{writerId}")
+    public ResponseEntity<List<SchedulePostResponse>> getCertainMembersSchedulePostList(@PathVariable("writerId") Long writerId) {
+        List<SchedulePostResponse> schedulePosts = schedulePostService.getCertainMemberSchedulePostList(writerId);
+        return ResponseEntity.ok(schedulePosts);
+    }
+
     @ApiOperation("특정 여행 일정 공유 게시글 상세조회")
     @GetMapping("/schedules/{schedulePostId}")
     public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable("schedulePostId") Long schedulePostId) {

@@ -29,4 +29,7 @@ public interface SchedulePostRepository extends JpaRepository<SchedulePost, Long
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select sp from SchedulePost sp where sp.id = :schedulePostId")
     Optional<SchedulePost> findByIdForLikedCountUpdate(Long schedulePostId);
+
+    @Query("select sp from SchedulePost sp where sp.member.id = :memberId")
+    List<SchedulePost> findAllByMemberId(Long memberId);
 }
