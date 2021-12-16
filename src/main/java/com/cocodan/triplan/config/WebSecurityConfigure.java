@@ -90,9 +90,10 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    @Autowired
-    public void configureAuthentication(AuthenticationManagerBuilder builder, JwtAuthenticationProvider authenticationProvider) {
-        builder.authenticationProvider(authenticationProvider);
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        JwtAuthenticationProvider provider = getApplicationContext().getBean(JwtAuthenticationProvider.class);
+        auth.authenticationProvider(provider);
     }
 
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
