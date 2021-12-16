@@ -1,5 +1,6 @@
 package com.cocodan.triplan.post.schedule.controller;
 
+import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,12 +73,12 @@ public class SchedulePostController {
 
     @ApiOperation("여행 일정 공유 게시글 작성")
     @PostMapping("/schedules")
-    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(@RequestBody SchedulePostRequest request) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(
+            @RequestBody SchedulePostRequest request,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
 
-        Long postId = schedulePostService.createSchedulePost(member.getId(), request);
+        Long postId = schedulePostService.createSchedulePost(authentication.getId(), request);
         return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
     }
 
@@ -89,12 +91,12 @@ public class SchedulePostController {
 
     @ApiOperation("(자신이 작성한)특정 여행 공유 게시글 삭제")
     @DeleteMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<Void> deleteSchedulePost(@PathVariable("schedulePostId") Long schedulePostId) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+    public ResponseEntity<Void> deleteSchedulePost(
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
 
-        schedulePostService.deleteSchedulePost(member.getId(), schedulePostId);
+        schedulePostService.deleteSchedulePost(authentication.getId(), schedulePostId);
         return ResponseEntity.ok().build();
     }
 
@@ -102,14 +104,11 @@ public class SchedulePostController {
     @PutMapping("/schedules/{schedulePostId}")
     public ResponseEntity<Void> modifySchedulePost(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @RequestBody SchedulePostRequest request
+            @RequestBody SchedulePostRequest request,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // TODO: 2021.12.10 Teru - 별도의 Util class 를 만들어 요청을 보내는 유저 정보 받아오는 메서드 작성하기
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
-        schedulePostService.modifySchedulePost(member.getId(), schedulePostId, request);
+        schedulePostService.modifySchedulePost(authentication.getId(), schedulePostId, request);
         return ResponseEntity.ok().build();
     }
 
@@ -117,25 +116,19 @@ public class SchedulePostController {
     @PostMapping("/schedules/{schedulePostId}/liked")
     public ResponseEntity<SchedulePostLikeResponse> changeLikeFlag(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @RequestBody SchedulePostLikeRequest request
+            @RequestBody SchedulePostLikeRequest request,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
-        Long likeCount = schedulePostService.toggleSchedulePostLiked(member.getId(), request);
+        Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), request);
         return ResponseEntity.ok(new SchedulePostLikeResponse(likeCount));
     }
 
     @ApiOperation("좋아요 누른 게시글만 조회")
     @GetMapping("/schedules/liked")
-    public ResponseEntity<List<SchedulePostResponse>> likedSchedulePostList() {
-        // TODO: 2021.12.14 Teru - Pageable 적용 여부 고민... 한다면 어떻게?
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
+    public ResponseEntity<List<SchedulePostResponse>> likedSchedulePostList(@AuthenticationPrincipal JwtAuthentication authentication) {
 
-        return ResponseEntity.ok(schedulePostService.getLikedSchedulePosts(member.getId()));
+        return ResponseEntity.ok(schedulePostService.getLikedSchedulePosts(authentication.getId()));
     }
 
     @ApiOperation("여행 공유 게시글에 작성된 댓글 조회하기")
@@ -149,13 +142,11 @@ public class SchedulePostController {
     @PostMapping("/schedules/{schedulePostId}/comments")
     public ResponseEntity<List<SchedulePostCommentResponse>> writeSchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @RequestBody SchedulePostCommentRequest request
+            @RequestBody SchedulePostCommentRequest request,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
-        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(member.getId(), schedulePostId, request);
+        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(authentication.getId(), schedulePostId, request);
         return ResponseEntity.ok(schedulePostComments);
     }
 
@@ -163,16 +154,14 @@ public class SchedulePostController {
     @DeleteMapping("/schedules/{schedulePostId}/comments/{commentId}")
     public ResponseEntity<Void> deleteSchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @PathVariable("commentId") Long commentId
+            @PathVariable("commentId") Long commentId,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
         // TODO: 2021.12.15 Teru - 댓글에 대댓글이 작성되어 있는 상태에서 댓글이 삭제되면 어떻게 할 것인지 고민
         // 방법 1. 삭제된 댓글은 공란(삭제됨 표시)으로 두고, 아래 대댓글은 표시한다.
         // 방법 2. 삭제된 댓글에 있던 대댓글도 모두 삭제한다.
-        schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, member.getId());
+        schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, authentication.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -181,13 +170,11 @@ public class SchedulePostController {
     public ResponseEntity<Void> modifySchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
-            @RequestBody SchedulePostCommentRequest request
+            @RequestBody SchedulePostCommentRequest request,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
-        schedulePostService.modifySchedulePostComment(schedulePostId, commentId, member.getId(), request);
+        schedulePostService.modifySchedulePostComment(schedulePostId, commentId, authentication.getId(), request);
         return ResponseEntity.ok().build();
     }
 
@@ -196,14 +183,12 @@ public class SchedulePostController {
     public ResponseEntity<List<SchedulePostCommentResponse>> getSchedulePostNestedComments(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
-            @RequestBody SchedulePostCommentRequest request
+            @RequestBody SchedulePostCommentRequest request,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
         List<SchedulePostCommentResponse> schedulePostCommentResponses = schedulePostService.writeNestedCommentToSchedulePostComment(
-                member.getId(),
+                authentication.getId(),
                 schedulePostId,
                 commentId,
                 request
@@ -219,14 +204,12 @@ public class SchedulePostController {
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
             @PathVariable("nestedCommentId") Long nestedCommentId,
-            SchedulePostCommentRequest request
+            SchedulePostCommentRequest request,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
         schedulePostService.modifySchedulePostNestedComment(
-                member.getId(),
+                authentication.getId(),
                 schedulePostId,
                 commentId,
                 nestedCommentId,
@@ -240,14 +223,12 @@ public class SchedulePostController {
     public ResponseEntity<Void> deleteSchedulePostNestedComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
-            @PathVariable("nestedCommentId") Long nestedCommentId
+            @PathVariable("nestedCommentId") Long nestedCommentId,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        // Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // TODO: TP-68 티켓에 의한 임시 코드 -> 추후 위의 comment-out 된 것으로 다시 교체
-        Member member = new Member(1L, "Temporary@temp.com", "Temporary User", "01011110000", "19000101", GenderType.MALE, "Temporary", "https://Temporary.temp.tem/img/temp-1");
 
         schedulePostService.deleteSchedulePostNestedComment(
-                member.getId(),
+                authentication.getId(),
                 schedulePostId,
                 commentId,
                 nestedCommentId

@@ -3,7 +3,6 @@ package com.cocodan.triplan.config;
 import com.cocodan.triplan.jwt.Jwt;
 import com.cocodan.triplan.jwt.JwtAuthenticationFilter;
 import com.cocodan.triplan.jwt.JwtAuthenticationProvider;
-import com.cocodan.triplan.jwt.JwtSecurityContextRepository;
 import com.cocodan.triplan.member.service.MemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -107,52 +105,46 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         return new JwtAuthenticationFilter(jwtConfigure.getHeader(), jwt);
     }
 
-    public SecurityContextRepository securityContextRepository() {
-        Jwt jwt = getApplicationContext().getBean(Jwt.class);
-        return new JwtSecurityContextRepository(jwtConfigure.getHeader(), jwt);
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(AUTH_WHITELIST).permitAll()
-                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .antMatchers("/users/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
+                    .antMatchers(AUTH_WHITELIST).permitAll()
+                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                    .antMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+                    .anyRequest().authenticated()
                 .and()
                 /**
                  * formLogin, csrf, headers, http-basic, rememberMe, logout filter 비활성화
                  */
-                .formLogin()
-                .disable()
-                .csrf()
-                .disable()
-                .headers()
-                .disable()
-                .httpBasic()
-                .disable()
-                .rememberMe()
-                .disable()
-                .logout()
-                .disable()
+                    .formLogin()
+                        .disable()
+                    .csrf()
+                        .disable()
+                    .headers()
+                        .disable()
+                    .httpBasic()
+                        .disable()
+                    .rememberMe()
+                        .disable()
+                    .logout()
+                        .disable()
                 /**
                  * Session 사용하지 않음
                  */
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionManagement()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 /**
                  * 예외처리 핸들러
                  */
-                .exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler())
+                    .exceptionHandling()
+                        .accessDeniedHandler(accessDeniedHandler())
                 .and()
                 /**
                  * jwtAuthenticationFilter 추가
                  */
-                        .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class)
+                    .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class)
                 ;
     }
 

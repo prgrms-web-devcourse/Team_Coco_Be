@@ -25,19 +25,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.ApiOperation;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Api(tags = "Member")
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
+
     private final MemberService memberService;
     private final AuthenticationManager authenticationManager;
 
+    private static final long GROUP_ID = 1L;
+
     @ApiOperation("회원(Member) 신규 추가, 성공시 생성된 Member ID 반환")
     @PostMapping("/register")
-    public ResponseEntity<MemberCreateResponse> signUp(@Valid @RequestBody MemberCreateRequest request) {
-        MemberCreateResponse response = memberService.create(
+    public ResponseEntity<Void> signUp(@Valid @RequestBody MemberCreateRequest request) {
+        memberService.create(
                 request.getEmail(),
                 request.getName(),
                 request.getPhoneNumber(),
@@ -46,10 +51,10 @@ public class MemberController {
                 request.getNickname(),
                 request.getProfileImage(),
                 request.getPassword(),
-                request.getGroupId()
+                GROUP_ID
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation("회원(Member) 단건 조회, 성공시 Member 정보 반환")
@@ -96,15 +101,13 @@ public class MemberController {
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request) {
+    public ResponseEntity<Void> login(@RequestBody MemberLoginRequest request, HttpServletResponse httpServletResponse) {
         JwtAuthenticationToken authToken = new JwtAuthenticationToken(request.getEmail(), request.getPassword());
         Authentication resultToken = authenticationManager.authenticate(authToken);
         JwtAuthentication authentication = (JwtAuthentication) resultToken.getPrincipal();
-        Member member = (Member) resultToken.getDetails();
 
-        MemberLoginResponse response = new MemberLoginResponse(authentication.getToken(), authentication.getId(), member.getGroup().getName());
+        httpServletResponse.setHeader("token", authentication.getToken());
 
-        if (response == null) throw new NotIncludeException(Member.class, Member.class, authentication.getId(), authentication.getId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
     }
 }
