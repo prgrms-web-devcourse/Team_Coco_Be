@@ -1,7 +1,6 @@
 package com.cocodan.triplan.post.schedule.service;
 
 import com.cocodan.triplan.member.domain.vo.GenderType;
-import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
@@ -12,8 +11,6 @@ import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
-import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.ScheduleTheme;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.schedule.dto.request.DailyScheduleSpotCreationRequest;
 import com.cocodan.triplan.schedule.dto.request.Position;
@@ -435,7 +432,7 @@ class SchedulePostServiceTest {
         assertThat(comments.get(0).getNickname()).isEqualTo(NICKNAME);
 
         // 댓글 삭제
-        schedulePostService.deleteSchedulePostComment(createdSchedulePostId1, comments.get(0).getId(), testMemberId);
+        schedulePostService.deleteSchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
         // 댓글 삭제 확인
         List<SchedulePostCommentResponse> commentsAfterDeletion = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
         assertThat(commentsAfterDeletion.size()).isEqualTo(0);
@@ -456,7 +453,7 @@ class SchedulePostServiceTest {
 
         // 댓글 수정
         SchedulePostCommentRequest modifyRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
-        schedulePostService.modifySchedulePostComment(createdSchedulePostId1, comments.get(0).getId(), testMemberId, modifyRequest);
+        schedulePostService.modifySchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId, modifyRequest);
         // 댓글 수정 확인
         List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
         assertThat(schedulePostComments.size()).isEqualTo(1);
@@ -477,7 +474,7 @@ class SchedulePostServiceTest {
         schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
-                comments.get(0).getId(),
+                comments.get(0).getCommentId(),
                 nestedCommentRequest
         );
 
@@ -503,7 +500,7 @@ class SchedulePostServiceTest {
         comments = schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
-                comments.get(0).getId(),
+                comments.get(0).getCommentId(),
                 nestedCommentRequest
         );
 
@@ -512,8 +509,8 @@ class SchedulePostServiceTest {
         schedulePostService.modifySchedulePostNestedComment(
                 testMemberId,
                 createdSchedulePostId1,
-                comments.get(0).getId(),
-                comments.get(0).getNestedComments().get(0).getId(),
+                comments.get(0).getCommentId(),
+                comments.get(0).getNestedComments().get(0).getNestedCommentId(),
                 nestedCommentModifyRequest
         );
 
@@ -536,7 +533,7 @@ class SchedulePostServiceTest {
         comments = schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
-                comments.get(0).getId(),
+                comments.get(0).getCommentId(),
                 nestedCommentRequest
         );
 
@@ -547,8 +544,8 @@ class SchedulePostServiceTest {
         schedulePostService.deleteSchedulePostNestedComment(
                 testMemberId,
                 createdSchedulePostId1,
-                comments.get(0).getId(),
-                comments.get(0).getNestedComments().get(0).getId()
+                comments.get(0).getCommentId(),
+                comments.get(0).getNestedComments().get(0).getNestedCommentId()
         );
 
         // 대댓글 삭제 확인

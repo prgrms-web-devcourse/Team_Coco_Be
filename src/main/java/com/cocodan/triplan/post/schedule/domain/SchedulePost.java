@@ -65,7 +65,7 @@ public class SchedulePost extends BaseEntity {
     private City city;
 
     @Builder
-    public SchedulePost(Member member, Schedule schedule, String title, String content, long views, long liked, City city) {
+    private SchedulePost(Member member, Schedule schedule, String title, String content, long views, long liked, City city) {
         this.member = member;
         this.schedule = schedule;
         this.title = title;

@@ -1,8 +1,7 @@
 package com.cocodan.triplan.post.schedule.dto.response;
 
-import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
-import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
+import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostComment;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostNestedComment;
 import com.cocodan.triplan.post.schedule.vo.Ages;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class SchedulePostNestedCommentResponse {
 
-    private Long id;
+    private Long nestedCommentId;
 
     private Long parentCommentId;
 
@@ -33,22 +32,19 @@ public class SchedulePostNestedCommentResponse {
 
     private boolean schedulePostWriter; // 게시글의 작성자인지 여부
 
-    public static SchedulePostNestedCommentResponse of(
-            SchedulePostComment parentComment,
-            SchedulePostNestedComment comment,
-            Member member,
-            boolean schedulePostWriter
-    ) {
+    public static SchedulePostNestedCommentResponse from(SchedulePostNestedComment nestedComment) {
         return SchedulePostNestedCommentResponse.builder()
-                .id(comment.getId())
-                .parentCommentId(parentComment.getId())
-                .writerId(member.getId())
-                .nickname(member.getNickname())
-                .ages(Ages.from(member.getBirth()))
-                .gender(member.getGender())
-                .content(comment.getContent())
-                .createdAt(comment.getCreatedDate())
-                .schedulePostWriter(schedulePostWriter)
+                .nestedCommentId(nestedComment.getId())
+                .parentCommentId(nestedComment.getParentComment().getId())
+                .writerId(nestedComment.getMember().getId())
+                .nickname(nestedComment.getMember().getNickname())
+                .ages(Ages.from(nestedComment.getMember().getBirth()))
+                .gender(nestedComment.getMember().getGender())
+                .content(nestedComment.getContent())
+                .createdAt(nestedComment.getCreatedDate())
+                .schedulePostWriter(
+                        nestedComment.getParentComment().getSchedulePost().getMember().equals(nestedComment.getMember())
+                )
                 .build();
     }
 }

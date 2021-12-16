@@ -45,7 +45,7 @@ public class SchedulePostComment extends BaseEntity {
     private String content;
 
     @Builder
-    public SchedulePostComment(Member member, SchedulePost schedulePost, String content) {
+    private SchedulePostComment(Member member, SchedulePost schedulePost, String content) {
         this.member = member;
         this.schedulePost = schedulePost;
         this.content = content;

@@ -1,7 +1,7 @@
 package com.cocodan.triplan.post.schedule.dto.response;
 
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
-import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostComment;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class SchedulePostCommentResponse {
 
-    private Long id;
+    private Long commentId;
 
     private String nickname;
 
@@ -33,14 +33,12 @@ public class SchedulePostCommentResponse {
     private boolean schedulePostWriter; // 게시글의 작성자인지 여부
 
     public static SchedulePostCommentResponse of(
-            Long commentId,
             SchedulePostComment comment,
-            MemberGetOneResponse member,
-            boolean schedulePostWriter,
             List<SchedulePostNestedCommentResponse> nestedComments
     ) {
+        Member member = comment.getMember();
         return SchedulePostCommentResponse.builder()
-                .id(commentId)
+                .commentId(comment.getId())
                 .writerId(member.getId())
                 .nickname(member.getNickname())
                 .ages(Ages.from(member.getBirth()))
@@ -48,7 +46,7 @@ public class SchedulePostCommentResponse {
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedDate())
                 .nestedComments(nestedComments)
-                .schedulePostWriter(schedulePostWriter)
+                .schedulePostWriter(member.equals(comment.getSchedulePost().getMember()))
                 .build();
     }
 }

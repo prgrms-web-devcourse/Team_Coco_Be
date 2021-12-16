@@ -2,7 +2,6 @@ package com.cocodan.triplan.post.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostNestedCommentResponse;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,7 +30,7 @@ public class SchedulePostNestedComment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment", referencedColumnName = "id")
-    private SchedulePostComment comment; // parent comment
+    private SchedulePostComment parentComment; // parent comment
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", referencedColumnName = "id")
@@ -41,8 +40,8 @@ public class SchedulePostNestedComment extends BaseEntity {
     private String content;
 
     @Builder
-    public SchedulePostNestedComment(SchedulePostComment comment, Member member, String content) {
-        this.comment = comment;
+    private SchedulePostNestedComment(SchedulePostComment parentComment, Member member, String content) {
+        this.parentComment = parentComment;
         this.member = member;
         this.content = content;
     }
