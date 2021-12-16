@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import static com.cocodan.triplan.post.schedule.domain.SchedulePost.SCHEDULE_POST_CONTENT_MAX_LENGTH;
 import static com.cocodan.triplan.post.schedule.domain.SchedulePost.SCHEDULE_POST_CONTENT_MIN_LENGTH;
@@ -27,6 +27,6 @@ public class SchedulePostRequest {
     @NotBlank
     public String city;
 
-    @NotEmpty
+    @NotNull
     public Long scheduleId;
 }
