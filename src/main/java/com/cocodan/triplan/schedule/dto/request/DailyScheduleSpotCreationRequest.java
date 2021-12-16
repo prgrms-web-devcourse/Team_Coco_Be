@@ -32,8 +32,7 @@ public class DailyScheduleSpotCreationRequest {
     @NotNull
     private Position position;
 
-    @NotNull
-    private LocalDate date;
+    private int date;
 
     private int order;
 

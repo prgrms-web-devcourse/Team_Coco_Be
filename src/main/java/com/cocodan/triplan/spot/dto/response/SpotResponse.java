@@ -1,5 +1,6 @@
 package com.cocodan.triplan.spot.dto.response;
 
+import com.cocodan.triplan.schedule.dto.request.Position;
 import com.cocodan.triplan.spot.domain.Spot;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +19,7 @@ public class SpotResponse {
 
     private String phone;
 
-    private double lat;
-
-    private double lng;
+    private Position position;
 
     public static SpotResponse from(Spot spot) {
         return SpotResponse.builder()
@@ -29,8 +28,7 @@ public class SpotResponse {
                 .addressName(spot.getAddressName())
                 .roadAddressName(spot.getRoadAddressName())
                 .phone(spot.getPhone())
-                .lat(spot.getLatitude())
-                .lng(spot.getLongitude())
+                .position(new Position(spot.getLatitude(), spot.getLongitude()))
                 .build();
     }
 }

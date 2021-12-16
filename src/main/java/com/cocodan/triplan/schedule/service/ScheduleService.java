@@ -156,7 +156,7 @@ public class ScheduleService {
     }
 
     private void validateScheduleMember(Long scheduleId, Long memberId) {
-        if (!scheduleRepository.existsByScheduleIdAndMemberId(scheduleId, memberId)) {
+        if (scheduleRepository.countByScheduleIdAndMemberId(scheduleId, memberId) == 0) {
             throw new ForbiddenException(Schedule.class, scheduleId, memberId);
         }
     }

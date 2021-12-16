@@ -28,10 +28,10 @@ public class ScheduleController {
     // 일정
     @ApiOperation("일정 생성")
     @PostMapping()
-    public ResponseEntity<Long> createSchedule(@Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ResponseEntity<IdResponse> createSchedule(@Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest, @AuthenticationPrincipal JwtAuthentication authentication) {
         Long savedId = scheduleService.saveSchedule(scheduleCreationRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
     }
 
     @ApiOperation("회원이 속한 일정 목록 조회")
@@ -73,14 +73,14 @@ public class ScheduleController {
     // 메모
     @ApiOperation("메모 생성")
     @PostMapping("/{scheduleId}/memos")
-    public ResponseEntity<Long> createMemo(
+    public ResponseEntity<IdResponse> createMemo(
             @PathVariable Long scheduleId,
             @RequestBody @Valid MemoRequest memoRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long savedId = scheduleService.saveMemo(scheduleId, memoRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 메모 목록 조회")
@@ -131,14 +131,14 @@ public class ScheduleController {
     // 체크리스트
     @ApiOperation("체크리스트 생성")
     @PostMapping("/{scheduleId}/checklists")
-    public ResponseEntity<Long> saveChecklist(
+    public ResponseEntity<IdResponse> saveChecklist(
             @PathVariable Long scheduleId,
             @RequestBody @Valid ChecklistCreationRequest checklistCreationRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 체크리스트 목록 조회")
@@ -177,14 +177,14 @@ public class ScheduleController {
     // 투표
     @ApiOperation("투표 생성")
     @PostMapping("/{scheduleId}/votings")
-    public ResponseEntity<Long> createVoting(
+    public ResponseEntity<IdResponse> createVoting(
             @PathVariable Long scheduleId,
             @RequestBody @Valid VotingCreationRequest votingCreationRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long savedId = scheduleService.saveVoting(scheduleId, votingCreationRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 투표 목록 조회")
