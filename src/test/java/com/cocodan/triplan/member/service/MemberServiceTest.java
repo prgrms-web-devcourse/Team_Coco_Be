@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
@@ -43,7 +44,7 @@ class MemberServiceTest {
     Pageable pageable;
 
     @Mock
-    Page<Member> members;
+    List<Member> members;
 
     Member member = new Member(MEMBER_ID, EMAIL, NAME, PHONE_NUMBER, BIRTH, GenderType.of(GENDER), NICKNAME, PROFILE_IMAGE);
 
@@ -89,13 +90,13 @@ class MemberServiceTest {
     @Test
     void getAll() {
         // given
-        when(memberRepository.findAllByNickname(pageable,NICKNAME)).thenReturn(members);
+        when(memberRepository.findAllByNickname(NICKNAME)).thenReturn(members);
 
         // when
-        memberService.getAll(pageable, NICKNAME);
+        memberService.findMemberByNickname(NICKNAME);
 
         // then
-        verify(memberRepository).findAllByNickname(pageable,NICKNAME);
+        verify(memberRepository).findAllByNickname(NICKNAME);
     }
 
     @Test

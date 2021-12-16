@@ -1,11 +1,8 @@
 package com.cocodan.triplan.member.service;
 
+import com.cocodan.triplan.member.dto.response.*;
 import com.cocodan.triplan.util.MemberConverter;
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
-import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
-import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
-import com.cocodan.triplan.member.dto.response.MemberUpdateResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -51,9 +51,10 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MemberGetOneResponse> getAll(Pageable pageable, String nickname){
-        return memberRepository.findAllByNickname(pageable,nickname)
-                .map(converter::toMemberFindResponse);
+    public List<MemberSimpleResponse> findMemberByNickname(String nickname){
+        return memberRepository.findAllByNickname(nickname).stream()
+                .map(MemberSimpleResponse::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional

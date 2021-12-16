@@ -27,20 +27,18 @@ public class SchedulePostSearchService {
     private final SchedulePostRepository schedulePostRepository;
 
     @Transactional
-    public Page<SchedulePostResponse> getSchedulePosts(
+    public List<SchedulePostResponse> getSchedulePosts(
             String search,
             City city,
             Theme theme,
-            SchedulePostSortingRule sortRule,
-            Pageable pageable
+            SchedulePostSortingRule sortRule
     ) {
 
-        List<SchedulePost> result = schedulePostRepository.search(search, city, theme, sortRule, pageable);
+        List<SchedulePost> result = schedulePostRepository.search(search, city, theme, sortRule);
 
-        List<SchedulePostResponse> responses = result.stream()
+        return result.stream()
                 .map(schedulePost -> SchedulePostResponse.of(schedulePost, schedulePost.getMember(), schedulePost.getSchedule()))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageable, responses.size());
     }
 }

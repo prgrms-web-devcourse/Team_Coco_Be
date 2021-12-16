@@ -9,6 +9,7 @@ import com.cocodan.triplan.member.dto.request.MemberLoginRequest;
 import com.cocodan.triplan.member.dto.request.MemberUpdateRequest;
 import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
+import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.dto.response.MemberUpdateResponse;
 import com.cocodan.triplan.member.service.MemberService;
 import io.swagger.annotations.Api;
@@ -25,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 @Api(tags = "Member")
 @RestController
@@ -69,8 +71,8 @@ public class MemberController {
 
     @ApiOperation("닉네임으로 회원 조회, Member Page 반환")
     @GetMapping("/users")
-    public ResponseEntity<Page<MemberGetOneResponse>> readPage(Pageable pageable, @RequestParam String nickname) {
-        Page<MemberGetOneResponse> responses = memberService.getAll(pageable, nickname);
+    public ResponseEntity<List<MemberSimpleResponse>> findMemberByNickname(@RequestParam String nickname) {
+        List<MemberSimpleResponse> responses = memberService.findMemberByNickname(nickname);
 
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
