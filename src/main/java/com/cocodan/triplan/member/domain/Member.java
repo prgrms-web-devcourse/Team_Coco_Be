@@ -33,9 +33,6 @@ public class Member extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "phone_number", nullable = false)
-    private String phoneNumber;
-
     @Column(name = "birth", nullable = false)
     private String birth;
 
@@ -54,10 +51,9 @@ public class Member extends BaseEntity {
     private Group group;
 
     @Builder
-    public Member(String email, String name, String phoneNumber, String birth, GenderType gender, String nickname, String profileImage, String passwd, Group group) {
+    public Member(String email, String name, String birth, GenderType gender, String nickname, String profileImage, String passwd, Group group) {
         this.email = email;
         this.name = name;
-        this.phoneNumber = phoneNumber;
         this.birth = birth;
         this.gender = gender;
         this.nickname = nickname;
@@ -67,20 +63,18 @@ public class Member extends BaseEntity {
     }
 
     @Builder
-    public Member(Long id, String email, String name, String phoneNumber, String birth, GenderType gender, String nickname, String profileImage) {
+    public Member(Long id, String email, String name, String birth, GenderType gender, String nickname, String profileImage) {
         this.id = id;
         this.email = email;
         this.name = name;
-        this.phoneNumber = phoneNumber;
         this.birth = birth;
         this.gender = gender;
         this.nickname = nickname;
         this.profileImage = profileImage;
     }
 
-    public void changeValues(String name, String phoneNumber, String nickname, String profileImage) {
+    public void changeValues(String name, String nickname, String profileImage) {
         this.name = name.isBlank() ? this.name : name;
-        this.phoneNumber = phoneNumber.isBlank() ? this.phoneNumber : phoneNumber;
         this.nickname = nickname.isBlank() ? this.nickname : nickname;
         this.profileImage = profileImage.isBlank() ? this.profileImage : profileImage;
     }
@@ -95,10 +89,6 @@ public class Member extends BaseEntity {
 
     public String getName() {
         return name;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
     }
 
     public String getBirth() {

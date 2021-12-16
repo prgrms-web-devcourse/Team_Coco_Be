@@ -44,7 +44,6 @@ public class MemberController {
         memberService.create(
                 request.getEmail(),
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getBirth(),
                 request.getGender(),
                 request.getNickname(),
@@ -83,7 +82,6 @@ public class MemberController {
         MemberUpdateResponse response = memberService.update(
                 memberId,
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getNickname(),
                 request.getProfileImage()
         );

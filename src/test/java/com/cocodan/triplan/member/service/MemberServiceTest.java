@@ -25,7 +25,6 @@ class MemberServiceTest {
     private static final Long MEMBER_ID = 1L;
     private static final String EMAIL = "ddkk94@naver.com";
     private static final String NAME =  "Taid";
-    private static final String PHONE_NUMBER = "01011223344";
     private static final String BIRTH = "20211015";
     private static final String GENDER = GenderType.MALE.getTypeStr();
     private static final String NICKNAME = "TTTaid";
@@ -46,13 +45,12 @@ class MemberServiceTest {
     @Mock
     List<Member> members;
 
-    Member member = new Member(MEMBER_ID, EMAIL, NAME, PHONE_NUMBER, BIRTH, GenderType.of(GENDER), NICKNAME, PROFILE_IMAGE);
+    Member member = new Member(MEMBER_ID, EMAIL, NAME, BIRTH, GenderType.of(GENDER), NICKNAME, PROFILE_IMAGE);
 
     MemberGetOneResponse findResponse = MemberGetOneResponse.builder()
             .id(MEMBER_ID)
             .email(EMAIL)
             .name(NAME)
-            .phoneNumber(PHONE_NUMBER)
             .birth(BIRTH)
             .gender(GenderType.of(GENDER))
             .nickname(NICKNAME)
@@ -105,7 +103,7 @@ class MemberServiceTest {
         when(memberRepository.findById(MEMBER_ID)).thenReturn(Optional.of(member));
 
         // when
-        memberService.update(MEMBER_ID, NAME, PHONE_NUMBER, NICKNAME, PROFILE_IMAGE);
+        memberService.update(MEMBER_ID, NAME, NICKNAME, PROFILE_IMAGE);
 
         // then
         verify(memberRepository).findById(MEMBER_ID);

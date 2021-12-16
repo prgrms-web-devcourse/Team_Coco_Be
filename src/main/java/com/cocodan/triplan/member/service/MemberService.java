@@ -34,8 +34,8 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberCreateResponse create(String email, String name, String phoneNumber, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {
-        Member originMember = converter.toMemberEntity(email, name, phoneNumber, birth, gender, nickname, profileImage, passwordEncoder.encode(passwd), groupId);
+    public MemberCreateResponse create(String email, String name, String birth, String gender, String nickname, String profileImage, String passwd, Long groupId) {
+        Member originMember = converter.toMemberEntity(email, name, birth, gender, nickname, profileImage, passwordEncoder.encode(passwd), groupId);
         Member memberEntity = memberRepository.save(originMember);
 
         return converter.toMemberCreateResponse(memberEntity);
@@ -58,11 +58,11 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberUpdateResponse update(Long id, String name, String phoneNumber, String nickname, String profileImage) {
+    public MemberUpdateResponse update(Long id, String name, String nickname, String profileImage) {
         Member originMember = memberRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("사용자 id를 조회할 수 없습니다"));
 
-        originMember.changeValues(name, phoneNumber, nickname, profileImage);
+        originMember.changeValues(name, nickname, profileImage);
         return converter.toMemberUpdateResponse(originMember);
     }
 
