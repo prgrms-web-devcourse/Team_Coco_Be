@@ -1,5 +1,7 @@
 package com.cocodan.triplan.post.schedule.service;
 
+import com.cocodan.triplan.exception.common.ForbiddenException;
+import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.post.schedule.domain.Like;
@@ -17,10 +19,10 @@ import com.cocodan.triplan.post.schedule.repository.SchedulePostCommentRepositor
 import com.cocodan.triplan.post.schedule.repository.SchedulePostLikeRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostNestedCommentRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
-import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.spot.domain.vo.City;
+import com.cocodan.triplan.util.ExceptionMessageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +32,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class SchedulePostService {
-
-    private final MemberService memberService;
 
     private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
@@ -45,7 +45,6 @@ public class SchedulePostService {
     private final SchedulePostRepository schedulePostRepository;
 
     public SchedulePostService(
-            MemberService memberService,
             MemberRepository memberRepository,
             ScheduleRepository scheduleRepository,
             SchedulePostLikeRepository schedulePostLikeRepository,
@@ -53,7 +52,6 @@ public class SchedulePostService {
             SchedulePostNestedCommentRepository schedulePostNestedCommentRepository,
             SchedulePostRepository schedulePostRepository
     ) {
-        this.memberService = memberService;
         this.memberRepository = memberRepository;
         this.scheduleRepository = scheduleRepository;
         this.schedulePostLikeRepository = schedulePostLikeRepository;
@@ -264,56 +262,45 @@ public class SchedulePostService {
     private void validateNestedCommentOwnership(Long memberId, Long schedulePostId, Long commentId, Long nestedCommentId) {
         nullCheck(memberId, schedulePostId, commentId, nestedCommentId);
 
-        schedulePostRepository.findById(schedulePostId).orElseThrow(
-                () -> new RuntimeException("No schedule post found (ID : " + schedulePostId + ")")
-        );
-
-        schedulePostCommentRepository.findById(commentId).orElseThrow(
-                () -> new RuntimeException("No comment found (ID : " + commentId + ")")
-        );
-
-        SchedulePostNestedComment nestedComment = schedulePostNestedCommentRepository.findById(nestedCommentId).orElseThrow(
-                () -> new RuntimeException("No nested comment found (ID : " + nestedCommentId + ")")
-        );
-
-        if (!memberId.equals(nestedComment.getMember().getId())) {
-            throw new RuntimeException("Invalid Request. Only writer can delete a comment");
-        }
+        getSchedulePost(schedulePostId);
+        getComment(commentId);
+        SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId);
+        validateOwnership(memberId, nestedComment);
     }
 
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(
-                () -> new RuntimeException("Invalid User Detected")
+                () -> new NotFoundException(Member.class, memberId)
         );
     }
 
     private Schedule getSchedule(Long scheduleId) {
         return scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new RuntimeException("No schedule found (ID : " + scheduleId + ")")
+                () -> new NotFoundException(Schedule.class, scheduleId)
         );
     }
 
     private SchedulePost getSchedulePost(Long schedulePostId) {
         return schedulePostRepository.findById(schedulePostId).orElseThrow(
-                () -> new RuntimeException("No such post found (ID : " + schedulePostId + ")")
+                () -> new NotFoundException(SchedulePost.class, schedulePostId)
         );
     }
 
     private SchedulePost getSchedulePostForLikeUpdate(Long schedulePostId) {
         return schedulePostRepository.findByIdForLikedCountUpdate(schedulePostId).orElseThrow(
-                () -> new RuntimeException("No such post found (ID : " + schedulePostId + ")")
+                () -> new NotFoundException(SchedulePost.class, schedulePostId)
         );
     }
 
     private SchedulePostComment getComment(Long commentId) {
         return schedulePostCommentRepository.findById(commentId).orElseThrow(
-                () -> new RuntimeException("No such comment found")
+                () -> new NotFoundException(SchedulePostComment.class, commentId)
         );
     }
 
     private SchedulePostNestedComment getNestedComment(Long nestedCommentId) {
         return schedulePostNestedCommentRepository.findById(nestedCommentId).orElseThrow(
-                () -> new RuntimeException("No such nested comment found (ID " + nestedCommentId + ")")
+                () -> new NotFoundException(SchedulePostNestedComment.class, nestedCommentId)
         );
     }
 
@@ -347,27 +334,38 @@ public class SchedulePostService {
         return schedulePost;
     }
 
-    private void validateOwnership(Long memberId, SchedulePost schedulePost) {
-        if (!memberId.equals(schedulePost.getMember().getId())) {
-            throw new RuntimeException("Invalid access for schedule post. Only owner can access to it");
-        }
-    }
-
     private void validateCommentOwnership(Long schedulePostId, Long commentId, Long memberId) {
         nullCheck(schedulePostId, commentId, memberId);
 
         SchedulePost schedulePost = getSchedulePost(schedulePostId);
         SchedulePostComment comment = getComment(commentId);
+        validateOwnership(memberId, comment);
+    }
 
+    private void validateOwnership(Long memberId, SchedulePost schedulePost) {
+        if (!memberId.equals(schedulePost.getMember().getId())) {
+            throw new ForbiddenException(SchedulePost.class, schedulePost.getId(), memberId);
+        }
+    }
+
+    private void validateOwnership(Long memberId, SchedulePostComment comment) {
         if (!memberId.equals(comment.getMember().getId())) {
-            throw new RuntimeException("Invalid Request. Only writer can delete a comment");
+            throw new ForbiddenException(SchedulePostComment.class, comment.getId(), memberId);
+        }
+    }
+
+    private void validateOwnership(Long memberId, SchedulePostNestedComment nestedComment) {
+        if (!memberId.equals(nestedComment.getMember().getId())) {
+            throw new ForbiddenException(SchedulePostNestedComment.class, nestedComment.getId(), memberId);
         }
     }
 
     private void nullCheck(Object... args) {
         for (Object obj : args) {
             if (obj == null) {
-                throw new RuntimeException("Invalid Request");
+                throw new IllegalArgumentException(
+                        ExceptionMessageUtils
+                                .getMessage("exception.argument_not_valid"));
             }
         }
     }
