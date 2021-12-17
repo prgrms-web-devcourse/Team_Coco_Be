@@ -60,7 +60,7 @@ public class SchedulePostController {
             @RequestParam(defaultValue = "최신순") String sorting
     ) {
         City city = City.from(searchingCity);
-        Theme theme = Theme.valueOf(searchingTheme);
+        Theme theme = Theme.from(searchingTheme);
         SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
         List<SchedulePostResponse> schedulePosts = schedulePostSearchService.getSchedulePosts(search, city, theme, sortRule);
 

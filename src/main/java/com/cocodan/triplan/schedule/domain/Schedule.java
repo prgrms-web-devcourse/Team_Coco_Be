@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,8 +36,9 @@ public class Schedule extends BaseEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    private Member member;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleTheme> scheduleThemes = new ArrayList<>();
@@ -57,12 +59,12 @@ public class Schedule extends BaseEntity {
     private List<ScheduleMember> scheduleMembers = new ArrayList<>();
 
     @Builder
-    private Schedule(String title, LocalDate startDate, LocalDate endDate, Long memberId) {
+    private Schedule(String title, LocalDate startDate, LocalDate endDate, Member member) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.memberId = memberId;
-        ScheduleMember owner = createOwner(memberId);
+        this.member = member;
+        ScheduleMember owner = createOwner(member.getId());
         scheduleMembers.add(owner);
     }
 
@@ -113,8 +115,8 @@ public class Schedule extends BaseEntity {
         return scheduleMembers;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
     public void removeAllSpots() {
@@ -128,7 +130,7 @@ public class Schedule extends BaseEntity {
     public void updateThemes(List<String> themes) {
         this.scheduleThemes.clear();
         themes.stream()
-                .map(Theme::valueOf)
+                .map(Theme::from)
                 .forEach(theme -> new ScheduleTheme(this, theme));
     }
 

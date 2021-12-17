@@ -1,5 +1,7 @@
 package com.cocodan.triplan.spot.domain.vo;
 
+import com.cocodan.triplan.exception.common.NotFoundException;
+
 import java.util.Arrays;
 
 public enum City {
