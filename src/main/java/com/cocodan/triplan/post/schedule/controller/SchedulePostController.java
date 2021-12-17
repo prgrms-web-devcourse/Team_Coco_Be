@@ -30,13 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.cocodan.triplan.post.schedule.controller.SchedulePostController.schedulePostBaseUri;
-import static java.util.Collections.emptyList;
 
 @Api(tags = "Schedule Post")
 @RequestMapping(schedulePostBaseUri)
@@ -73,7 +70,7 @@ public class SchedulePostController {
     @ApiOperation("여행 일정 공유 게시글 작성")
     @PostMapping("/schedules")
     public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(
-            @RequestBody SchedulePostRequest request,
+            @Valid @RequestBody SchedulePostRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long postId = schedulePostService.createSchedulePost(authentication.getId(), request);
@@ -116,7 +113,7 @@ public class SchedulePostController {
     @PutMapping("/schedules/{schedulePostId}")
     public ResponseEntity<Void> modifySchedulePost(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @RequestBody SchedulePostRequest request,
+            @Valid @RequestBody SchedulePostRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         schedulePostService.modifySchedulePost(authentication.getId(), schedulePostId, request);
@@ -127,7 +124,7 @@ public class SchedulePostController {
     @PostMapping("/schedules/{schedulePostId}/liked")
     public ResponseEntity<SchedulePostLikeResponse> changeLikeFlag(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @RequestBody SchedulePostLikeRequest request,
+            @Valid @RequestBody SchedulePostLikeRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), request);
@@ -151,7 +148,7 @@ public class SchedulePostController {
     @PostMapping("/schedules/{schedulePostId}/comments")
     public ResponseEntity<List<SchedulePostCommentResponse>> writeSchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @RequestBody SchedulePostCommentRequest request,
+            @Valid @RequestBody SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(authentication.getId(), schedulePostId, request);
@@ -177,7 +174,7 @@ public class SchedulePostController {
     public ResponseEntity<Void> modifySchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
-            @RequestBody SchedulePostCommentRequest request,
+            @Valid @RequestBody SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         schedulePostService.modifySchedulePostComment(schedulePostId, commentId, authentication.getId(), request);
@@ -200,7 +197,7 @@ public class SchedulePostController {
     public ResponseEntity<List<SchedulePostCommentResponse>> writeSchedulePostNestedComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
-            @RequestBody SchedulePostCommentRequest request,
+            @Valid @RequestBody SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<SchedulePostCommentResponse> schedulePostCommentResponses = schedulePostService.writeNestedCommentToSchedulePostComment(
@@ -218,7 +215,7 @@ public class SchedulePostController {
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
             @PathVariable("nestedCommentId") Long nestedCommentId,
-            SchedulePostCommentRequest request,
+            @Valid @RequestBody SchedulePostCommentRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         schedulePostService.modifySchedulePostNestedComment(
