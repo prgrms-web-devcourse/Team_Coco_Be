@@ -1,6 +1,7 @@
 drop table if exists access_group CASCADE;
 drop table if exists checklist CASCADE;
 drop table if exists daily_schedule_spot CASCADE;
+drop table if exists friend CASCADE;
 drop table if exists group_permission CASCADE;
 drop table if exists member CASCADE;
 drop table if exists memo CASCADE;
@@ -74,8 +75,8 @@ create table daily_schedule_spot
     created_date       timestamp,
     last_modified_by   bigint,
     last_modified_date timestamp,
-    trip_date          integer not null,
-    trip_order         integer not null,
+    date_order         integer not null,
+    spot_order         integer not null,
     spot_id            bigint  not null,
     schedule_id        bigint,
     primary key (id)
