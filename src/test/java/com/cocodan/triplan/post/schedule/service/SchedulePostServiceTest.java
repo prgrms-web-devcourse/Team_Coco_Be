@@ -90,12 +90,7 @@ class SchedulePostServiceTest {
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         // 여행 공유 게시글 생성
-        SchedulePostRequest request = SchedulePostRequest.builder()
-                .title("1번 여행 게시글")
-                .content("1번 여행 게시글 본문")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
+        SchedulePostRequest request = new SchedulePostRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
 
         Pageable pageable = new Pageable() {
@@ -176,27 +171,25 @@ class SchedulePostServiceTest {
     private Long createSchedulePost1() {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
-        SchedulePostRequest request = SchedulePostRequest.builder()
-                .title("1번 여행!")
-                .content("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
+        SchedulePostRequest request = new SchedulePostRequest("1번 여행!",
+                "Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
                         "\n" +
                         "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
                         "\n" +
                         "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
                         "\n" +
-                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
+                        "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]",
+                "서울",
+                createdScheduleId
+        );
         return schedulePostService.createSchedulePost(testMemberId, request);
     }
 
     private Long createSchedulePost2() {
         ScheduleCreationRequest scheduleCreationRequest2 = createScheduleCreation();
         Long createdScheduleId2 = scheduleService.saveSchedule(scheduleCreationRequest2, testMemberId);
-        SchedulePostRequest request2 = SchedulePostRequest.builder()
-                .title("2번 여행!")
-                .content("삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
+        SchedulePostRequest request2 = new SchedulePostRequest("2번 여행!",
+                "삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
                         "\n" +
                         "처음에는 이병철 창업주가 삼성물산이라는 이름으로 자본금 3만 원(현재가치 3억 원)에 지금의 삼성 그룹을 창립하였다.\n" +
                         "\n" +
@@ -206,10 +199,10 @@ class SchedulePostServiceTest {
                         "\n" +
                         "또한 삼성 그룹은 2013년 380조원 규모의 매출을 올렸다. 한국은행에 따르면 같은 해 대한민국의 명목 국내총생산(GDP)은 1428조 원이다.[4] 해외 매출 비중이 훨씬 큰 삼성의 매출액은 GDP와 직접 비교하기 어렵지만, 그럼에도 삼성의 매출액이 대한민국 GDP의 26.6%나 차지한다는 점은 시사하는 바가 크다.[4] 삼성의 수출은 2013년 1572억 달러로 한국 전체 수출액 6171억 달러의 25%에 해당한다.[4]\n" +
                         "\n" +
-                        "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.")
-                .city("부산")
-                .scheduleId(createdScheduleId)
-                .build();
+                        "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.",
+                "부산",
+                createdScheduleId
+                );
         return schedulePostService.createSchedulePost(testMemberId, request2);
     }
 
@@ -224,12 +217,7 @@ class SchedulePostServiceTest {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
-        SchedulePostRequest request = SchedulePostRequest.builder()
-                .title("1번 여행!")
-                .content("어디로든 갔다옴~")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
+        SchedulePostRequest request = new SchedulePostRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
         SchedulePost post1 = schedulePostService.findById(createdSchedulePostId);
 
@@ -239,8 +227,8 @@ class SchedulePostServiceTest {
         assertThat(memberService.getOne(post1.getMember().getId()).getBirth()).isEqualTo(BIRTH);
         assertThat(memberService.getOne(post1.getMember().getId()).getNickname()).isEqualTo(NICKNAME);
         assertThat(memberService.getOne(post1.getMember().getId()).getProfileImage()).isEqualTo(PROFILE_IMAGE);
-        assertThat(post1.getTitle()).isEqualTo("1번 여행!");
-        assertThat(post1.getContent()).isEqualTo("어디로든 갔다옴~");
+        assertThat(post1.getTitle()).isEqualTo("1번 여행 게시글");
+        assertThat(post1.getContent()).isEqualTo("1번 여행 게시글 본문");
         assertThat(post1.getCity()).isEqualTo(City.SEOUL);
         assertThat(post1.getSchedule().getId()).isEqualTo(createdScheduleId);
     }
@@ -309,9 +297,8 @@ class SchedulePostServiceTest {
         Long createdSchedulePostId = createSchedulePost1();
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
 
-        SchedulePostRequest modifyRequest = SchedulePostRequest.builder()
-                .title("가자 우주로!")
-                .content("삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
+        SchedulePostRequest modifyRequest = new SchedulePostRequest("가자 우주로!",
+                "삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
                         "\n" +
                         "처음에는 이병철 창업주가 삼성물산이라는 이름으로 자본금 3만 원(현재가치 3억 원)에 지금의 삼성 그룹을 창립하였다.\n" +
                         "\n" +
@@ -321,10 +308,10 @@ class SchedulePostServiceTest {
                         "\n" +
                         "또한 삼성 그룹은 2013년 380조원 규모의 매출을 올렸다. 한국은행에 따르면 같은 해 대한민국의 명목 국내총생산(GDP)은 1428조 원이다.[4] 해외 매출 비중이 훨씬 큰 삼성의 매출액은 GDP와 직접 비교하기 어렵지만, 그럼에도 삼성의 매출액이 대한민국 GDP의 26.6%나 차지한다는 점은 시사하는 바가 크다.[4] 삼성의 수출은 2013년 1572억 달러로 한국 전체 수출액 6171억 달러의 25%에 해당한다.[4]\n" +
                         "\n" +
-                        "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.")
-                .city("부산")
-                .scheduleId(createdScheduleId)
-                .build();
+                        "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.",
+                "부산",
+                createdScheduleId
+        );
         schedulePostService.modifySchedulePost(testMemberId, post.getId(), modifyRequest);
 
         // assert
@@ -593,12 +580,7 @@ class SchedulePostServiceTest {
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         // 게시글 생성1
-        SchedulePostRequest request1 = SchedulePostRequest.builder()
-                .title("1번 여행 넘모 신나요~")
-                .content("신나씐나신나씐나")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
+        SchedulePostRequest request1 = new SchedulePostRequest("1번 여행 넘모 신나요~", "신나씐나신나씐나", "서울", createdScheduleId);
         Long createdSchedulePostId1 = schedulePostService.createSchedulePost(testMemberId, request1);
         SchedulePost post1 = schedulePostService.findById(createdSchedulePostId1);
 
@@ -610,12 +592,7 @@ class SchedulePostServiceTest {
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getWriterId()).isEqualTo(testMemberId);
 
         // 게시글 생성 2
-        SchedulePostRequest request2 = SchedulePostRequest.builder()
-                .title("1번 여행 다녀왔어요~")
-                .content("갔다왔어요~")
-                .city("서울")
-                .scheduleId(createdScheduleId)
-                .build();
+        SchedulePostRequest request2 = new SchedulePostRequest("1번 여행 다녀왔어요~", "갔다왔어요~", "서울", createdScheduleId);
         Long createdSchedulePostId2 = schedulePostService.createSchedulePost(testMemberId, request2);
         SchedulePost post2 = schedulePostService.findById(createdSchedulePostId2);
 
