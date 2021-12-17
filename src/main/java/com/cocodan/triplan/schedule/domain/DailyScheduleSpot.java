@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,18 +23,18 @@ public class DailyScheduleSpot extends BaseEntity {
     @Column(name = "spotId", nullable = false)
     private Long spotId;
 
-    @Column(name = "trip_date", nullable = false)
-    private int date;
+    @Column(name = "date_order", nullable = false)
+    private int dateOrder;
 
-    @Column(name = "trip_order", nullable = false)
-    private int order;
+    @Column(name = "spot_order", nullable = false)
+    private int spotOrder;
 
     @Builder
-    public DailyScheduleSpot(Schedule schedule, Long spotId, int date, int order) {
+    private DailyScheduleSpot(Schedule schedule, Long spotId, int dateOrder, int spotOrder) {
         this.schedule = schedule;
         this.spotId = spotId;
-        this.date = date;
-        this.order = order;
+        this.dateOrder = dateOrder;
+        this.spotOrder = spotOrder;
         schedule.getDailyScheduleSpots().add(this);
     }
 
@@ -47,11 +46,11 @@ public class DailyScheduleSpot extends BaseEntity {
         return spotId;
     }
 
-    public int getDate() {
-        return date;
+    public int getDateOrder() {
+        return dateOrder;
     }
 
-    public int getOrder() {
-        return order;
+    public int getSpotOrder() {
+        return spotOrder;
     }
 }

@@ -1,34 +1,25 @@
 package com.cocodan.triplan.schedule.dto.response;
 
 import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class DailyScheduleSpotResponse {
 
-    private Long spotId;
+    private final Long spotId;
 
-    private int date;
+    private final int dateOrder;
 
-    private int order;
-
-    @Builder
-    private DailyScheduleSpotResponse(Long spotId, int date, int order) {
-        this.spotId = spotId;
-        this.date = date;
-        this.order = order;
-    }
+    private final int spotOrder;
 
     public static DailyScheduleSpotResponse from(DailyScheduleSpot dailyScheduleSpot) {
         return DailyScheduleSpotResponse.builder()
                 .spotId(dailyScheduleSpot.getSpotId())
-                .date(dailyScheduleSpot.getDate())
-                .order(dailyScheduleSpot.getOrder())
+                .dateOrder(dailyScheduleSpot.getDateOrder())
+                .spotOrder(dailyScheduleSpot.getSpotOrder())
                 .build();
     }
 
@@ -37,6 +28,14 @@ public class DailyScheduleSpotResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DailyScheduleSpotResponse that = (DailyScheduleSpotResponse) o;
-        return spotId.equals(that.spotId) && date == that.date && order == that.order;
+        return spotId.equals(that.spotId) && dateOrder == that.dateOrder && spotOrder == that.spotOrder;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = spotId.hashCode();
+        result = 31 * result + dateOrder;
+        result = 31 * result + spotOrder;
+        return result;
     }
 }

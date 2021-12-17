@@ -1,38 +1,45 @@
 package com.cocodan.triplan.schedule.dto.response;
 
 import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
+import com.cocodan.triplan.schedule.dto.request.Position;
 import com.cocodan.triplan.spot.domain.Spot;
-import com.cocodan.triplan.spot.dto.response.SpotResponse;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
-
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class ScheduleSpotResponse {
 
     private final Long id;
-
-    private final SpotResponse spotResponse;
 
     private final int date;
 
     private final int order;
 
-    @Builder
-    private ScheduleSpotResponse(Long id, SpotResponse spotResponse, int date, int order) {
-        this.id = id;
-        this.spotResponse = spotResponse;
-        this.date = date;
-        this.order = order;
-    }
+    private final Long spotId;
+
+    private final String placeName;
+
+    private final String addressName;
+
+    private final String roadAddressName;
+
+    private final String phone;
+
+    private final Position position;
 
     public static ScheduleSpotResponse of(Spot spot, DailyScheduleSpot dailyScheduleSpot) {
         return ScheduleSpotResponse.builder()
                 .id(dailyScheduleSpot.getId())
-                .date(dailyScheduleSpot.getDate())
-                .order(dailyScheduleSpot.getOrder())
-                .spotResponse(SpotResponse.from(spot))
+                .date(dailyScheduleSpot.getDateOrder())
+                .order(dailyScheduleSpot.getSpotOrder())
+                .spotId(spot.getId())
+                .placeName(spot.getPlaceName())
+                .addressName(spot.getAddressName())
+                .roadAddressName(spot.getRoadAddressName())
+                .phone(spot.getPhone())
+                .position(new Position(spot.getLatitude(), spot.getLongitude()))
                 .build();
     }
 }

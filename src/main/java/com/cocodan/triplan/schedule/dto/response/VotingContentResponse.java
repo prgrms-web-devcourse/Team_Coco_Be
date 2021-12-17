@@ -1,10 +1,12 @@
 package com.cocodan.triplan.schedule.dto.response;
 
 import com.cocodan.triplan.schedule.domain.VotingContent;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class VotingContentResponse {
 
     private final Long id;
@@ -14,14 +16,6 @@ public class VotingContentResponse {
     private final int numOfParticipants;
 
     private final boolean participantFlag;
-
-    @Builder
-    private VotingContentResponse(Long id, String content, int numOfParticipants, boolean participantFlag) {
-        this.id = id;
-        this.content = content;
-        this.numOfParticipants = numOfParticipants;
-        this.participantFlag = participantFlag;
-    }
 
     public static VotingContentResponse convertVotingContentResponse(VotingContent votingContent, Long memberId) {
         return VotingContentResponse.builder()

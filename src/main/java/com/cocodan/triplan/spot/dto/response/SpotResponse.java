@@ -1,12 +1,14 @@
 package com.cocodan.triplan.spot.dto.response;
 
 import com.cocodan.triplan.schedule.dto.request.Position;
+import com.cocodan.triplan.schedule.dto.response.ScheduleSpotResponse;
 import com.cocodan.triplan.spot.domain.Spot;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public class SpotResponse {
 
     private Long id;

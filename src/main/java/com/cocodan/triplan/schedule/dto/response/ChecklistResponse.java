@@ -1,27 +1,21 @@
 package com.cocodan.triplan.schedule.dto.response;
 
 import com.cocodan.triplan.schedule.domain.Checklist;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class ChecklistResponse {
 
-    private Long id;
+    private final Long id;
 
-    private String content;
+    private final String content;
 
-    private boolean checked;
+    private final boolean checked;
 
-    private int day;
-
-    @Builder
-    private ChecklistResponse(Long id, String content, boolean checked, int day) {
-        this.id = id;
-        this.content = content;
-        this.checked = checked;
-        this.day = day;
-    }
+    private final int day;
 
     public static ChecklistResponse from(Checklist checklist) {
         return ChecklistResponse.builder()

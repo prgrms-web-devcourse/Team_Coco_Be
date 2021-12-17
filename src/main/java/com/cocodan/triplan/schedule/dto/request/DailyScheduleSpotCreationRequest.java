@@ -32,8 +32,8 @@ public class DailyScheduleSpotCreationRequest {
     @NotNull
     private Position position;
 
-    private int date;
+    private int dateOrder;
 
-    private int order;
+    private int spotOrder;
 
 }

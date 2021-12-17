@@ -34,7 +34,7 @@ public class Checklist extends BaseEntity {
     private int day;
 
     @Builder
-    public Checklist(Schedule schedule, String title, int day) {
+    private Checklist(Schedule schedule, String title, int day) {
         this.schedule = schedule;
         this.title = title;
         this.day = day;

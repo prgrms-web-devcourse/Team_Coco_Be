@@ -1,10 +1,12 @@
 package com.cocodan.triplan.schedule.dto.response;
 
 import com.cocodan.triplan.schedule.domain.Voting;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class VotingSimpleResponse {
 
     private final Long id;
@@ -12,13 +14,6 @@ public class VotingSimpleResponse {
     private final String title;
 
     private final int memberCount;
-
-    @Builder
-    private VotingSimpleResponse(Long id, String title, int memberCount) {
-        this.id = id;
-        this.title = title;
-        this.memberCount = memberCount;
-    }
 
     public static VotingSimpleResponse from(Voting voting) {
         return VotingSimpleResponse.builder()
