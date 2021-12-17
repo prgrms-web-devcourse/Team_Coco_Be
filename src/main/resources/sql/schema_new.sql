@@ -78,6 +78,7 @@ create table daily_schedule_spot
     date_order         integer not null,
     spot_order         integer not null,
     spot_id            bigint  not null,
+    place_name         varchar(255) not null,
     schedule_id        bigint,
     primary key (id)
 );

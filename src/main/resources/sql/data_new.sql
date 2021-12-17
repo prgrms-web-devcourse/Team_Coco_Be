@@ -15,6 +15,7 @@ VALUES (1, 1, 1),
        (2, 2, 1),
        (3, 2, 2)
 ;
+
 -- 이메일 : taid@test.com, 패스워드 : taid123
 INSERT INTO member(id, created_date, last_modified_date, birth, email, gender, group_id, name, nickname, passwd, profile_image)
 values (1, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '1999-11-11', 'taid@test.com', 'MALE', 1, '엄진환', 'Taid', '$2b$10$pOvH32HB1Am/1N9CtJpkl.hTx7FzeKuIDavoZlZ8SIGtt5CBPKtmS', 'none');
