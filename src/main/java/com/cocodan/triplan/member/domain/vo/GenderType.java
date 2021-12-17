@@ -4,8 +4,7 @@ import java.util.Arrays;
 
 public enum GenderType {
     MALE("MALE"),
-    FEMALE("FEMALE"),
-    DEFAULT("미입력");
+    FEMALE("FEMALE");
 
     private final String typeStr;
 
