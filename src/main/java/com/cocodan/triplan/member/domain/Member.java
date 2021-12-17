@@ -20,7 +20,7 @@ public class Member extends BaseEntity {
     private static final int BASIC_AGE = 1;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
