@@ -113,7 +113,7 @@ public class Member extends BaseEntity {
 
     public void checkPassword(PasswordEncoder passwordEncoder, String credentials) {
         if (!passwordEncoder.matches(credentials, password))
-            throw new IllegalArgumentException("Bad credential");
+            throw new IllegalArgumentException("Invalid user's password username");
     }
 
     public int getAge() {

@@ -3,8 +3,8 @@ package com.cocodan.triplan.member.domain.vo;
 import java.util.Arrays;
 
 public enum GenderType {
-    MALE("남성"),
-    FEMALE("여성"),
+    MALE("MALE"),
+    FEMALE("FEMALE"),
     DEFAULT("미입력");
 
     private final String typeStr;

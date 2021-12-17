@@ -1,6 +1,6 @@
 package com.cocodan.triplan.member.dto.request;
 
-import com.cocodan.triplan.schedule.domain.Checklist;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +31,7 @@ public class MemberCreateRequest {
     @Pattern(regexp="^\\d{4}-\\d{2}-\\d{2}$", message="'yyyy-mm-dd'형식으로 작성해주세요")
     private String birth;
 
+    @ApiModelProperty(required = true, example = "string(MALE or FEMALE)")
     @Pattern(regexp="^[ㄱ-ㅎ|가-힣|a-z|A-Z]{1,10}$", message="성별은 1~10자이어야 합니다")
     private String gender;
 
