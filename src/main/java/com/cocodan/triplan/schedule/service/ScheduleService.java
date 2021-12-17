@@ -68,18 +68,25 @@ public class ScheduleService {
     }
 
     private Schedule createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
+        Member member = getMember(memberId);
         return Schedule.builder()
                 .title(scheduleCreationRequest.getTitle())
                 .startDate(scheduleCreationRequest.getStartDate())
                 .endDate(scheduleCreationRequest.getEndDate())
-                .memberId(memberId)
+                .member(member)
                 .build();
+    }
+
+    private Member getMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(Member.class, memberId)
+        );
     }
 
     private void createScheduleThemes(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
         scheduleCreationRequest.getThemes()
                 .stream()
-                .map(s -> Theme.valueOf(s.toUpperCase()))
+                .map(s -> Theme.from(s.toUpperCase()))
                 .forEach(theme -> new ScheduleTheme(schedule, theme));
     }
 
@@ -179,7 +186,7 @@ public class ScheduleService {
     }
 
     private boolean isConstructor(Schedule schedule, Long memberId) {
-        return schedule.getMemberId().equals(memberId);
+        return schedule.getMember().getId().equals(memberId);
     }
 
     @Transactional
