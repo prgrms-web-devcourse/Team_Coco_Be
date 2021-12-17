@@ -23,7 +23,7 @@ public class VotingContentMember extends BaseEntity {
     private Long memberId;
 
     @Builder
-    public VotingContentMember(VotingContent votingContent, Long memberId) {
+    private VotingContentMember(VotingContent votingContent, Long memberId) {
         this.votingContent = votingContent;
         this.memberId = memberId;
     }

@@ -36,7 +36,7 @@ public class Memo extends BaseEntity {
     private Long memberId;
 
     @Builder
-    public Memo(Schedule schedule, String title, String content, Long memberId) {
+    private Memo(Schedule schedule, String title, String content, Long memberId) {
         this.schedule = schedule;
         this.title = title;
         this.content = content;

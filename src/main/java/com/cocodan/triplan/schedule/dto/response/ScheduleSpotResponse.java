@@ -32,8 +32,8 @@ public class ScheduleSpotResponse {
     public static ScheduleSpotResponse of(Spot spot, DailyScheduleSpot dailyScheduleSpot) {
         return ScheduleSpotResponse.builder()
                 .id(dailyScheduleSpot.getId())
-                .date(dailyScheduleSpot.getDate())
-                .order(dailyScheduleSpot.getOrder())
+                .date(dailyScheduleSpot.getDateOrder())
+                .order(dailyScheduleSpot.getSpotOrder())
                 .spotId(spot.getId())
                 .placeName(spot.getPlaceName())
                 .addressName(spot.getAddressName())

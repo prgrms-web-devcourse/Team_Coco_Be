@@ -42,7 +42,7 @@ public class Voting extends BaseEntity {
     private boolean multipleFlag;
 
     @Builder
-    public Voting(String title, Schedule schedule, Long memberId, boolean multipleFlag) {
+    private Voting(String title, Schedule schedule, Long memberId, boolean multipleFlag) {
         this.schedule = schedule;
         this.title = title;
         this.memberId = memberId;

@@ -32,7 +32,7 @@ public class VotingContent extends BaseEntity {
     private List<VotingContentMember> votingContentMembers = new ArrayList<>();
 
     @Builder
-    public VotingContent(String content, Voting voting) {
+    private VotingContent(String content, Voting voting) {
         this.content = content;
         this.voting = voting;
         this.voting.getVotingContents().add(this);

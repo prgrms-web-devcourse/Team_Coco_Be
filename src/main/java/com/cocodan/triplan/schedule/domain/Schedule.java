@@ -57,7 +57,7 @@ public class Schedule extends BaseEntity {
     private List<ScheduleMember> scheduleMembers = new ArrayList<>();
 
     @Builder
-    public Schedule(String title, LocalDate startDate, LocalDate endDate, Long memberId) {
+    private Schedule(String title, LocalDate startDate, LocalDate endDate, Long memberId) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;

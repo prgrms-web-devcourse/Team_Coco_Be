@@ -24,7 +24,7 @@ public class ScheduleMember extends BaseEntity {
     private Long memberId;
 
     @Builder
-    public ScheduleMember(Schedule schedule, Long memberId) {
+    private ScheduleMember(Schedule schedule, Long memberId) {
         this.schedule = schedule;
         this.memberId = memberId;
         schedule.getScheduleMembers().add(this);

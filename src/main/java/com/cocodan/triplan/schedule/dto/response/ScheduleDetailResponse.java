@@ -43,9 +43,9 @@ public class ScheduleDetailResponse {
     }
 
     private static int sortByDateAndOrder(DailyScheduleSpot o1, DailyScheduleSpot o2) {
-        int compareResult = o1.getDate() - o2.getDate();
+        int compareResult = o1.getDateOrder() - o2.getDateOrder();
         if (compareResult == 0) {
-            return o1.getOrder() - o2.getOrder();
+            return o1.getSpotOrder() - o2.getSpotOrder();
         }
 
         return compareResult;

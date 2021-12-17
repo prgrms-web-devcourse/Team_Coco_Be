@@ -25,7 +25,6 @@ public class ScheduleTheme extends BaseEntity {
     @Column(name = "theme")
     private Theme theme;
 
-    @Builder
     public ScheduleTheme(Schedule schedule, Theme theme) {
         this.schedule = schedule;
         this.theme = theme;
