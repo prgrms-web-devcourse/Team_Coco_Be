@@ -1,6 +1,7 @@
 package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.cocodan.triplan.exception.common.NotFoundException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -62,7 +63,7 @@ public class Voting extends BaseEntity {
         return votingContents.stream()
                 .filter(votingContent -> votingContent.getId().equals(contentId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new NotFoundException(VotingContent.class, contentId));
     }
 
     private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {
