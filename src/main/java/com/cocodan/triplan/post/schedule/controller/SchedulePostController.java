@@ -94,8 +94,11 @@ public class SchedulePostController {
 
     @ApiOperation("특정 여행 일정 공유 게시글 상세조회")
     @GetMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<SchedulePostDetailResponse> detailSchedulePost(@PathVariable("schedulePostId") Long schedulePostId) {
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(schedulePostId);
+    public ResponseEntity<SchedulePostDetailResponse> getDetailSchedulePost(
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(schedulePostId, authentication.getId());
         return ResponseEntity.ok(schedulePostDetail);
     }
 

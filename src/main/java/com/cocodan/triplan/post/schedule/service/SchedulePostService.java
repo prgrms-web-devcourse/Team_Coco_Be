@@ -88,14 +88,17 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public SchedulePostDetailResponse getSchedulePostDetail(Long schedulePostId) {
+    public SchedulePostDetailResponse getSchedulePostDetail(Long schedulePostId, Long memberId) {
+        nullCheck(schedulePostId, memberId);
+
         SchedulePost schedulePost = getSchedulePost(schedulePostId);
 
         // TODO: 2021.12.13 Teru - 조회수에 대한 동시성 문제를 어떻게 해야 잘 해결할 수 있을지 고민... 현재는 별다른 처리를 해두지 않은 상태
         schedulePost.increaseViews();
 
         List<SchedulePostCommentResponse> comments = getSchedulePostComments(schedulePostId);
-        return SchedulePostDetailResponse.of(schedulePost, comments);
+        Optional<Like> isLiked = getLike(memberId, schedulePostId);
+        return SchedulePostDetailResponse.of(schedulePost, comments, isLiked.isPresent());
     }
 
     @Transactional
