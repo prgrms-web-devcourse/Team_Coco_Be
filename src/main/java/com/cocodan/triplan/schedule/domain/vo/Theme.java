@@ -8,8 +8,8 @@ public enum Theme {
     ACTIVITY("ACTIVITY"),
     FOOD("FOOD"),
     ART("ART"),
-    ARCHITECT("ARCHITECT"),
     NATURE("NATURE"),
+    HISTORY("HISTORY"),
     ALL("ALL"); // 검색 전용
 
     private String value;
