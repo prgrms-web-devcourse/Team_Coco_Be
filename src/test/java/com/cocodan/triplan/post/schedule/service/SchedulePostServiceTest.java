@@ -8,6 +8,7 @@ import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
 import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostNestedCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
@@ -458,7 +459,7 @@ class SchedulePostServiceTest {
     }
 
     @Test
-    @DisplayName("댓글에 대댓글을 달고 조회할 수 있다")
+    @DisplayName("댓글에 대댓글을 달 수 있다")
     @Transactional
     void writeNestedCommentsToCommentOfSchedulePost() {
         // 댓글 작성
@@ -481,6 +482,40 @@ class SchedulePostServiceTest {
         assertThat(schedulePostDetail.getComments().get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().size()).isEqualTo(1);
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+    }
+
+    @Test
+    @DisplayName("댓글에 달린 대댓글을 조회할 수 있다")
+    @Transactional
+    void getNestedCommentsOfACommentOfASchedulePost() {
+        // 댓글 작성
+        Long createdSchedulePostId1 = createSchedulePost1();
+        SchedulePostCommentRequest commentRequest = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+
+        // 대댓글 작성
+        SchedulePostCommentRequest nestedCommentRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        schedulePostService.writeNestedCommentToSchedulePostComment(
+                testMemberId,
+                createdSchedulePostId1,
+                comments.get(0).getCommentId(),
+                nestedCommentRequest
+        );
+        // 1차 확인
+        List<SchedulePostNestedCommentResponse> nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
+        assertThat(nestedComments.get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+
+        SchedulePostCommentRequest nestedCommentRequest2 = new SchedulePostCommentRequest("아이클리어 루테인지아잔틴");
+        schedulePostService.writeNestedCommentToSchedulePostComment(
+                testMemberId,
+                createdSchedulePostId1,
+                comments.get(0).getCommentId(),
+                nestedCommentRequest2
+        );
+
+        // 2차 확인
+        nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
+        assertThat(nestedComments.size()).isEqualTo(2);
     }
 
     @Test
