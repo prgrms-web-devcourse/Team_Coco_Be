@@ -221,6 +221,17 @@ public class SchedulePostService {
         return getSchedulePostComments(schedulePostId);
     }
 
+    @Transactional(readOnly = true)
+    public List<SchedulePostNestedCommentResponse> getSchedulePostNestedComments(Long schedulePostId, Long commentId, Long memberId) {
+        nullCheck(schedulePostId, commentId, memberId);
+
+        SchedulePostComment comment = getComment(commentId);
+        List<SchedulePostNestedComment> nestedComments = getNestedCommentsOf(comment);
+        return nestedComments.stream()
+                .map(SchedulePostNestedCommentResponse::from)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void modifySchedulePostNestedComment(
             Long memberId,

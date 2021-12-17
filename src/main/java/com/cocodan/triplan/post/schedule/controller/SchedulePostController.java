@@ -8,6 +8,7 @@ import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentRespons
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostLikeResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostNestedCommentResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.service.SchedulePostSearchService;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
@@ -16,8 +17,7 @@ import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +31,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.cocodan.triplan.post.schedule.controller.SchedulePostController.schedulePostBaseUri;
+import static java.util.Collections.emptyList;
 
 @Api(tags = "Schedule Post")
 @RequestMapping(schedulePostBaseUri)
@@ -73,7 +77,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long postId = schedulePostService.createSchedulePost(authentication.getId(), request);
-        return ResponseEntity.ok(SchedulePostCreateResponse.from(postId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(SchedulePostCreateResponse.from(postId));
     }
 
     @ApiOperation("자신이 작성한 여행 공유 게시글 모아보기")
@@ -151,7 +155,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(authentication.getId(), schedulePostId, request);
-        return ResponseEntity.ok(schedulePostComments);
+        return ResponseEntity.status(HttpStatus.CREATED).body(schedulePostComments);
     }
 
     @ApiOperation("여행 공유 게시글에 작성된 댓글 삭제하기")
@@ -182,7 +186,18 @@ public class SchedulePostController {
 
     @ApiOperation("여행 공유 게시글에 작성된 댓글의 대댓글 조회하기")
     @GetMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments")
-    public ResponseEntity<List<SchedulePostCommentResponse>> getSchedulePostNestedComments(
+    public ResponseEntity<List<SchedulePostNestedCommentResponse>> getSchedulePostNestedComments(
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @PathVariable("commentId") Long commentId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        List<SchedulePostNestedCommentResponse> schedulePostNestedComments = schedulePostService.getSchedulePostNestedComments(schedulePostId, commentId, authentication.getId());
+        return ResponseEntity.ok(schedulePostNestedComments);
+    }
+
+    @ApiOperation("여행 공유 게시글에 작성된 댓글에 대댓글 작성하기 (전체 댓글 반환)")
+    @PostMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments")
+    public ResponseEntity<List<SchedulePostCommentResponse>> writeSchedulePostNestedComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
             @RequestBody SchedulePostCommentRequest request,
@@ -194,7 +209,6 @@ public class SchedulePostController {
                 commentId,
                 request
         );
-        // 전체 댓글 및 대댓글 반환
         return ResponseEntity.ok(schedulePostCommentResponses);
     }
 
