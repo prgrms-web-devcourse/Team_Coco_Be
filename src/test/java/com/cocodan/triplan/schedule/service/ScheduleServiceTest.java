@@ -110,8 +110,8 @@ class ScheduleServiceTest {
         // Then
         assertThat(scheduleSimpleResponse.getId()).isEqualTo(scheduleId);
         assertThat(scheduleSimpleResponse.getTitle()).isEqualTo("title");
-        assertThat(scheduleSimpleResponse.getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
-        assertThat(scheduleSimpleResponse.getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
+        assertThat(scheduleSimpleResponse.getStartDate()).isEqualTo("2021-12-01");
+        assertThat(scheduleSimpleResponse.getEndDate()).isEqualTo("2021-12-03");
         assertThat(scheduleSimpleResponse.getThemes()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
     }
 
@@ -126,8 +126,8 @@ class ScheduleServiceTest {
         ScheduleDetailResponse response = scheduleService.getSchedule(scheduleId);
 
         // Then
-        assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
-        assertThat(response.getScheduleSimpleResponse().getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
+        assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo("2021-12-01");
+        assertThat(response.getScheduleSimpleResponse().getEndDate()).isEqualTo("2021-12-03");
         assertThat(response.getScheduleSimpleResponse().getTitle()).isEqualTo("title");
         assertThat(response.getScheduleSimpleResponse().getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
 

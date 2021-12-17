@@ -148,8 +148,8 @@ class SchedulePostServiceTest {
         assertThat(posts.get(0).getTitle()).isEqualTo("1번 여행 게시글");
         assertThat(posts.get(0).getGenderType().getTypeStr()).isEqualTo(GENDER);
         assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL);
-        assertThat(posts.get(0).getStartDate()).isEqualTo(LocalDate.of(2021, 12, 1));
-        assertThat(posts.get(0).getEndDate()).isEqualTo(LocalDate.of(2021, 12, 3));
+        assertThat(posts.get(0).getStartDate()).isEqualTo("2021-12-01");
+        assertThat(posts.get(0).getEndDate()).isEqualTo("2021-12-03");
         assertThat(posts.get(0).getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
 
         // TODO: 다양한 조건으로 테스트 추가
@@ -252,12 +252,12 @@ class SchedulePostServiceTest {
                 "\n" +
                 "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]");
         assertThat(schedulePostDetail.getCity()).isEqualTo(City.SEOUL);
-        assertThat(schedulePostDetail.getCreatedAt()).isEqualTo(post.getCreatedDate());
+        assertThat(schedulePostDetail.getCreatedAt()).isEqualTo(post.getCreatedDate().toString());
         assertThat(schedulePostDetail.getViews()).isEqualTo(post.getViews());
         assertThat(initialViews + 1).isEqualTo(post.getViews());
         assertThat(schedulePostDetail.getLiked()).isEqualTo(post.getLiked());
-        assertThat(schedulePostDetail.getStartDate()).isEqualTo(post.getSchedule().getStartDate());
-        assertThat(schedulePostDetail.getEndDate()).isEqualTo(post.getSchedule().getEndDate());
+        assertThat(schedulePostDetail.getStartDate()).isEqualTo(post.getSchedule().getStartDate().toString());
+        assertThat(schedulePostDetail.getEndDate()).isEqualTo(post.getSchedule().getEndDate().toString());
         assertThat(schedulePostDetail.getGender()).isEqualTo(post.getMember().getGender());
         assertThat(schedulePostDetail.getNickname()).isEqualTo(post.getMember().getNickname());
         assertThat(schedulePostDetail.getAges()).isEqualTo(Ages.from(post.getMember().getBirth()));
