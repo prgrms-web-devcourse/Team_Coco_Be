@@ -122,7 +122,7 @@ public class SchedulePostService {
         // TODO: 2021.12.13 Teru - 좋아요 수에 대한 동시성 문제를 어떻게하면 더 잘 해결할 수 있을지 고민...
         Long schedulePostId = request.getSchedulePostId();
         Optional<Like> likeData = getLike(memberId, schedulePostId);
-        SchedulePost post = getSchedulePost(schedulePostId);
+        SchedulePost post = getSchedulePostForLikeUpdate(schedulePostId);
 
         if (likeData.isEmpty() && request.getFlag()) {
             Member member = getMember(memberId);
@@ -241,6 +241,14 @@ public class SchedulePostService {
         schedulePostNestedCommentRepository.delete(nestedComment);
     }
 
+    @Transactional(readOnly = true)
+    public List<SchedulePostResponse> getCertainMemberSchedulePostList(Long memberId) {
+        nullCheck(memberId);
+
+        List<SchedulePost> schedulePosts = getSchedulePostsByMemberId(memberId);
+        return convertToSchedulePostResponseList(schedulePosts);
+    }
+
     // private methods...
     private void validateNestedCommentOwnership(Long memberId, Long schedulePostId, Long commentId, Long nestedCommentId) {
         nullCheck(memberId, schedulePostId, commentId, nestedCommentId);
@@ -280,6 +288,12 @@ public class SchedulePostService {
         );
     }
 
+    private SchedulePost getSchedulePostForLikeUpdate(Long schedulePostId) {
+        return schedulePostRepository.findByIdForLikedCountUpdate(schedulePostId).orElseThrow(
+                () -> new RuntimeException("No such post found (ID : " + schedulePostId + ")")
+        );
+    }
+
     private SchedulePostComment getComment(Long commentId) {
         return schedulePostCommentRepository.findById(commentId).orElseThrow(
                 () -> new RuntimeException("No such comment found")
@@ -310,6 +324,10 @@ public class SchedulePostService {
 
     private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
         return schedulePosts.stream().map(SchedulePostResponse::from).collect(Collectors.toList());
+    }
+
+    private List<SchedulePost> getSchedulePostsByMemberId(Long memberId) {
+        return  schedulePostRepository.findAllByMemberId(memberId);
     }
 
     private SchedulePost validateAuthorities(Long memberId, Long schedulePostId) {

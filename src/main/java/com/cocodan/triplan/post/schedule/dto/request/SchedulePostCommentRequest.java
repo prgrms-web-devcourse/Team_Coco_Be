@@ -7,6 +7,9 @@ import org.hibernate.validator.constraints.Length;
 import static com.cocodan.triplan.post.schedule.domain.SchedulePostComment.COMMENT_MAX_LENGTH;
 import static com.cocodan.triplan.post.schedule.domain.SchedulePostComment.COMMENT_MIN_LENGTH;
 
+import static com.cocodan.triplan.post.schedule.domain.SchedulePostComment.COMMENT_MAX_LENGTH;
+import static com.cocodan.triplan.post.schedule.domain.SchedulePostComment.COMMENT_MIN_LENGTH;
+
 @Getter
 @AllArgsConstructor
 public class SchedulePostCommentRequest {

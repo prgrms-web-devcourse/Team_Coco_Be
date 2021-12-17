@@ -1,5 +1,6 @@
 package com.cocodan.triplan.post.schedule.dto.response;
 
+import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostNestedComment;
 import com.cocodan.triplan.post.schedule.vo.Ages;
