@@ -241,7 +241,7 @@ class SchedulePostServiceTest {
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
         long initialViews = post.getViews();
 
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId);
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId, testMemberId);
 
         assertThat(schedulePostDetail.getTitle()).isEqualTo("1번 여행!");
         assertThat(schedulePostDetail.getContent()).isEqualTo("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
@@ -255,7 +255,8 @@ class SchedulePostServiceTest {
         assertThat(schedulePostDetail.getCreatedAt()).isEqualTo(post.getCreatedDate().toString());
         assertThat(schedulePostDetail.getViews()).isEqualTo(post.getViews());
         assertThat(initialViews + 1).isEqualTo(post.getViews());
-        assertThat(schedulePostDetail.getLiked()).isEqualTo(post.getLiked());
+        assertThat(schedulePostDetail.getLikeCount()).isEqualTo(post.getLiked());
+        assertThat(schedulePostDetail.getIsLiked()).isEqualTo(false);
         assertThat(schedulePostDetail.getStartDate()).isEqualTo(post.getSchedule().getStartDate().toString());
         assertThat(schedulePostDetail.getEndDate()).isEqualTo(post.getSchedule().getEndDate().toString());
         assertThat(schedulePostDetail.getGender()).isEqualTo(post.getMember().getGender());
@@ -464,7 +465,7 @@ class SchedulePostServiceTest {
         );
 
         // 대댓글 확인
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1);
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1, testMemberId);
         assertThat(schedulePostDetail.getComments().size()).isEqualTo(1);
         assertThat(schedulePostDetail.getComments().get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().size()).isEqualTo(1);
@@ -534,7 +535,7 @@ class SchedulePostServiceTest {
         );
 
         // 대댓글 확인
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1);
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1, testMemberId);
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().get(0).getContent()).isEqualTo("나랏말싸미 듕귁에달아 문자와로 서로 사맛디 아니할새 이런 젼챠로 어린 백셩이 니르고져 할 배 이셔도 못 할 노미 하니라");
     }
 

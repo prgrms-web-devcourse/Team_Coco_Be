@@ -40,11 +40,17 @@ public class SchedulePostDetailResponse {
 
     private Long views;
 
-    private Long liked;
+    private Long likeCount;
 
     private List<SchedulePostCommentResponse> comments;
 
-    public static SchedulePostDetailResponse of(SchedulePost schedulePost, List<SchedulePostCommentResponse> comments) {
+    private Boolean isLiked;
+
+    public static SchedulePostDetailResponse of(
+            SchedulePost schedulePost,
+            List<SchedulePostCommentResponse> comments,
+            Boolean isLiked
+    ) {
         return SchedulePostDetailResponse.builder()
                 .writerId(schedulePost.getMember().getId())
                 .nickname(schedulePost.getMember().getNickname())
@@ -61,8 +67,9 @@ public class SchedulePostDetailResponse {
                 )
                 .createdAt(schedulePost.getCreatedDate().toString())
                 .views(schedulePost.getViews())
-                .liked(schedulePost.getLiked())
+                .likeCount(schedulePost.getLiked())
                 .comments(comments)
+                .isLiked(isLiked)
                 .build();
     }
 
