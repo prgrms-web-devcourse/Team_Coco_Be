@@ -25,7 +25,7 @@ public class SchedulePostCommentResponse {
 
     private String content;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     private List<SchedulePostNestedCommentResponse> nestedComments;
 
@@ -45,7 +45,7 @@ public class SchedulePostCommentResponse {
                 .ages(Ages.from(member.getBirth()))
                 .gender(member.getGender())
                 .content(comment.getContent())
-                .createdAt(comment.getCreatedDate())
+                .createdAt(comment.getCreatedDate().toString())
                 .nestedComments(nestedComments)
                 .schedulePostWriter(member.equals(comment.getSchedulePost().getMember()))
                 .build();

@@ -25,7 +25,7 @@ public class SchedulePostNestedCommentResponse {
 
     private String content;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     private Long writerId; // 이 댓글을 쓴 사람의 memberId;
 
@@ -40,7 +40,7 @@ public class SchedulePostNestedCommentResponse {
                 .ages(Ages.from(nestedComment.getMember().getBirth()))
                 .gender(nestedComment.getMember().getGender())
                 .content(nestedComment.getContent())
-                .createdAt(nestedComment.getCreatedDate())
+                .createdAt(nestedComment.getCreatedDate().toString())
                 .schedulePostWriter(
                         nestedComment.getParentComment().getSchedulePost().getMember().equals(nestedComment.getMember())
                 )

@@ -28,9 +28,9 @@ public class SchedulePostDetailResponse {
 
     private City city;
 
-    private LocalDate startDate;
+    private String startDate;
 
-    private LocalDate endDate;
+    private String endDate;
 
     private String title;
 
@@ -38,7 +38,7 @@ public class SchedulePostDetailResponse {
 
     private List<DailyScheduleSpotResponse> dailyScheduleSpots;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     private Long views;
 
@@ -53,15 +53,15 @@ public class SchedulePostDetailResponse {
                 .ages(Ages.from(schedulePost.getMember().getBirth()))
                 .gender(schedulePost.getMember().getGender())
                 .city(schedulePost.getCity())
-                .startDate(schedulePost.getSchedule().getStartDate())
-                .endDate(schedulePost.getSchedule().getEndDate())
+                .startDate(schedulePost.getSchedule().getStartDate().toString())
+                .endDate(schedulePost.getSchedule().getEndDate().toString())
                 .title(schedulePost.getTitle())
                 .content(schedulePost.getContent())
                 .dailyScheduleSpots(schedulePost.getSchedule().getDailyScheduleSpots().stream()
                         .map(DailyScheduleSpotResponse::from)
                         .collect(Collectors.toList())
                 )
-                .createdAt(schedulePost.getCreatedDate())
+                .createdAt(schedulePost.getCreatedDate().toString())
                 .views(schedulePost.getViews())
                 .liked(schedulePost.getLiked())
                 .comments(comments)

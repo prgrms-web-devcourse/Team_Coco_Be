@@ -61,6 +61,7 @@ public class ScheduleDetailResponse {
         return MemberSimpleResponse.builder()
                 .id(member.getId())
                 .nickname(member.getNickname())
+                .imageUrl(member.getProfileImage())
                 .build();
     }
 }

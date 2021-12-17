@@ -22,8 +22,8 @@ public class FriendService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long addFollowing(Long followerId, Long followingId) {
-        Friend friend = new Friend(followerId, followingId);
+    public Long addFollowing(Long toId, Long fromId) {
+        Friend friend = new Friend(fromId, toId);
 
         return friendRepository.save(friend).getId();
     }

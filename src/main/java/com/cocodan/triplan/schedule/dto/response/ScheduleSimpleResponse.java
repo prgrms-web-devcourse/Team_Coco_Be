@@ -19,9 +19,9 @@ public class ScheduleSimpleResponse {
 
     private final String title;
 
-    private final LocalDate startDate;
+    private final String startDate;
 
-    private final LocalDate endDate;
+    private final String endDate;
 
     private final List<Theme> themes;
 
@@ -29,8 +29,8 @@ public class ScheduleSimpleResponse {
         return ScheduleSimpleResponse.builder()
                 .id(schedule.getId())
                 .title(schedule.getTitle())
-                .startDate(schedule.getStartDate())
-                .endDate(schedule.getEndDate())
+                .startDate(schedule.getStartDate().toString())
+                .endDate(schedule.getEndDate().toString())
                 .themes(getThemes(schedule))
                 .build();
     }

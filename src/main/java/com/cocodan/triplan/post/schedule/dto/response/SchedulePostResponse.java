@@ -38,9 +38,9 @@ public class SchedulePostResponse {
 
     private List<Theme> themes;
 
-    private LocalDate startDate;
+    private String startDate;
 
-    private LocalDate endDate;
+    private String endDate;
 
     public static SchedulePostResponse from(SchedulePost schedulePost) {
         Member member = schedulePost.getMember();
@@ -60,8 +60,8 @@ public class SchedulePostResponse {
                                 .map(ScheduleTheme::getTheme)
                                 .collect(Collectors.toList())
                 )
-                .startDate(schedule.getStartDate())
-                .endDate(schedule.getEndDate())
+                .startDate(schedule.getStartDate().toString())
+                .endDate(schedule.getEndDate().toString())
                 .build();
     }
 }
