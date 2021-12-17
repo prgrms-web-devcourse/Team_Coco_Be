@@ -15,11 +15,14 @@ public class DailyScheduleSpotResponse {
 
     private final int spotOrder;
 
+    private final String placeName;
+
     public static DailyScheduleSpotResponse from(DailyScheduleSpot dailyScheduleSpot) {
         return DailyScheduleSpotResponse.builder()
                 .spotId(dailyScheduleSpot.getSpotId())
                 .dateOrder(dailyScheduleSpot.getDateOrder())
                 .spotOrder(dailyScheduleSpot.getSpotOrder())
+                .placeName(dailyScheduleSpot.getPlaceName())
                 .build();
     }
 

@@ -38,3 +38,4 @@ values (5, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '1999-11-11', 'jay@test.com
 -- 이메일 : mini@test.com, 패스워드 : mini123
 INSERT INTO member(id, created_date, last_modified_date, birth, email, gender, group_id, name, nickname, passwd, profile_image)
 values (6, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '1999-11-11', 'mini@test.com', 'FEMALE', 1, '김민정', 'Mini', '$2b$10$pt57S1oP3tsCr5TMhxp35eFu97uGCS7z.Lc5er8Iu9vFt198Vc9WC', 'none');
+values (6, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '1999-11-11', 'mini@test.com', 'FEMALE', 1, '김민정', 'Mini', '$2b$10$pt57S1oP3tsCr5TMhxp35eFu97uGCS7z.Lc5er8Iu9vFt198Vc9WC', 'none');

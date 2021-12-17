@@ -23,6 +23,9 @@ public class DailyScheduleSpot extends BaseEntity {
     @Column(name = "spotId", nullable = false)
     private Long spotId;
 
+    @Column(name = "place_name", nullable = false)
+    private String placeName;
+
     @Column(name = "date_order", nullable = false)
     private int dateOrder;
 
@@ -30,9 +33,10 @@ public class DailyScheduleSpot extends BaseEntity {
     private int spotOrder;
 
     @Builder
-    private DailyScheduleSpot(Schedule schedule, Long spotId, int dateOrder, int spotOrder) {
+    private DailyScheduleSpot(Schedule schedule, Long spotId, String placeName, int dateOrder, int spotOrder) {
         this.schedule = schedule;
         this.spotId = spotId;
+        this.placeName = placeName;
         this.dateOrder = dateOrder;
         this.spotOrder = spotOrder;
         schedule.getDailyScheduleSpots().add(this);
@@ -44,6 +48,10 @@ public class DailyScheduleSpot extends BaseEntity {
 
     public Long getSpotId() {
         return spotId;
+    }
+
+    public String getPlaceName() {
+        return placeName;
     }
 
     public int getDateOrder() {

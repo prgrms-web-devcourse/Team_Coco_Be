@@ -91,6 +91,7 @@ public class ScheduleService {
     private void createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
         DailyScheduleSpot.builder()
                 .spotId(dailyScheduleSpotCreationRequest.getSpotId())
+                .placeName(dailyScheduleSpotCreationRequest.getPlaceName())
                 .dateOrder(dailyScheduleSpotCreationRequest.getDateOrder())
                 .spotOrder(dailyScheduleSpotCreationRequest.getSpotOrder())
                 .schedule(schedule)
