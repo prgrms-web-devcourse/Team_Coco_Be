@@ -51,8 +51,7 @@ public class MemberController {
 
     @ApiOperation("회원(Member) 단건 조회, 성공시 Member 정보 반환")
     @GetMapping(value = "/users/{memberId}")
-    public ResponseEntity<MemberGetOneResponse> readSingleData(@AuthenticationPrincipal JwtAuthentication authentication) {
-        Long memberId = authentication.getId();
+    public ResponseEntity<MemberGetOneResponse> readSingleData(@PathVariable Long memberId, @AuthenticationPrincipal JwtAuthentication authentication) {
         MemberGetOneResponse response = memberService.getOne(memberId);
 
         return ResponseEntity.ok(response);
