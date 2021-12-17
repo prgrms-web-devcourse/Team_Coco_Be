@@ -4,11 +4,13 @@ import com.cocodan.triplan.exception.common.ForbiddenException;
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.exception.common.UniqueEmailException;
+import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.util.ExceptionMessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -39,7 +41,7 @@ public class GlobalExceptionHandler {
     }
 
     private void loggingWarningStackTrace(Exception exception) {
-        log.warn("exception", exception);
+        log.warn("Exception {}: ", exception.getMessage(), exception);
     }
 
     private void putError(ObjectError error, Map<String, String> errors) {
@@ -110,6 +112,6 @@ public class GlobalExceptionHandler {
     }
 
     private void loggingErrorStackTrace(Exception exception) {
-        log.error("error", exception);
+        log.error("Unexpected error {}",exception.getMessage(), exception);
     }
 }

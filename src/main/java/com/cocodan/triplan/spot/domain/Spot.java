@@ -15,6 +15,12 @@ public class Spot extends BaseEntity implements Persistable<Long> {
     public static final int PHONE_MAX_LENGTH = 13;
     public static final int PHONE_MIN_LENGTH = 10;
 
+    public static final int ADDRESS_MIN_LENGTH = 5;
+    public static final int ADDRESS_MAX_LENGTH = 100;
+
+    public static final int PLACE_NAME_MIN_LENGTH = 1;
+    public static final int PLACE_NAME_MAX_LENGTH = 100;
+
     @Id
     @Column(name = "id", nullable = false)
     private Long id;

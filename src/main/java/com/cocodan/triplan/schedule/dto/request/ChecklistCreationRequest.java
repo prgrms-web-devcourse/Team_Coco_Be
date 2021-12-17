@@ -1,10 +1,12 @@
 package com.cocodan.triplan.schedule.dto.request;
 
 import com.cocodan.triplan.schedule.domain.Checklist;
+import com.cocodan.triplan.schedule.domain.Schedule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDate;
 
@@ -13,6 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ChecklistCreationRequest {
 
+    @Range(min = Schedule.DAY_MIN, max = Schedule.DAY_MAX)
     private int day;
 
     @Length(min = Checklist.MIN_LENGTH, max = Checklist.MAX_LENGTH)
