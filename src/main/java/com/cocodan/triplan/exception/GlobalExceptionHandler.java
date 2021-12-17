@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -105,7 +106,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleInvalidLogin(BadCredentialsException exception) {
-        log.warn("Invalid login data : {}", exception.getMessage());
+        log.warn("Invalid token data : {}", exception.getMessage());
+        loggingWarningStackTrace(exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleInvalidLogin(IllegalArgumentException exception) {
+        log.warn("Invalid login password check : {}", exception.getMessage());
+        loggingWarningStackTrace(exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleInvalidLogin(UsernameNotFoundException exception) {
+        log.warn("Invalid login email : {}", exception.getMessage());
         loggingWarningStackTrace(exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
