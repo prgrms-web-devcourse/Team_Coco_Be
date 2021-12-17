@@ -1,11 +1,10 @@
 package com.cocodan.triplan.jwt;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.cocodan.triplan.config.JwtAuthenticationSuccessHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.log.LogMessage;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,7 +17,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -70,7 +68,13 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                         successfulAuthentication(request, response, chain, authentication);
                     }
                 } catch (Exception e) {
+                    log.warn("Exception type: {}", e.getClass().getSimpleName());
                     log.warn("Jwt processing failed: {}", e.getMessage());
+                    if (e.getClass() == TokenExpiredException.class)
+                    {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        throw new TokenExpiredException("Login Token has expired!");
+                    }
                 }
             }
         } else {
