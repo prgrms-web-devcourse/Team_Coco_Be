@@ -59,8 +59,7 @@ class SchedulePostServiceTest {
 
     private static final String EMAIL = "KimLeePark@gmail.com";
     private static final String NAME = "김이박";
-    private static final String PHONE = "01077775555";
-    private static final String BIRTH = "19901111";
+    private static final String BIRTH = "1990-11-11";
     private static final String GENDER = GenderType.MALE.getTypeStr();
     private static final String NICKNAME = "TestNickname";
     private static final String PROFILE_IMAGE = "https://wwww.someonesownserver.org/img/1";
@@ -72,7 +71,6 @@ class SchedulePostServiceTest {
         testMemberId = memberService.create(
                 EMAIL,
                 NAME,
-                PHONE,
                 BIRTH,
                 GENDER,
                 NICKNAME,
@@ -237,7 +235,6 @@ class SchedulePostServiceTest {
         assertThat(post1.getMember().getId()).isEqualTo(testMemberId);
         assertThat(memberService.getOne(post1.getMember().getId()).getEmail()).isEqualTo(EMAIL);
         assertThat(memberService.getOne(post1.getMember().getId()).getName()).isEqualTo(NAME);
-        assertThat(memberService.getOne(post1.getMember().getId()).getPhoneNumber()).isEqualTo(PHONE);
         assertThat(memberService.getOne(post1.getMember().getId()).getBirth()).isEqualTo(BIRTH);
         assertThat(memberService.getOne(post1.getMember().getId()).getNickname()).isEqualTo(NICKNAME);
         assertThat(memberService.getOne(post1.getMember().getId()).getProfileImage()).isEqualTo(PROFILE_IMAGE);

@@ -7,6 +7,7 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.request.MemberCreateRequest;
 import com.cocodan.triplan.member.dto.request.MemberLoginRequest;
 import com.cocodan.triplan.member.dto.request.MemberUpdateRequest;
+import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
 import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
 import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
@@ -26,6 +27,7 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Optional;
 import java.util.List;
 
 @Api(tags = "Member")
@@ -41,10 +43,9 @@ public class MemberController {
     @ApiOperation("회원(Member) 신규 추가, 성공시 생성된 Member ID 반환")
     @PostMapping("/register")
     public ResponseEntity<Void> signUp(@Valid @RequestBody MemberCreateRequest request) {
-        memberService.create(
+        memberService.validCreate(
                 request.getEmail(),
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getBirth(),
                 request.getGender(),
                 request.getNickname(),
@@ -60,10 +61,6 @@ public class MemberController {
     @GetMapping(value = "/users/{memberId}")
     public ResponseEntity<MemberGetOneResponse> readSingleData(@AuthenticationPrincipal JwtAuthentication authentication) {
         Long memberId = authentication.getId();
-        if (memberId == 0)
-        {
-            throw new NotFoundException(Member.class, memberId);
-        }
         MemberGetOneResponse response = memberService.getOne(memberId);
 
         return ResponseEntity.ok(response);
@@ -83,7 +80,6 @@ public class MemberController {
         MemberUpdateResponse response = memberService.update(
                 memberId,
                 request.getName(),
-                request.getPhoneNumber(),
                 request.getNickname(),
                 request.getProfileImage()
         );
@@ -110,4 +106,16 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation("내 프로필 조회")
+    @GetMapping("/profiles")
+    public ResponseEntity<MemberGetOneResponse> readProfile(@AuthenticationPrincipal JwtAuthentication authentication) {
+        Long memberId = authentication.getId();
+        if (memberId == 0)
+        {
+            throw new NotFoundException(Member.class, memberId);
+        }
+        MemberGetOneResponse response = memberService.getOne(memberId);
+
+        return ResponseEntity.ok(response);
+    }
 }

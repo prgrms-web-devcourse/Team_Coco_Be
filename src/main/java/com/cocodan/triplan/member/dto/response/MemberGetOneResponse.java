@@ -16,8 +16,6 @@ public class MemberGetOneResponse {
 
     private final String name;
 
-    private final String phoneNumber;
-
     private final String birth;
 
     private final GenderType gender;
@@ -32,7 +30,6 @@ public class MemberGetOneResponse {
                 "id=" + id +
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
                 ", birth='" + birth + '\'' +
                 ", gender=" + gender +
                 ", nickname='" + nickname + '\'' +
