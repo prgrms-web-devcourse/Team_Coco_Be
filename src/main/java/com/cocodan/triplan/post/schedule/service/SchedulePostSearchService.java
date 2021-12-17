@@ -1,13 +1,9 @@
 package com.cocodan.triplan.post.schedule.service;
 
-import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
-import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
-import com.cocodan.triplan.schedule.domain.Schedule;
-import com.cocodan.triplan.schedule.domain.ScheduleTheme;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +33,7 @@ public class SchedulePostSearchService {
         List<SchedulePost> result = schedulePostRepository.search(search, city, theme, sortRule);
 
         return result.stream()
-                .map(schedulePost -> SchedulePostResponse.of(schedulePost, schedulePost.getMember(), schedulePost.getSchedule()))
+                .map(SchedulePostResponse::from)
                 .collect(Collectors.toList());
-
     }
 }

@@ -1,6 +1,7 @@
 package com.cocodan.triplan.post.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.cocodan.triplan.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -25,15 +26,16 @@ public class Like extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_post_id", referencedColumnName = "id")
     private SchedulePost schedulePost;
 
-    public Like(Long memberId, SchedulePost schedulePost) {
-        this.memberId = memberId;
+    public Like(Member member, SchedulePost schedulePost) {
+        this.member = member;
         this.schedulePost = schedulePost;
     }
 
@@ -41,8 +43,8 @@ public class Like extends BaseEntity {
         return id;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
     public SchedulePost getSchedulePost() {

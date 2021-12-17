@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +28,11 @@ import javax.persistence.Table;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SchedulePost extends BaseEntity {
 
+    public static final int SCHEDULE_POST_TITLE_MIN_LENGTH = 1;
+    public static final int SCHEDULE_POST_TITLE_MAX_LENGTH = 16;
+    public static final int SCHEDULE_POST_CONTENT_MIN_LENGTH = 1;
+    public static final int SCHEDULE_POST_CONTENT_MAX_LENGTH = 10_000;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,9 +47,11 @@ public class SchedulePost extends BaseEntity {
     private Schedule schedule;
 
     @Column(name = "title", nullable = false)
+    @Length(min = SCHEDULE_POST_TITLE_MIN_LENGTH, max = SCHEDULE_POST_TITLE_MAX_LENGTH)
     private String title;
 
     @Column(name = "content", nullable = false, columnDefinition = "text")
+    @Length(min = SCHEDULE_POST_CONTENT_MIN_LENGTH, max = SCHEDULE_POST_CONTENT_MAX_LENGTH)
     private String content;
 
     @Column(name = "views", nullable = false)
@@ -57,7 +65,7 @@ public class SchedulePost extends BaseEntity {
     private City city;
 
     @Builder
-    public SchedulePost(Member member, Schedule schedule, String title, String content, long views, long liked, City city) {
+    private SchedulePost(Member member, Schedule schedule, String title, String content, long views, long liked, City city) {
         this.member = member;
         this.schedule = schedule;
         this.title = title;
