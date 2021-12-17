@@ -212,8 +212,6 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<MemoSimpleResponse> getMemos(Long scheduleId, Long memberId) {
-        findScheduleById(scheduleId);
-
         validateScheduleMember(scheduleId, memberId);
 
         return memoRepository.findByScheduleId(scheduleId)
@@ -224,8 +222,6 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public MemoDetailResponse getMemo(Long scheduleId, Long memoId, Long memberId) {
-        findScheduleById(scheduleId);
-
         Memo memo = findMemoById(memoId);
 
         validateScheduleMemo(scheduleId, memoId);
@@ -260,8 +256,6 @@ public class ScheduleService {
 
     @Transactional
     public void modifyMemo(Long scheduleId, Long memoId, MemoRequest memoRequest, Long memberId) {
-        findScheduleById(scheduleId);
-
         Memo memo = findMemoById(memoId);
 
         validateScheduleMemo(scheduleId, memoId);
@@ -279,8 +273,6 @@ public class ScheduleService {
 
     @Transactional
     public void deleteMemo(Long scheduleId, Long memoId, Long memberId) {
-        findScheduleById(scheduleId);
-
         Memo memo = findMemoById(memoId);
 
         validateScheduleMemo(scheduleId, memoId);
@@ -312,8 +304,6 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<ChecklistResponse> getChecklists(Long scheduleId, Long memberId) {
-        findScheduleById(scheduleId);
-
         validateScheduleMember(scheduleId, memberId);
 
         return checklistRepository.findByScheduleId(scheduleId).stream()
@@ -323,8 +313,6 @@ public class ScheduleService {
 
     @Transactional
     public void doCheck(Long scheduleId, Long checklistId, Long memberId, boolean flag) {
-        findScheduleById(scheduleId);
-
         Checklist checklist = findChecklistById(checklistId);
 
         validateScheduleChecklist(scheduleId, checklistId);
@@ -349,8 +337,6 @@ public class ScheduleService {
 
     @Transactional
     public void deleteChecklist(Long scheduleId, Long checklistId, Long memberId) {
-        findScheduleById(scheduleId);
-
         Checklist checklist = findChecklistById(checklistId);
 
         validateScheduleChecklist(scheduleId, checklistId);
@@ -406,8 +392,6 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<VotingSimpleResponse> getVotingList(Long scheduleId, Long memberId) {
-        findScheduleById(scheduleId);
-
         validateScheduleMember(scheduleId, memberId);
 
         return votingRepository.findByScheduleId(scheduleId)
@@ -418,8 +402,6 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public VotingDetailResponse getVoting(Long scheduleId, Long votingId, Long memberId) {
-        findScheduleById(scheduleId);
-
         Voting voting = findVotingById(votingId);
 
         validateScheduleVoting(scheduleId, votingId);
@@ -440,8 +422,6 @@ public class ScheduleService {
 
     @Transactional
     public void doVote(Long scheduleId, Long votingId, VotingRequest votingRequest, Long memberId) {
-        findScheduleById(scheduleId);
-
         Voting voting = findVotingById(votingId);
 
         validateScheduleVoting(scheduleId, votingId);
@@ -453,8 +433,6 @@ public class ScheduleService {
 
     @Transactional
     public void deleteVoting(Long scheduleId, Long votingId, Long memberId) {
-        findScheduleById(scheduleId);
-
         Voting voting = findVotingById(votingId);
 
         validateScheduleVoting(scheduleId, votingId);

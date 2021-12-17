@@ -22,6 +22,12 @@ public class Schedule extends BaseEntity {
 
     public static final int THEME_MAX_COUNT = 6;
 
+    public static final int DAY_MIN = 1;
+    public static final int DAY_MAX = 7;
+
+    public static final int NUM_OF_SPOT_MIN = 1;
+    public static final int NUM_OF_SPOT_MAX = 6;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
