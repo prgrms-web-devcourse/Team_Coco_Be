@@ -59,7 +59,7 @@ class ScheduleServiceTest {
                 "ffff@naver.com",
                 "taehyun",
                 "1994-12-16",
-                "남성",
+                "MALE",
                 "henry",
                 "",
                 "asdf123",

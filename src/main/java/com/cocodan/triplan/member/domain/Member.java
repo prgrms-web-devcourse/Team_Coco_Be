@@ -83,6 +83,10 @@ public class Member extends BaseEntity {
         return id;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -109,11 +113,6 @@ public class Member extends BaseEntity {
 
     public Group getGroup() {
         return group;
-    }
-
-    public void checkPassword(PasswordEncoder passwordEncoder, String credentials) {
-        if (!passwordEncoder.matches(credentials, password))
-            throw new IllegalArgumentException("Bad credential");
     }
 
     public int getAge() {

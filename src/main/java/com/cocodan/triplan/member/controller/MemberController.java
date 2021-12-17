@@ -7,17 +7,10 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.request.MemberCreateRequest;
 import com.cocodan.triplan.member.dto.request.MemberLoginRequest;
 import com.cocodan.triplan.member.dto.request.MemberUpdateRequest;
-import com.cocodan.triplan.member.dto.response.MemberCreateResponse;
-import com.cocodan.triplan.member.dto.response.MemberDeleteResponse;
-import com.cocodan.triplan.member.dto.response.MemberGetOneResponse;
-import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
-import com.cocodan.triplan.member.dto.response.MemberUpdateResponse;
+import com.cocodan.triplan.member.dto.response.*;
 import com.cocodan.triplan.member.service.MemberService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -27,7 +20,6 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Optional;
 import java.util.List;
 
 @Api(tags = "Member")
@@ -42,8 +34,8 @@ public class MemberController {
 
     @ApiOperation("회원(Member) 신규 추가, 성공시 생성된 Member ID 반환")
     @PostMapping("/register")
-    public ResponseEntity<Void> signUp(@Valid @RequestBody MemberCreateRequest request) {
-        memberService.validCreate(
+    public ResponseEntity<MemberCreateResponse> signUp(@Valid @RequestBody MemberCreateRequest request) {
+        MemberCreateResponse response = memberService.validCreate(
                 request.getEmail(),
                 request.getName(),
                 request.getBirth(),
@@ -54,7 +46,7 @@ public class MemberController {
                 GROUP_ID
         );
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 
     @ApiOperation("회원(Member) 단건 조회, 성공시 Member 정보 반환")
@@ -71,7 +63,7 @@ public class MemberController {
     public ResponseEntity<List<MemberSimpleResponse>> findMemberByNickname(@RequestParam String nickname) {
         List<MemberSimpleResponse> responses = memberService.findMemberByNickname(nickname);
 
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+        return ResponseEntity.ok(responses);
     }
 
     @ApiOperation("회원(Member) 단건 수정, 성공시 수정된 Member 정보 반환")
@@ -96,14 +88,16 @@ public class MemberController {
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<Void> login(@RequestBody MemberLoginRequest request, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request, HttpServletResponse httpServletResponse) {
         JwtAuthenticationToken authToken = new JwtAuthenticationToken(request.getEmail(), request.getPassword());
         Authentication resultToken = authenticationManager.authenticate(authToken);
         JwtAuthentication authentication = (JwtAuthentication) resultToken.getPrincipal();
 
         httpServletResponse.setHeader("token", authentication.getToken());
 
-        return ResponseEntity.ok().build();
+        MemberLoginResponse response = new MemberLoginResponse(authentication.getToken(), authentication.getId());
+
+        return ResponseEntity.ok(response);
     }
 
     @ApiOperation("내 프로필 조회")

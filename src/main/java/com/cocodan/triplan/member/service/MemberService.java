@@ -5,6 +5,7 @@ import com.cocodan.triplan.member.dto.response.*;
 import com.cocodan.triplan.util.MemberConverter;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.repository.MemberRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Service
+@Slf4j
 public class MemberService {
 
     private final PasswordEncoder passwordEncoder;
@@ -98,7 +100,11 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Could not found user for " + email));
 
-        member.checkPassword(passwordEncoder, credentials);
+        if (!passwordEncoder.matches(credentials, member.getPassword()))
+        {
+            log.warn("Invalid password. user email : " + email);
+            throw new IllegalArgumentException("Invalid password.");
+        }
 
         return member;
     }
