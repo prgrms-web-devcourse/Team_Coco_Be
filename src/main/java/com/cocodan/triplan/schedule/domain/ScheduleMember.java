@@ -1,11 +1,14 @@
 package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static com.google.common.base.Preconditions.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,6 +28,10 @@ public class ScheduleMember extends BaseEntity {
 
     @Builder
     private ScheduleMember(Schedule schedule, Long memberId) {
+        checkNotNull(schedule, "Schedule is required");
+        checkNotNull(memberId, "MemberId is required");
+        checkArgument(memberId > 0, "MemberId must be positive, you supplied %d", memberId);
+
         this.schedule = schedule;
         this.memberId = memberId;
         schedule.getScheduleMembers().add(this);

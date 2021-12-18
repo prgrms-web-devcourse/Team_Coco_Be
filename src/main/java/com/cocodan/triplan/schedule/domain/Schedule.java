@@ -1,8 +1,7 @@
 package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
-import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.schedule.domain.vo.Theme;
+import com.google.common.collect.Range;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,9 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -42,9 +43,8 @@ public class Schedule extends BaseEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", referencedColumnName = "id")
-    private Member member;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleTheme> scheduleThemes = new ArrayList<>();
@@ -65,20 +65,21 @@ public class Schedule extends BaseEntity {
     private List<ScheduleMember> scheduleMembers = new ArrayList<>();
 
     @Builder
-    private Schedule(String title, LocalDate startDate, LocalDate endDate, Member member) {
+    private Schedule(String title, LocalDate startDate, LocalDate endDate, Long memberId) {
+        checkTitle(title);
+        checkNotNull(startDate, "startDate is required");
+        checkNotNull(endDate, "endDate is required");
+        checkNotNull(memberId, "memberId is required");
+
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.member = member;
-        ScheduleMember owner = createOwner(member.getId());
-        scheduleMembers.add(owner);
+        this.memberId = memberId;
     }
 
-    private ScheduleMember createOwner(Long memberId) {
-        return ScheduleMember.builder()
-                .schedule(this)
-                .memberId(memberId)
-                .build();
+    public void checkTitle(String title) {
+        checkNotNull(title, "title is required");
+        checkArgument(Range.closed(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH).contains(title.length()));
     }
 
     public Long getId() {
@@ -121,8 +122,8 @@ public class Schedule extends BaseEntity {
         return scheduleMembers;
     }
 
-    public Member getMember() {
-        return member;
+    public Long getMemberId() {
+        return memberId;
     }
 
     public void removeAllSpots() {
@@ -130,25 +131,16 @@ public class Schedule extends BaseEntity {
     }
 
     public void updateTitle(String title) {
+        checkTitle(title);
         this.title = title;
     }
 
-    public void updateThemes(List<String> themes) {
-        this.scheduleThemes.clear();
-        themes.stream()
-                .map(Theme::from)
-                .forEach(theme -> new ScheduleTheme(this, theme));
-    }
-
-    public void addMember(long friendId) {
-        // TODO : [henry] 여행 멤버 수 제한 6명 검증
-        ScheduleMember.builder()
-                .memberId(friendId)
-                .schedule(this)
-                .build();
-    }
-
     public void deleteScheduleMember(ScheduleMember deletedMember) {
+        checkNotNull(deletedMember);
         scheduleMembers.remove(deletedMember);
+    }
+
+    public void clearThemes() {
+        scheduleThemes.clear();
     }
 }

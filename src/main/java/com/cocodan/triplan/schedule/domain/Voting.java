@@ -2,6 +2,7 @@ package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
 import com.cocodan.triplan.exception.common.NotFoundException;
+import com.google.common.collect.Range;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -11,15 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Voting extends BaseEntity {
 
-    public static final int MIN_LENGTH = 1;
-    public static final int MAX_LENGTH = 16;
+    public static final int TITLE_MIN_LENGTH = 1;
+    public static final int TITLE_MAX_LENGTH = 16;
 
-    public static final int CONTENT_MAX = 10;
-    public static final int CONTENT_MIN = 2;
+    public static final int CONTENT_COUNT_MAX = 10;
+    public static final int CONTENT_COUNT_MIN = 2;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -43,7 +47,12 @@ public class Voting extends BaseEntity {
     private boolean multipleFlag;
 
     @Builder
-    private Voting(String title, Schedule schedule, Long memberId, boolean multipleFlag) {
+    private Voting(Schedule schedule, String title, Long memberId, boolean multipleFlag) {
+        checkNotNull(schedule, "Schedule is required");
+        checkNotNull(title, "Title is required");
+        checkArgument(Range.closed(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH).contains(title.length()));
+        checkMemberId(memberId);
+
         this.schedule = schedule;
         this.title = title;
         this.memberId = memberId;
@@ -51,12 +60,37 @@ public class Voting extends BaseEntity {
         this.schedule.getVotingList().add(this);
     }
 
+    private void checkMemberId(Long memberId) {
+        checkNotNull(memberId, "MemberId is required");
+        checkArgument(memberId > 0, "MemberId must be positive, you supplied %d", memberId);
+    }
+
     public void vote(Map<Long, Boolean> votingMap, Long memberId) {
+        checkNotNull(votingMap);
+        checkMemberId(memberId);
+        checkArgument(votingMap.size() > 0, "Should vote at least one");
+        checkMultipleMode(votingMap);
+
+
         votingMap.forEach((contentId, flag) -> {
             VotingContent votingContent = getVotingContent(contentId);
             voteByFlag(flag, memberId, votingContent);
         });
+    }
 
+    private void checkMultipleMode(Map<Long, Boolean> votingMap) {
+        if (multipleFlag) {
+            return ;
+        }
+
+        int trueCount = 0;
+        for (Boolean value : votingMap.values()) {
+            if(value) trueCount++;
+        }
+
+        if (trueCount > 1) {
+            throw new IllegalArgumentException("It's single vote mode. You supplied more than one");
+        }
     }
 
     private VotingContent getVotingContent(Long contentId) {
@@ -67,6 +101,9 @@ public class Voting extends BaseEntity {
     }
 
     private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {
+        checkNotNull(votingContent);
+        checkMemberId(memberId);
+
         if (flag) {
             votingContent.vote(memberId);
             return;
@@ -96,10 +133,10 @@ public class Voting extends BaseEntity {
     }
 
     public int getNumOfTotalParticipants() {
-         return (int) votingContents.stream()
-                 .flatMap(votingContent -> votingContent.getVotingContentMembers().stream())
-                 .map(VotingContentMember::getMemberId)
-                 .distinct()
-                 .count();
+        return (int) votingContents.stream()
+                .flatMap(votingContent -> votingContent.getVotingContentMembers().stream())
+                .map(VotingContentMember::getMemberId)
+                .distinct()
+                .count();
     }
 }

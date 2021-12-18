@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VotingContentMember extends BaseEntity {
@@ -24,8 +27,16 @@ public class VotingContentMember extends BaseEntity {
 
     @Builder
     private VotingContentMember(VotingContent votingContent, Long memberId) {
+        checkNotNull(votingContent, "VotingContent is required");
+        checkMemberId(memberId);
+
         this.votingContent = votingContent;
         this.memberId = memberId;
+    }
+
+    private void checkMemberId(Long memberId) {
+        checkNotNull(memberId, "MemberId is required");
+        checkArgument(memberId > 0, "MemberId must be positive, you supplied %d", memberId);
     }
 
     public Long getId() {

@@ -14,10 +14,10 @@ import java.util.List;
 @NoArgsConstructor
 public class VotingCreationRequest {
 
-    @Length(min = Voting.MIN_LENGTH, max = Voting.MAX_LENGTH)
+    @Length(min = Voting.TITLE_MIN_LENGTH, max = Voting.TITLE_MAX_LENGTH)
     private String title;
 
-    @Size(min = Voting.CONTENT_MIN, max = Voting.CONTENT_MAX)
+    @Size(min = Voting.CONTENT_COUNT_MIN, max = Voting.CONTENT_COUNT_MAX)
     private List<String> contents;
 
     private boolean multipleFlag;

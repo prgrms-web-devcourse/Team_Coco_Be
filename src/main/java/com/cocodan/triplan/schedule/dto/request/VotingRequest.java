@@ -13,6 +13,6 @@ import java.util.Map;
 @AllArgsConstructor
 public class VotingRequest {
 
-    @Size(max = Voting.MAX_LENGTH)
+    @Size(max = Voting.TITLE_MAX_LENGTH)
     Map<Long, Boolean> votingMap;
 }

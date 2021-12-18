@@ -20,7 +20,7 @@ public class ChecklistResponse {
     public static ChecklistResponse from(Checklist checklist) {
         return ChecklistResponse.builder()
                 .id(checklist.getId())
-                .content(checklist.getContent())
+                .content(checklist.getTitle())
                 .checked(checklist.isChecked())
                 .day(checklist.getDay())
                 .build();
