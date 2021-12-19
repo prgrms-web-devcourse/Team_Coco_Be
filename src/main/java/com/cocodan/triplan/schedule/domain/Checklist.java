@@ -1,12 +1,17 @@
 package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.common.BaseEntity;
+import com.google.common.collect.Range;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+
+import static com.cocodan.triplan.schedule.domain.Schedule.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,6 +40,10 @@ public class Checklist extends BaseEntity {
 
     @Builder
     private Checklist(Schedule schedule, String title, int day) {
+        checkArgument(schedule != null, "Schedule is required");
+        checkArgument(title != null, "Title is required");
+        checkArgument(Range.closed(MIN_LENGTH, MAX_LENGTH).contains(title.length()),"Title is invalid");
+        checkArgument(Range.closed(0, DAY_MAX).contains(day), "Day is invalid");
         this.schedule = schedule;
         this.title = title;
         this.day = day;
@@ -49,7 +58,7 @@ public class Checklist extends BaseEntity {
         return id;
     }
 
-    public String getContent() {
+    public String getTitle() {
         return title;
     }
 

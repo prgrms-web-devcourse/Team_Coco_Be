@@ -11,7 +11,6 @@ import com.cocodan.triplan.schedule.repository.ChecklistRepository;
 import com.cocodan.triplan.schedule.repository.MemoRepository;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.schedule.repository.VotingRepository;
-import com.cocodan.triplan.spot.dto.response.SpotResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -273,7 +272,7 @@ class ScheduleServiceTest {
         Long memo = scheduleService.saveMemo(schedule, memoRequest, MEMBER_ID);
 
         // When
-        MemoRequest updateRequest = new MemoRequest("Updated Memo Title", "Updated Memo Content");
+        MemoRequest updateRequest = new MemoRequest("핫둘셋넷다여일여아열핫둘셋넷닷엿", "Updated Memo Content");
         scheduleService.modifyMemo(schedule, memo, updateRequest, MEMBER_ID);
 
         // Then
@@ -433,7 +432,7 @@ class ScheduleServiceTest {
                 .map(VotingContent::getId)
                 .collect(Collectors.toList());
 
-        Map<Long, Boolean> votingMap = Map.of(ids.get(0), true, ids.get(1), false, ids.get(2), true, ids.get(3), false);
+        Map<Long, Boolean> votingMap = Map.of(ids.get(0), true, ids.get(1), false, ids.get(2), false, ids.get(3), false);
         VotingRequest votingRequest = new VotingRequest(votingMap);
 
         // When
@@ -454,7 +453,7 @@ class ScheduleServiceTest {
             }
         });
 
-        assertThat(votingCountList).containsExactly(1, 0, 1, 0);
+        assertThat(votingCountList).containsExactly(1, 0, 0, 0);
         assertThat(saved.getNumOfTotalParticipants()).isEqualTo(1);
     }
 

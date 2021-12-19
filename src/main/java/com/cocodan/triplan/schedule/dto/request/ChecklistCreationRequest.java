@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ChecklistCreationRequest {
 
-    @Range(min = Schedule.DAY_MIN, max = Schedule.DAY_MAX)
+    @Range(max = Schedule.DAY_MAX)
     private int day;
 
     @Length(min = Checklist.MIN_LENGTH, max = Checklist.MAX_LENGTH)

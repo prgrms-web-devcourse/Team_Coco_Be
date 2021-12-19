@@ -45,6 +45,8 @@ public class ScheduleService {
     public Long saveSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
         Schedule schedule = convertSchedule(scheduleCreationRequest, memberId);
 
+        createOwner(schedule, memberId);
+
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
                 .forEach(this::saveSpot);
 
@@ -60,31 +62,31 @@ public class ScheduleService {
     private Schedule convertSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
         Schedule schedule = createSchedule(scheduleCreationRequest, memberId);
 
-        createScheduleThemes(scheduleCreationRequest, schedule);
+        createScheduleThemes(scheduleCreationRequest.getThemes(), schedule);
 
         createScheduleDailySpots(scheduleCreationRequest, schedule);
 
         return schedule;
     }
 
+    private void createOwner(Schedule schedule, Long memberId) {
+        ScheduleMember.builder()
+                .schedule(schedule)
+                .memberId(memberId)
+                .build();
+    }
+
     private Schedule createSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
-        Member member = getMember(memberId);
         return Schedule.builder()
                 .title(scheduleCreationRequest.getTitle())
                 .startDate(scheduleCreationRequest.getStartDate())
                 .endDate(scheduleCreationRequest.getEndDate())
-                .member(member)
+                .memberId(memberId)
                 .build();
     }
 
-    private Member getMember(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(Member.class, memberId)
-        );
-    }
-
-    private void createScheduleThemes(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
-        scheduleCreationRequest.getThemes()
+    private void createScheduleThemes(List<String> themes, Schedule schedule) {
+        themes
                 .stream()
                 .map(s -> Theme.from(s.toUpperCase()))
                 .forEach(theme -> new ScheduleTheme(schedule, theme));
@@ -153,7 +155,10 @@ public class ScheduleService {
                 .forEach(this::saveSpot);
 
         schedule.updateTitle(scheduleModificationRequest.getTitle());
-        schedule.updateThemes(scheduleModificationRequest.getThemes());
+
+        schedule.clearThemes();
+        createScheduleThemes(scheduleModificationRequest.getThemes(), schedule);
+
         schedule.removeAllSpots();
         convertDailyScheduleSpotList(schedule, scheduleModificationRequest);
     }
@@ -186,7 +191,7 @@ public class ScheduleService {
     }
 
     private boolean isConstructor(Schedule schedule, Long memberId) {
-        return schedule.getMember().getId().equals(memberId);
+        return schedule.getMemberId().equals(memberId);
     }
 
     @Transactional
@@ -457,7 +462,14 @@ public class ScheduleService {
 
         validateFriends(scheduleMemberRequest, memberId);
 
-        schedule.addMember(scheduleMemberRequest.getFriendId());
+        createScheduleMember(schedule, scheduleMemberRequest.getFriendId());
+    }
+
+    private void createScheduleMember(Schedule schedule, long friendId) {
+        ScheduleMember.builder()
+                .memberId(friendId)
+                .schedule(schedule)
+                .build();
     }
 
     private void validateFriends(ScheduleMemberRequest scheduleMemberRequest, Long memberId) {
