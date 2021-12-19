@@ -41,9 +41,9 @@ public class DailyScheduleSpot extends BaseEntity {
 
     @Builder
     private DailyScheduleSpot(Schedule schedule, Long spotId, String placeName, int dateOrder, int spotOrder) {
-        checkNotNull(schedule, "Schedule is required");
-        checkNotNull(spotId, "SpotId is required");
-        checkNotNull(placeName, "PlaceName is required");
+        checkArgument(schedule != null, "Schedule is required");
+        checkArgument(spotId != null, "SpotId is required");
+        checkArgument(placeName != null, "PlaceName is required");
         checkArgument(spotId > 0 ,"SpotId must be greater than 0");
         checkArgument(Range.closed(Spot.PLACE_NAME_MIN_LENGTH, Spot.PLACE_NAME_MAX_LENGTH).contains(placeName.length()), "PlaceName is invalid");
         checkArgument(Range.closed(DAY_MIN, DAY_MAX).contains(dateOrder), "DateOrder is invalid");

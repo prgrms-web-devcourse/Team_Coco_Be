@@ -27,7 +27,7 @@ public class VotingContentMember extends BaseEntity {
 
     @Builder
     private VotingContentMember(VotingContent votingContent, Long memberId) {
-        checkNotNull(votingContent, "VotingContent is required");
+        checkArgument(votingContent != null, "VotingContent is required");
         checkMemberId(memberId);
 
         this.votingContent = votingContent;
@@ -35,7 +35,7 @@ public class VotingContentMember extends BaseEntity {
     }
 
     private void checkMemberId(Long memberId) {
-        checkNotNull(memberId, "MemberId is required");
+        checkArgument(memberId != null, "MemberId is required");
         checkArgument(memberId > 0, "MemberId must be positive, you supplied %d", memberId);
     }
 

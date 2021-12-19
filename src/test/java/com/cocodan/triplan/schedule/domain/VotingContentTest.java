@@ -23,13 +23,10 @@ class VotingContentTest {
 
     private final Long MEMBER_ID = 111L;
 
-    // checkNotNull(voting, "voting is required");
-    //        checkContent(content);
-
     @Test
     @DisplayName("voting가 null이면 생성할 수 없다")
     void votingNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createVotingContent(null, CONTENT)
         ).withMessageContaining("Voting");
     }
@@ -44,7 +41,7 @@ class VotingContentTest {
     @Test
     @DisplayName("내용이 null이면 생성할 수 없다")
     void contentNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createVotingContent(voting, null)
         ).withMessageContaining("Content");
     }

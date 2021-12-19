@@ -37,7 +37,7 @@ public class VotingContent extends BaseEntity {
 
     @Builder
     private VotingContent(Voting voting, String content) {
-        checkNotNull(voting, "Voting is required");
+        checkArgument(voting != null, "Voting is required");
         checkContent(content);
 
         this.voting = voting;
@@ -46,7 +46,7 @@ public class VotingContent extends BaseEntity {
     }
 
     private void checkContent(String content) {
-        checkNotNull(content, "Content is required");
+        checkArgument(content != null, "Content is required");
         checkArgument(Range.closed(MIN_LENGTH, MAX_LENGTH).contains(content.length()));
     }
 
@@ -63,7 +63,7 @@ public class VotingContent extends BaseEntity {
     }
 
     private void checkMemberId(Long memberId) {
-        checkNotNull(memberId, "memberId is required");
+        checkArgument(memberId != null, "memberId is required");
         checkArgument(memberId > 0, "memberId must be positive, you supplied %d", memberId);
     }
 

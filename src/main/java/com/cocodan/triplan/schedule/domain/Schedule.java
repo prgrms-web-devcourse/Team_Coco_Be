@@ -67,9 +67,9 @@ public class Schedule extends BaseEntity {
     @Builder
     private Schedule(String title, LocalDate startDate, LocalDate endDate, Long memberId) {
         checkTitle(title);
-        checkNotNull(startDate, "startDate is required");
-        checkNotNull(endDate, "endDate is required");
-        checkNotNull(memberId, "memberId is required");
+        checkArgument(startDate != null, "startDate is required");
+        checkArgument(endDate != null, "endDate is required");
+        checkArgument(memberId != null, "memberId is required");
 
         this.title = title;
         this.startDate = startDate;
@@ -78,7 +78,7 @@ public class Schedule extends BaseEntity {
     }
 
     public void checkTitle(String title) {
-        checkNotNull(title, "title is required");
+        checkArgument(title != null, "title is required");
         checkArgument(Range.closed(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH).contains(title.length()));
     }
 

@@ -1,6 +1,5 @@
 package com.cocodan.triplan.schedule.domain;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class MemoTest {
@@ -58,7 +56,7 @@ class MemoTest {
     @Test
     @DisplayName("일정이 null이면 생성할 수 없다")
     void scheduleNullCheckTest() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createMemo(TITLE, CONTENT, null, MEMBER_ID)
         ).withMessageContaining("Schedule");
     }
@@ -66,7 +64,7 @@ class MemoTest {
     @Test
     @DisplayName("제목이 null이면 생성할 수 없다")
     void titleNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createMemo(null, CONTENT, schedule, MEMBER_ID)
         ).withMessageContaining("Title");
     }
@@ -74,7 +72,7 @@ class MemoTest {
     @Test
     @DisplayName("내용이 null이면 생성할 수 없다")
     void contentNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createMemo(TITLE, null, schedule, MEMBER_ID)
         ).withMessageContaining("Content");
     }
@@ -82,7 +80,7 @@ class MemoTest {
     @Test
     @DisplayName("멤버 id가 null이면 생성할 수 없다")
     void memberIdNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createMemo(TITLE, CONTENT, schedule, null)
         ).withMessageContaining("Member");
     }

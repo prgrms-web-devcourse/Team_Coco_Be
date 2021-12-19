@@ -40,8 +40,8 @@ public class Checklist extends BaseEntity {
 
     @Builder
     private Checklist(Schedule schedule, String title, int day) {
-        checkNotNull(schedule, "Schedule is required");
-        checkNotNull(title, "Title is required");
+        checkArgument(schedule != null, "Schedule is required");
+        checkArgument(title != null, "Title is required");
         checkArgument(Range.closed(MIN_LENGTH, MAX_LENGTH).contains(title.length()),"Title is invalid");
         checkArgument(Range.closed(0, DAY_MAX).contains(day), "Day is invalid");
         this.schedule = schedule;

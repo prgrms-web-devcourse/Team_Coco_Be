@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Entity
@@ -28,8 +29,8 @@ public class ScheduleTheme extends BaseEntity {
     private Theme theme;
 
     public ScheduleTheme(Schedule schedule, Theme theme) {
-        checkNotNull(schedule, "schedule is required");
-        checkNotNull(theme, "theme is required");
+        checkArgument(schedule != null, "schedule is required");
+        checkArgument(theme != null, "theme is required");
 
         this.schedule = schedule;
         this.theme = theme;

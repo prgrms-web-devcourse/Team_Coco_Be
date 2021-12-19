@@ -10,8 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduleTest {
@@ -33,7 +31,7 @@ class ScheduleTest {
     @Test
     @DisplayName("title이 null이면 생성할 수 없다")
     void titleNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createSchedule(null, MEMBER_ID, START_DATE, END_DATE)
         );
     }
@@ -41,7 +39,7 @@ class ScheduleTest {
     @Test
     @DisplayName("startDate가 null이면 생성할 수 없다")
     void startDatedNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createSchedule(TITLE, MEMBER_ID, null, END_DATE)
         );
     }
@@ -49,7 +47,7 @@ class ScheduleTest {
     @Test
     @DisplayName("endDate가 null이면 생성할 수 없다")
     void endDateNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createSchedule(TITLE, MEMBER_ID, START_DATE, null)
         );
     }
@@ -57,7 +55,7 @@ class ScheduleTest {
     @Test
     @DisplayName("memberId이 null이면 생성할 수 없다")
     void memberIdNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createSchedule(TITLE, null, START_DATE, END_DATE)
         );
     }

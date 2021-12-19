@@ -54,15 +54,10 @@ class ChecklistTest {
         assertThat(checklist.isChecked()).isEqualTo(flag);
     }
 
-//    checkNotNull(schedule, "Schedule is required");
-//        checkNotNull(title, "title is required");
-//        checkArgument(Range.closed(MIN_LENGTH, MAX_LENGTH).contains(title.length()));
-//        checkArgument(Range.closed(0, DAY_MAX).contains(day));
-
     @Test
     @DisplayName("일정이 null이면 생성할 수 없다")
     void ScheduleNullCheckTest() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createChecklist(title, DAY, null)
         ).withMessageContaining("Schedule");
     }
@@ -70,7 +65,7 @@ class ChecklistTest {
     @Test
     @DisplayName("제목이 null이면 생성할 수 없다")
     void TitleNullCheckTest() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createChecklist(null, DAY, schedule)
         ).withMessageContaining("Title");
     }

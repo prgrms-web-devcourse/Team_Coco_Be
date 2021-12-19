@@ -7,8 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduleThemeTest {
@@ -21,7 +20,7 @@ class ScheduleThemeTest {
     @Test
     @DisplayName("일정이 null이면 생성할 수 없다")
     void scheduleNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createScheduleTheme(null, theme)
         );
     }
@@ -33,7 +32,7 @@ class ScheduleThemeTest {
     @Test
     @DisplayName("테마가 null이면 생성할 수 없다")
     void themeNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createScheduleTheme(schedule, null)
         );
     }

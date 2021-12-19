@@ -1,7 +1,6 @@
 package com.cocodan.triplan.schedule.domain;
 
 import com.cocodan.triplan.spot.domain.Spot;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class DailyScheduleSpotTest {
@@ -48,7 +46,7 @@ class DailyScheduleSpotTest {
     @Test
     @DisplayName("일정이 null이면 생성할 수 없다")
     void scheduleNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createDailyScheduleSpot(null, SPOT_ID, SPOT_ORDER, DATE_ORDER, PLACE_NAME)
         );
     }
@@ -56,7 +54,7 @@ class DailyScheduleSpotTest {
     @Test
     @DisplayName("spotId가 null이면 생성할 수 없다")
     void spotIdNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createDailyScheduleSpot(schedule, null, SPOT_ORDER, DATE_ORDER, PLACE_NAME)
         );
     }
@@ -64,7 +62,7 @@ class DailyScheduleSpotTest {
     @Test
     @DisplayName("placeName이 null이면 생성할 수 없다")
     void placeNameNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createDailyScheduleSpot(schedule, SPOT_ID, SPOT_ORDER, DATE_ORDER, null)
         );
     }

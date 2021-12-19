@@ -9,8 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class VotingContentMemberTest {
@@ -23,7 +21,7 @@ class VotingContentMemberTest {
     @Test
     @DisplayName("votingContent가 null이면 생성할 수 없다")
     void votingContentNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createVotingContentMember(null, MEMBER_ID)
         ).withMessageContaining("VotingContent");
     }
@@ -38,7 +36,7 @@ class VotingContentMemberTest {
     @Test
     @DisplayName("멤버 id가 null이면 생성할 수 없다")
     void memberIdNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createVotingContentMember(votingContent, null)
         ).withMessageContaining("Member");
     }

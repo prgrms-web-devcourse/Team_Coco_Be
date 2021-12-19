@@ -28,8 +28,8 @@ public class ScheduleMember extends BaseEntity {
 
     @Builder
     private ScheduleMember(Schedule schedule, Long memberId) {
-        checkNotNull(schedule, "Schedule is required");
-        checkNotNull(memberId, "MemberId is required");
+        checkArgument(schedule != null, "Schedule is required");
+        checkArgument(memberId != null, "MemberId is required");
         checkArgument(memberId > 0, "MemberId must be positive, you supplied %d", memberId);
 
         this.schedule = schedule;

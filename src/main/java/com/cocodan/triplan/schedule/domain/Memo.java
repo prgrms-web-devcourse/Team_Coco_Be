@@ -41,7 +41,7 @@ public class Memo extends BaseEntity {
 
     @Builder
     private Memo(Schedule schedule, String title, String content, Long memberId) {
-        checkNotNull(schedule, "Schedule is required");
+        checkArgument(schedule != null, "Schedule is required");
         checkTitle(title);
         checkContent(content);
         checkMemberId(memberId);
@@ -54,17 +54,17 @@ public class Memo extends BaseEntity {
     }
 
     private void checkMemberId(Long memberId) {
-        checkNotNull(memberId, "MemberId is required");
+        checkArgument(memberId != null, "MemberId is required");
         checkArgument(memberId > 0, "MemberId must be positive");
     }
 
     public void checkTitle(String title) {
-        checkNotNull(title, "Title is required");
+        checkArgument(title != null, "Title is required");
         checkArgument(Range.closed(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH).contains(title.length()), "Title length is invalid");
     }
 
     private void checkContent(String content) {
-        checkNotNull(content, "Content is required");
+        checkArgument(content != null, "Content is required");
         checkArgument(Range.closed(CONTENT_MIN_LENGTH, CONTENT_MAX_LENGTH).contains(content.length()), "Content length is invalid");
     }
 

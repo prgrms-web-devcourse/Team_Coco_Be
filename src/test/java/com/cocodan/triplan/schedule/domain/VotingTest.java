@@ -46,7 +46,7 @@ class VotingTest {
     @Test
     @DisplayName("일정이 null이면 생성할 수 없다")
     void scheduleNullCheckTest() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createVoting(null, TITLE, MEMBER_ID, MULTIPLE_FLAG)
         ).withMessageContaining("Schedule");
     }
@@ -54,7 +54,7 @@ class VotingTest {
     @Test
     @DisplayName("제목이 null이면 생성할 수 없다")
     void titleNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createVoting(schedule, null, MEMBER_ID, MULTIPLE_FLAG)
         ).withMessageContaining("Title");
     }
@@ -62,7 +62,7 @@ class VotingTest {
     @Test
     @DisplayName("멤버 id가 null이면 생성할 수 없다")
     void memberIdNullCheck() {
-        assertThatNullPointerException().isThrownBy(
+        assertThatIllegalArgumentException().isThrownBy(
                 () -> createVoting(schedule, TITLE, null, MULTIPLE_FLAG)
         ).withMessageContaining("Member");
     }

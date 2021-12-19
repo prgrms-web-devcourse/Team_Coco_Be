@@ -48,8 +48,8 @@ public class Voting extends BaseEntity {
 
     @Builder
     private Voting(Schedule schedule, String title, Long memberId, boolean multipleFlag) {
-        checkNotNull(schedule, "Schedule is required");
-        checkNotNull(title, "Title is required");
+        checkArgument(schedule != null, "Schedule is required");
+        checkArgument(title != null, "Title is required");
         checkArgument(Range.closed(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH).contains(title.length()));
         checkMemberId(memberId);
 
@@ -61,12 +61,12 @@ public class Voting extends BaseEntity {
     }
 
     private void checkMemberId(Long memberId) {
-        checkNotNull(memberId, "MemberId is required");
+        checkArgument(memberId != null, "MemberId is required");
         checkArgument(memberId > 0, "MemberId must be positive, you supplied %d", memberId);
     }
 
     public void vote(Map<Long, Boolean> votingMap, Long memberId) {
-        checkNotNull(votingMap);
+        checkArgument(votingMap != null);
         checkMemberId(memberId);
         checkArgument(votingMap.size() > 0, "Should vote at least one");
         checkMultipleMode(votingMap);
@@ -80,12 +80,12 @@ public class Voting extends BaseEntity {
 
     private void checkMultipleMode(Map<Long, Boolean> votingMap) {
         if (multipleFlag) {
-            return ;
+            return;
         }
 
         int trueCount = 0;
         for (Boolean value : votingMap.values()) {
-            if(value) trueCount++;
+            if (value) trueCount++;
         }
 
         if (trueCount > 1) {
@@ -101,7 +101,7 @@ public class Voting extends BaseEntity {
     }
 
     private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {
-        checkNotNull(votingContent);
+        checkArgument(votingContent != null, "VotingContent is required");
         checkMemberId(memberId);
 
         if (flag) {
