@@ -87,6 +87,10 @@ public class SchedulePost extends BaseEntity {
         this.city = city;
     }
 
+    public void updateSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
+
     public void increaseViews() {
         views++;
     }

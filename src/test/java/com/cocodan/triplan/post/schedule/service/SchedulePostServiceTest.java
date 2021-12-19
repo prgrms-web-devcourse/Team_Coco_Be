@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -262,6 +261,7 @@ class SchedulePostServiceTest {
         assertThat(schedulePostDetail.getGender()).isEqualTo(post.getMember().getGender());
         assertThat(schedulePostDetail.getNickname()).isEqualTo(post.getMember().getNickname());
         assertThat(schedulePostDetail.getAges()).isEqualTo(Ages.from(post.getMember().getBirth()));
+        assertThat(schedulePostDetail.getScheduleId()).isEqualTo(post.getSchedule().getId());
 
         // TODO: 2021.12.10 Teru - equals method를 오버라이드 하지 않고, 그냥 DTO의 toString() 을 통해서 String 비교로 검증하도록 수정.
         Assertions.assertArrayEquals(
@@ -295,8 +295,13 @@ class SchedulePostServiceTest {
     @DisplayName("작성한 공유 게시글을 수정할 수 있다")
     @Transactional
     void modifySchedulePost() {
+        // 여행 공유 게시글 생성
         Long createdSchedulePostId = createSchedulePost1();
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
+
+        // 새로운 여행 공유 게시글 생성 (수정용)
+        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        Long newScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         SchedulePostRequest modifyRequest = new SchedulePostRequest("가자 우주로!",
                 "삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
@@ -311,7 +316,7 @@ class SchedulePostServiceTest {
                         "\n" +
                         "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.",
                 "부산",
-                createdScheduleId
+                newScheduleId
         );
         schedulePostService.modifySchedulePost(testMemberId, post.getId(), modifyRequest);
 
@@ -330,6 +335,7 @@ class SchedulePostServiceTest {
                 "\n" +
                 "삼성 그룹은 브랜드 파이낸스에서 선정하는 글로벌 브랜드가치순위 500대 기업에서 2018년 기준 4위에 올랐다. 브랜드 파이낸스는 매년 세계 기업의 브랜드가치를 평가하여 보고서를 작성, 브랜드가치 500대기업을 발표하고있는데, 브랜드 파이낸스는 2018년 삼성의 브랜드가치가 92289백만달러(약 104조원)의 가치를 지녔다고 평가했다.");
         assertThat(modifiedPost.getCity()).isEqualTo(City.BUSAN);
+        assertThat(modifiedPost.getSchedule().getId()).isEqualTo(newScheduleId);
     }
 
     @Test

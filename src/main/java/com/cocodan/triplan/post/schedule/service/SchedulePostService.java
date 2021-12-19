@@ -87,7 +87,7 @@ public class SchedulePostService {
         return savedSchedulePost.getId();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public SchedulePostDetailResponse getSchedulePostDetail(Long schedulePostId, Long memberId) {
         nullCheck(schedulePostId, memberId);
 
@@ -95,6 +95,7 @@ public class SchedulePostService {
 
         // TODO: 2021.12.13 Teru - 조회수에 대한 동시성 문제를 어떻게 해야 잘 해결할 수 있을지 고민... 현재는 별다른 처리를 해두지 않은 상태
         schedulePost.increaseViews();
+        schedulePostRepository.save(schedulePost);
 
         List<SchedulePostCommentResponse> comments = getSchedulePostComments(schedulePostId);
         Optional<Like> isLiked = getLike(memberId, schedulePostId);
@@ -114,6 +115,11 @@ public class SchedulePostService {
         schedulePost.updateTitle(request.getTitle());
         schedulePost.updateContent(request.getContent());
         schedulePost.updateCity(City.from(request.getCity()));
+
+        Schedule schedule = getSchedule(request.getScheduleId());
+
+        validateOwnership(memberId, schedule);
+        schedulePost.updateSchedule(schedule);
 
         schedulePostRepository.save(schedulePost);
     }
@@ -335,6 +341,14 @@ public class SchedulePostService {
         SchedulePost schedulePost = getSchedulePost(schedulePostId);
         validateOwnership(memberId, schedulePost);
         return schedulePost;
+    }
+
+    private void validateOwnership(Long memberId, Schedule schedule) {
+        nullCheck(memberId);
+
+        if (!memberId.equals(schedule.getMemberId())) {
+            throw new ForbiddenException(Schedule.class, schedule.getId(), memberId);
+        }
     }
 
     private void validateCommentOwnership(Long schedulePostId, Long commentId, Long memberId) {

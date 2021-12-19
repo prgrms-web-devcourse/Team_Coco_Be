@@ -46,6 +46,8 @@ public class SchedulePostDetailResponse {
 
     private Boolean isLiked;
 
+    private Long scheduleId;
+
     public static SchedulePostDetailResponse of(
             SchedulePost schedulePost,
             List<SchedulePostCommentResponse> comments,
@@ -70,6 +72,7 @@ public class SchedulePostDetailResponse {
                 .likeCount(schedulePost.getLiked())
                 .comments(comments)
                 .isLiked(isLiked)
+                .scheduleId(schedulePost.getSchedule().getId())
                 .build();
     }
 
