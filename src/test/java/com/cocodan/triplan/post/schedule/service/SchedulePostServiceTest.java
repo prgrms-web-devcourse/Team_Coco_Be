@@ -608,4 +608,12 @@ class SchedulePostServiceTest {
         // 존재하지 않는 유저 게시글 조회 요청
         assertThat(schedulePostService.getCertainMemberSchedulePostList(-1L).size()).isEqualTo(0);
     }
+
+    @Test
+    @DisplayName("선택 가능한 도시 목록을 정상적으로 받아올 수 있다")
+    void getAvailableCities() {
+        List<City> cities = schedulePostService.getAvailableCities();
+        
+        assertThat(cities.size()).isEqualTo(City.values().length - 1);
+    }
 }
