@@ -20,6 +20,7 @@ import com.cocodan.triplan.post.schedule.repository.SchedulePostLikeRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostNestedCommentRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.domain.ScheduleMember;
 import com.cocodan.triplan.schedule.repository.ScheduleRepository;
 import com.cocodan.triplan.spot.domain.vo.City;
 import com.cocodan.triplan.util.ExceptionMessageUtils;
@@ -137,7 +138,7 @@ public class SchedulePostService {
 
         Schedule schedule = getSchedule(request.getScheduleId());
 
-        validateOwnership(memberId, schedule);
+        validateScheduleMember(schedule, memberId);
         schedulePost.updateSchedule(schedule);
 
         schedulePostRepository.save(schedulePost);
@@ -360,12 +361,19 @@ public class SchedulePostService {
         return schedulePost;
     }
 
-    private void validateOwnership(Long memberId, Schedule schedule) {
-        nullCheck(memberId);
-
-        if (!memberId.equals(schedule.getMemberId())) {
-            throw new ForbiddenException(Schedule.class, schedule.getId(), memberId);
+    private void validateScheduleMember(Schedule schedule, Long memberId) {
+        if (schedule.getMemberId().equals(memberId)) {
+            return;
         }
+
+        List<ScheduleMember> scheduleMembers = schedule.getScheduleMembers();
+        for (ScheduleMember member : scheduleMembers) {
+            if (member.getMemberId().equals(memberId)) {
+                return;
+            }
+        }
+
+        throw new ForbiddenException(Schedule.class, schedule.getId(), memberId);
     }
 
     private void validateCommentOwnership(Long schedulePostId, Long commentId, Long memberId) {
