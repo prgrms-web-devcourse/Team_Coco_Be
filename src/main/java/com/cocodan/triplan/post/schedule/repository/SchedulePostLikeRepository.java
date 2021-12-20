@@ -2,6 +2,7 @@ package com.cocodan.triplan.post.schedule.repository;
 
 import com.cocodan.triplan.post.schedule.domain.Like;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -13,4 +14,8 @@ public interface SchedulePostLikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByMemberIdAndSchedulePostId(Long memberId, Long schedulePostId);
 
     List<Like> findAllByMemberId(Long memberId);
+
+    @Modifying
+    @Query("DELETE FROM Like l where l.schedulePost.id = :schedulePostId")
+    void deleteAllBySchedulePostId(Long schedulePostId);
 }

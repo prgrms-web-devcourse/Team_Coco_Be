@@ -354,7 +354,7 @@ class SchedulePostServiceTest {
         // 좋아요 취소
         SchedulePostLikeRequest doSchedulePostLikeAgain = new SchedulePostLikeRequest(false);
         Long afterLikedAgain = schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId, doSchedulePostLikeAgain);
-
+        
         // 좋아요 누른 후 좋아요 수
         assertThat(beforeLiked + 1).isEqualTo(afterLiked);
         // 좋아요 취소된 후 좋아요 수
