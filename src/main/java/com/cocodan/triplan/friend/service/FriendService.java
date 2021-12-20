@@ -6,11 +6,13 @@ import com.cocodan.triplan.friend.repository.FriendRepository;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
+import com.cocodan.triplan.util.ExceptionMessageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,10 +24,19 @@ public class FriendService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long addFollowing(Long toId, Long fromId) {
+    public void addFollowing(Long toId, Long fromId) {
+        if (toId.equals(fromId)) {
+            throw new IllegalArgumentException(ExceptionMessageUtils.getMessage("friend_myself"));
+        }
+
         Friend friend = new Friend(fromId, toId);
 
-        return friendRepository.save(friend).getId();
+        Optional<Friend> optionalFriend = friendRepository.findByFromIdAndToId(fromId, toId);
+        if (optionalFriend.isPresent()) {
+            throw new IllegalArgumentException(ExceptionMessageUtils.getMessage("already_friend"));
+        }
+
+        friendRepository.save(friend);
     }
 
     @Transactional(readOnly = true)

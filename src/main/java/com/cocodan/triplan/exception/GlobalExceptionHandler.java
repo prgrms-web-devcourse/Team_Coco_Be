@@ -1,9 +1,6 @@
 package com.cocodan.triplan.exception;
 
-import com.cocodan.triplan.exception.common.ForbiddenException;
-import com.cocodan.triplan.exception.common.NotFoundException;
-import com.cocodan.triplan.exception.common.NotIncludeException;
-import com.cocodan.triplan.exception.common.UniqueEmailException;
+import com.cocodan.triplan.exception.common.*;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.util.ExceptionMessageUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -86,17 +83,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
-        loggingErrorStackTrace(exception);
-
-        return ResponseEntity.internalServerError().body(
-                ExceptionResponse.from(
-                        ExceptionMessageUtils.getMessage("exception")
-                )
-        );
-    }
-
-    @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleUniqueEmail(UniqueEmailException exception) {
         log.warn("{} Unique email : {}", exception.getClazz().getSimpleName(), exception.getEmail());
         loggingWarningStackTrace(exception);
@@ -126,6 +112,27 @@ public class GlobalExceptionHandler {
         loggingWarningStackTrace(exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleNoFriends(NoFriendsException exception) {
+        log.warn("No Friend Exception : {}", exception.getMessage());
+        loggingWarningStackTrace(exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
+    }
+
+
+    /* 최하단 유지 */
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
+        loggingErrorStackTrace(exception);
+
+        return ResponseEntity.internalServerError().body(
+                ExceptionResponse.from(
+                        ExceptionMessageUtils.getMessage("exception")
+                )
+        );
     }
 
     private void loggingErrorStackTrace(Exception exception) {
