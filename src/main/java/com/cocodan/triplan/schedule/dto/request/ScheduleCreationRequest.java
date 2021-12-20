@@ -30,4 +30,7 @@ public class ScheduleCreationRequest {
 
     @NotNull
     private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
+
+    @NotNull
+    private List<Long> IdsOfFriends;
 }

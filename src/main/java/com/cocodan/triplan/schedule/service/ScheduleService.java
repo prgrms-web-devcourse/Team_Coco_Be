@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,7 +53,17 @@ public class ScheduleService {
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
                 .forEach(this::saveSpot);
 
-        return scheduleRepository.save(schedule).getId();
+        Schedule save = scheduleRepository.save(schedule);
+
+        addScheduleMember(scheduleCreationRequest, save);
+
+        return save.getId();
+    }
+
+    private void addScheduleMember(ScheduleCreationRequest scheduleCreationRequest, Schedule save) {
+        for (Long id : scheduleCreationRequest.getIdsOfFriends()) {
+            createScheduleMember(save, id);
+        }
     }
 
     private void saveSpot(DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
@@ -464,9 +473,11 @@ public class ScheduleService {
 
         validateScheduleMember(scheduleId, memberId);
 
-        validateFriends(scheduleMemberRequest, memberId);
+        long friendId = scheduleMemberRequest.getFriendId();
 
-        createScheduleMember(schedule, scheduleMemberRequest.getFriendId());
+        validateFriends(friendId, memberId);
+
+        createScheduleMember(schedule, friendId);
     }
 
     private void createScheduleMember(Schedule schedule, long friendId) {
@@ -476,9 +487,9 @@ public class ScheduleService {
                 .build();
     }
 
-    private void validateFriends(ScheduleMemberRequest scheduleMemberRequest, Long memberId) {
-        friendRepository.findByFromIdAndToId(memberId, scheduleMemberRequest.getFriendId())
-                .orElseThrow(() -> new NoFriendsException(scheduleMemberRequest.getFriendId(), memberId));
+    private void validateFriends(long friendId, Long memberId) {
+        friendRepository.findByFromIdAndToId(memberId, friendId)
+                .orElseThrow(() -> new NoFriendsException(friendId, memberId));
     }
 
     @Transactional(readOnly = true)
