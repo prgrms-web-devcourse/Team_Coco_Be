@@ -92,7 +92,8 @@ class ScheduleServiceTest {
                         new DailyScheduleSpotCreationRequest(61L, "address6", "roadAddress6", "010-1111-2227", "불국사6", new Position(37.1234, 125.3333), 2, 3),
                         new DailyScheduleSpotCreationRequest(71L, "address7", "roadAddress7", "010-1111-2228", "불국사7", new Position(37.1234, 125.3333), 3, 1),
                         new DailyScheduleSpotCreationRequest(81L, "address8", "roadAddress8", "010-1111-2229", "불국사8", new Position(37.1234, 125.3333), 3, 2)
-                ));
+                ),
+                List.of());
     }
 
     @Test
