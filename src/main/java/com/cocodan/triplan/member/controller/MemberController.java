@@ -57,7 +57,7 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @ApiOperation("닉네임으로 회원 조회, Member Page 반환")
+    @ApiOperation("닉네임으로 회원 조회")
     @GetMapping("/users")
     public ResponseEntity<List<MemberSimpleResponse>> findMemberByNickname(@RequestParam String nickname) {
         List<MemberSimpleResponse> responses = memberService.findMemberByNickname(nickname);
