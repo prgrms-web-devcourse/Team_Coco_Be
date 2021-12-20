@@ -4,7 +4,6 @@ import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.schedule.dto.response.DailyScheduleSpotResponse;
-import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +23,7 @@ public class SchedulePostDetailResponse {
 
     private GenderType gender;
 
-    private City city;
+    private String city;
 
     private String startDate;
 
@@ -58,7 +57,7 @@ public class SchedulePostDetailResponse {
                 .nickname(schedulePost.getMember().getNickname())
                 .ages(Ages.from(schedulePost.getMember().getBirth()))
                 .gender(schedulePost.getMember().getGender())
-                .city(schedulePost.getCity())
+                .city(schedulePost.getCity().toString())
                 .startDate(schedulePost.getSchedule().getStartDate().toString())
                 .endDate(schedulePost.getSchedule().getEndDate().toString())
                 .title(schedulePost.getTitle())
