@@ -42,9 +42,8 @@ public class SchedulePostResponse {
 
     private String endDate;
 
-    public static SchedulePostResponse from(SchedulePost schedulePost) {
+    public static SchedulePostResponse from(SchedulePost schedulePost, Schedule schedule) {
         Member member = schedulePost.getMember();
-        Schedule schedule = schedulePost.getSchedule();
         return SchedulePostResponse.builder()
                 .writerId(member.getId())
                 .profileImageUrl(member.getProfileImage())
