@@ -34,7 +34,7 @@ public class DailyScheduleSpotCreationRequest {
     @NotNull
     private Position position;
 
-    @Range(min = Schedule.DAY_MAX, max = Schedule.DAY_MAX)
+    @Range(min = Schedule.DAY_MIN, max = Schedule.DAY_MAX)
     private int dateOrder;
 
     @Range(min = Schedule.NUM_OF_SPOT_MIN, max = Schedule.NUM_OF_SPOT_MAX)
