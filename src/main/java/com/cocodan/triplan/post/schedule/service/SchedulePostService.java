@@ -27,6 +27,7 @@ import com.cocodan.triplan.util.ExceptionMessageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -108,8 +109,15 @@ public class SchedulePostService {
 
         List<SchedulePostCommentResponse> comments = getSchedulePostComments(schedulePostId);
         Optional<Like> isLiked = getLike(memberId, schedulePostId);
-
-        Optional<Schedule> schedule = scheduleRepository.findById(schedulePost.getScheduleId());
+        // 여행이 삭제된 경우 더미값을 보내준다.
+        Schedule schedule = scheduleRepository.findById(schedulePost.getScheduleId()).orElse(
+                Schedule.builder()
+                        .title("이미 삭제된 여행입니다.")
+                        .startDate(LocalDate.MIN)
+                        .endDate(LocalDate.MIN)
+                        .memberId(schedulePost.getMember().getId())
+                        .build()
+        );
         return SchedulePostDetailResponse.of(schedulePost, schedule, comments, isLiked.isPresent());
     }
 
@@ -410,9 +418,7 @@ public class SchedulePostService {
     private void nullCheck(Object... args) {
         for (Object obj : args) {
             if (obj == null) {
-                throw new IllegalArgumentException(
-                        ExceptionMessageUtils
-                                .getMessage("exception.argument_not_valid"));
+                throw new IllegalArgumentException(ExceptionMessageUtils.getMessage("exception.argument_not_valid"));
             }
         }
     }

@@ -52,19 +52,10 @@ public class SchedulePostDetailResponse {
 
     public static SchedulePostDetailResponse of(
             SchedulePost schedulePost,
-            Optional<Schedule> optionalSchedule,
+            Schedule schedule,
             List<SchedulePostCommentResponse> comments,
             Boolean isLiked
     ) {
-        // 여행이 삭제되었을 경우 더미값을 보내준다. (여행 게시글이 존재하는 상태로 여행이 제거될 수 있다는 시나리오에 의거)
-        Schedule schedule = optionalSchedule.orElse(
-                Schedule.builder()
-                .title("이미 삭제된 여행입니다.")
-                .startDate(LocalDate.MIN)
-                .endDate(LocalDate.MIN)
-                .memberId(schedulePost.getMember().getId())
-                .build()
-        );
         return SchedulePostDetailResponse.builder()
                 .writerId(schedulePost.getMember().getId())
                 .nickname(schedulePost.getMember().getNickname())
