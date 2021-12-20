@@ -4,6 +4,7 @@ import com.cocodan.triplan.exception.common.ForbiddenException;
 import com.cocodan.triplan.exception.common.NoFriendsException;
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
+import com.cocodan.triplan.friend.repository.FriendRepository;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +42,8 @@ public class ScheduleService {
     private final ChecklistRepository checklistRepository;
 
     private final VotingRepository votingRepository;
+
+    private final FriendRepository friendRepository;
 
     @Transactional
     public Long saveSchedule(ScheduleCreationRequest scheduleCreationRequest, Long memberId) {
@@ -473,9 +477,8 @@ public class ScheduleService {
     }
 
     private void validateFriends(ScheduleMemberRequest scheduleMemberRequest, Long memberId) {
-        if (!memberRepository.existsByIdAndFriendId(memberId, scheduleMemberRequest.getFriendId())) {
-            throw new NoFriendsException(scheduleMemberRequest.getFriendId(), memberId);
-        }
+        friendRepository.findByFromIdAndToId(memberId, scheduleMemberRequest.getFriendId())
+                .orElseThrow(() -> new NoFriendsException(scheduleMemberRequest.getFriendId(), memberId));
     }
 
     @Transactional(readOnly = true)
@@ -513,7 +516,7 @@ public class ScheduleService {
         return schedule.getScheduleMembers().stream()
                 .filter(scheduleMember -> scheduleMember.getMemberId().equals(deletedId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("exception.bad_request"));
+                .orElseThrow(() -> new IllegalArgumentException(ExceptionMessageUtils.getMessage("exception.bad_request")));
     }
 
     @Transactional
@@ -521,6 +524,11 @@ public class ScheduleService {
         Schedule schedule = findScheduleById(scheduleId);
 
         validateScheduleMember(scheduleId, memberId);
+
+        if (memberId.equals(schedule.getMemberId())) {
+            scheduleRepository.delete(schedule);
+            return;
+        }
 
         ScheduleMember deletedMember = findDeletedMember(schedule, memberId);
 

@@ -53,11 +53,11 @@ CREATE TABLE member
 
 CREATE TABLE friend
 (
-    id      BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     from_id BIGINT NOT NULL,
     to_id   BIGINT NOT NULL,
     FOREIGN KEY (from_id) REFERENCES member (id),
-    FOREIGN KEY (to_id) REFERENCES member (id)
+    FOREIGN KEY (to_id) REFERENCES member (id),
+    PRIMARY KEY (from_id, to_id)
 );
 
 
