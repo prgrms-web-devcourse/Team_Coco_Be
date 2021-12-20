@@ -19,6 +19,8 @@ public class SchedulePostSearchService {
 
     private final SchedulePostRepository schedulePostRepository;
 
+    private final SchedulePostService schedulePostService;
+
     @Transactional
     public List<SchedulePostResponse> getSchedulePosts(
             String search,
@@ -26,11 +28,7 @@ public class SchedulePostSearchService {
             Theme theme,
             SchedulePostSortingRule sortRule
     ) {
-
         List<SchedulePost> result = schedulePostRepository.search(search, city, theme, sortRule);
-
-        return result.stream()
-                .map(SchedulePostResponse::from)
-                .collect(Collectors.toList());
+        return schedulePostService.convertToSchedulePostResponseList(result);
     }
 }
