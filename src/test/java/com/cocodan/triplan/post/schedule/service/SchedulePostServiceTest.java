@@ -612,7 +612,9 @@ class SchedulePostServiceTest {
     @Test
     @DisplayName("선택 가능한 도시 목록을 정상적으로 받아올 수 있다")
     void getAvailableCities() {
-        List<City> cities = schedulePostService.getAvailableCities();
+        List<String> cities = schedulePostService.getAvailableCities();
+
+        System.out.println(cities);
         
         assertThat(cities.size()).isEqualTo(City.values().length - 1);
     }

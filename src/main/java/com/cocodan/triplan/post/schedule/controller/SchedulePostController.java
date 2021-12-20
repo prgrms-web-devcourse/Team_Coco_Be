@@ -79,8 +79,8 @@ public class SchedulePostController {
 
     @ApiOperation("선택 가능한 도시 목록 보내주기")
     @GetMapping("/schedules/cities")
-    public ResponseEntity<List<City>> getAvailableCities() {
-        List<City> cities = schedulePostService.getAvailableCities();
+    public ResponseEntity<List<String>> getAvailableCities() {
+        List<String> cities = schedulePostService.getAvailableCities();
         return ResponseEntity.ok(cities);
     }
 
