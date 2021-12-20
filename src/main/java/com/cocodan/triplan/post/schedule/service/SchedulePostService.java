@@ -88,9 +88,10 @@ public class SchedulePostService {
         return savedSchedulePost.getId();
     }
 
-    public List<City> getAvailableCities() {
+    public List<String> getAvailableCities() {
         return Arrays.stream(City.values())
                 .filter(city -> !city.equals(City.ALL))
+                .map(City::toString)
                 .collect(Collectors.toList());
     }
 
