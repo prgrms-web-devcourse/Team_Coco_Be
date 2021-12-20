@@ -6,8 +6,6 @@ import com.cocodan.triplan.util.MemberConverter;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,7 +64,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public List<MemberSimpleResponse> findMemberByNickname(String nickname){
-        return memberRepository.findAllByNickname(nickname).stream()
+        return memberRepository.findAllByNicknameContaining(nickname).stream()
                 .map(MemberSimpleResponse::from)
                 .collect(Collectors.toList());
     }
