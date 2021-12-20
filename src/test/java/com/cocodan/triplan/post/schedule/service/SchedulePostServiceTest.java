@@ -349,11 +349,11 @@ class SchedulePostServiceTest {
         long beforeLiked = post.getLiked();
 
         // 좋아요 누르기
-        SchedulePostLikeRequest doSchedulePostLike = new SchedulePostLikeRequest(createdSchedulePostId, true);
-        Long afterLiked = schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLike);
+        SchedulePostLikeRequest doSchedulePostLike = new SchedulePostLikeRequest(true);
+        Long afterLiked = schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId, doSchedulePostLike);
         // 좋아요 취소
-        SchedulePostLikeRequest doSchedulePostLikeAgain = new SchedulePostLikeRequest(createdSchedulePostId, false);
-        Long afterLikedAgain = schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLikeAgain);
+        SchedulePostLikeRequest doSchedulePostLikeAgain = new SchedulePostLikeRequest(false);
+        Long afterLikedAgain = schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId, doSchedulePostLikeAgain);
 
         // 좋아요 누른 후 좋아요 수
         assertThat(beforeLiked + 1).isEqualTo(afterLiked);
@@ -370,12 +370,12 @@ class SchedulePostServiceTest {
         // 좋아요 한 게시글 없음
         List<SchedulePostResponse> emptySchedulePostList = schedulePostService.getLikedSchedulePosts(testMemberId);
         // 1번 여행 좋아요!
-        SchedulePostLikeRequest doSchedulePostLike1 = new SchedulePostLikeRequest(createdSchedulePostId1, true);
-        schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLike1);
+        SchedulePostLikeRequest doSchedulePostLike1 = new SchedulePostLikeRequest(true);
+        schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId1, doSchedulePostLike1);
         List<SchedulePostResponse> schedulePostListAfterLikeTrip1 = schedulePostService.getLikedSchedulePosts(testMemberId);
         // 2번 여행도 좋아요!
-        SchedulePostLikeRequest doSchedulePostLike2 = new SchedulePostLikeRequest(createdSchedulePostId2, true);
-        schedulePostService.toggleSchedulePostLiked(testMemberId, doSchedulePostLike2);
+        SchedulePostLikeRequest doSchedulePostLike2 = new SchedulePostLikeRequest(true);
+        schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId2, doSchedulePostLike2);
         List<SchedulePostResponse> schedulePostListAfterLikeTrip2 = schedulePostService.getLikedSchedulePosts(testMemberId);
 
         // then

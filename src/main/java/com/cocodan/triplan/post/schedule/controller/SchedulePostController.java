@@ -137,7 +137,7 @@ public class SchedulePostController {
             @Valid @RequestBody SchedulePostLikeRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), request);
+        Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), schedulePostId, request);
         return ResponseEntity.ok(new SchedulePostLikeResponse(likeCount));
     }
 

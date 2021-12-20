@@ -133,9 +133,7 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public Long toggleSchedulePostLiked(Long memberId, SchedulePostLikeRequest request) {
-        // TODO: 2021.12.13 Teru - 좋아요 수에 대한 동시성 문제를 어떻게하면 더 잘 해결할 수 있을지 고민...
-        Long schedulePostId = request.getSchedulePostId();
+    public Long toggleSchedulePostLiked(Long memberId, Long schedulePostId, SchedulePostLikeRequest request) {
         Optional<Like> likeData = getLike(memberId, schedulePostId);
         SchedulePost post = getSchedulePostForLikeUpdate(schedulePostId);
 
@@ -143,16 +141,13 @@ public class SchedulePostService {
             Member member = getMember(memberId);
             Like like = new Like(member, post);
             schedulePostLikeRepository.save(like);
-            return post.increaseLiked();
-        }
-
-        if (likeData.isPresent() && !request.getFlag()) {
+            post.increaseLiked();
+        } else if (likeData.isPresent() && !request.getFlag()) {
             schedulePostLikeRepository.delete(likeData.get());
-            return post.decreaseLiked();
+            post.decreaseLiked();
         }
 
-        // Invalid Like toggle
-        return post.getLiked();
+        return schedulePostRepository.save(post).getId();
     }
 
     @Transactional(readOnly = true)

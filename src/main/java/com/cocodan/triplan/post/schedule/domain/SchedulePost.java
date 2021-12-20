@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.PositiveOrZero;
 
 @Entity
 @Getter
@@ -54,9 +55,11 @@ public class SchedulePost extends BaseEntity {
     @Length(min = SCHEDULE_POST_CONTENT_MIN_LENGTH, max = SCHEDULE_POST_CONTENT_MAX_LENGTH)
     private String content;
 
+    @PositiveOrZero
     @Column(name = "views", nullable = false)
     private long views;
 
+    @PositiveOrZero
     @Column(name = "liked", nullable = false)
     private long liked;
 
@@ -100,6 +103,6 @@ public class SchedulePost extends BaseEntity {
     }
 
     public long decreaseLiked() {
-        return --liked;
+        return liked <= 0 ? 0 : --liked;
     }
 }
