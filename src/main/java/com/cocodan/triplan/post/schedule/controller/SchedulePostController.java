@@ -77,6 +77,13 @@ public class SchedulePostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SchedulePostCreateResponse.from(postId));
     }
 
+    @ApiOperation("선택 가능한 도시 목록 보내주기")
+    @GetMapping("/schedules/cities")
+    public ResponseEntity<List<City>> getAvailableCities() {
+        List<City> cities = schedulePostService.getAvailableCities();
+        return ResponseEntity.ok(cities);
+    }
+
     @ApiOperation("자신이 작성한 여행 공유 게시글 모아보기")
     @GetMapping("/schedules/me")
     public ResponseEntity<List<SchedulePostResponse>> getMySchedulePostList(@AuthenticationPrincipal JwtAuthentication authentication) {

@@ -26,6 +26,7 @@ import com.cocodan.triplan.util.ExceptionMessageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,6 +86,12 @@ public class SchedulePostService {
 
         SchedulePost savedSchedulePost = schedulePostRepository.save(post);
         return savedSchedulePost.getId();
+    }
+
+    public List<City> getAvailableCities() {
+        return Arrays.stream(City.values())
+                .filter(city -> !city.equals(City.ALL))
+                .collect(Collectors.toList());
     }
 
     @Transactional
