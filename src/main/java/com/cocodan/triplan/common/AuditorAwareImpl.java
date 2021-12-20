@@ -13,13 +13,16 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
 
     @Override
     public Optional<Long> getCurrentAuditor() {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return Optional.ofNullable(getUserId());
+    }
 
-        if (jwtAuthenticationToken == null) {
-            return Optional.empty();
+    private Long getUserId() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof JwtAuthentication) {
+            return ((JwtAuthentication) principal).getId();
         }
-
-        JwtAuthentication authentication = (JwtAuthentication) jwtAuthenticationToken.getPrincipal();
-        return Optional.of(authentication.getId());
+        
+        return null;
     }
 }
