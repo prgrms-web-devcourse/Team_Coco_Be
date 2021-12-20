@@ -112,7 +112,18 @@ public class SchedulePostService {
 
     @Transactional
     public void deleteSchedulePost(Long memberId, Long schedulePostId) {
+        nullCheck(memberId, schedulePostId);
         SchedulePost schedulePost = validateAuthorities(memberId, schedulePostId);
+
+        // 대댓글 -> 댓글 -> 좋아요 순으로 선행 삭제
+        List<SchedulePostComment> comments = getCommentsOf(schedulePost);
+
+        for (SchedulePostComment comment : comments) {
+            schedulePostNestedCommentRepository.deleteAllByCommentId(comment.getId());
+            schedulePostCommentRepository.delete(comment);
+        }
+        schedulePostLikeRepository.deleteAllBySchedulePostId(schedulePostId);
+
         schedulePostRepository.delete(schedulePost);
     }
 
@@ -198,6 +209,8 @@ public class SchedulePostService {
     @Transactional
     public void deleteSchedulePostComment(Long schedulePostId, Long commentId, Long memberId) {
         validateCommentOwnership(schedulePostId, commentId, memberId);
+        // 대댓글 선행 삭제
+        schedulePostNestedCommentRepository.deleteAllByCommentId(commentId);
         schedulePostCommentRepository.deleteById(commentId);
     }
 

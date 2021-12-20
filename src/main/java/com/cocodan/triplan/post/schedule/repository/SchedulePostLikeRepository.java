@@ -13,4 +13,7 @@ public interface SchedulePostLikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByMemberIdAndSchedulePostId(Long memberId, Long schedulePostId);
 
     List<Like> findAllByMemberId(Long memberId);
+
+    @Query("DELETE FROM Like l where l.schedulePost.id = :schedulePostId")
+    void deleteAllBySchedulePostId(Long schedulePostId);
 }
