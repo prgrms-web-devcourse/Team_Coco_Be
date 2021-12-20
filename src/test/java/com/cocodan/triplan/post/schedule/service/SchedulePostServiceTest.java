@@ -146,7 +146,7 @@ class SchedulePostServiceTest {
         assertThat(posts.get(0).getNickname()).isEqualTo(NICKNAME);
         assertThat(posts.get(0).getTitle()).isEqualTo("1번 여행 게시글");
         assertThat(posts.get(0).getGenderType().getTypeStr()).isEqualTo(GENDER);
-        assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL);
+        assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL.toString());
         assertThat(posts.get(0).getStartDate()).isEqualTo("2021-12-01");
         assertThat(posts.get(0).getEndDate()).isEqualTo("2021-12-03");
         assertThat(posts.get(0).getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
@@ -595,7 +595,7 @@ class SchedulePostServiceTest {
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).size()).isEqualTo(1);
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getTitle()).isEqualTo("1번 여행 넘모 신나요~");
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getPostId()).isEqualTo(createdSchedulePostId1);
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getCity()).isEqualTo(City.SEOUL);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getCity()).isEqualTo(City.SEOUL.toString());
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getWriterId()).isEqualTo(testMemberId);
 
         // 게시글 생성 2
