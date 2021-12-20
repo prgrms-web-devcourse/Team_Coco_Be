@@ -24,8 +24,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
-        log.warn("Method Argument Not Valid.");
-        loggingWarningStackTrace(exception);
+        log.warn("Method Argument Not Valid.", exception);
         Map<String, String> errorMap = new HashMap<>();
         exception.getBindingResult()
                 .getAllErrors()
@@ -38,10 +37,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    private void loggingWarningStackTrace(Exception exception) {
-        log.warn("Exception {}: ", exception.getMessage(), exception);
-    }
-
     private void putError(ObjectError error, Map<String, String> errors) {
         errors.put(
                 ((FieldError) error).getField(),
@@ -51,8 +46,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleNotFound(NotFoundException exception) {
-        log.warn("{} Not Found. Id : {}", exception.getClazz().getSimpleName(), exception.getId());
-        loggingWarningStackTrace(exception);
+        log.warn("{} Not Found. Id : {}", exception.getClazz().getSimpleName(), exception.getId(), exception);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ExceptionResponse.from(exception.getMessage()));
     }
@@ -63,9 +57,9 @@ public class GlobalExceptionHandler {
                 exception.getPart().getSimpleName(),
                 exception.getPartId(),
                 exception.getEntire().getSimpleName(),
-                exception.getEntireId()
+                exception.getEntireId(),
+                exception
         );
-        loggingWarningStackTrace(exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
@@ -75,49 +69,44 @@ public class GlobalExceptionHandler {
         log.warn("Member {} can not access {} {}",
                 exception.getAccessorId(),
                 exception.getResource().getSimpleName(),
-                exception.getResourceId()
+                exception.getResourceId(),
+                exception
         );
-        loggingWarningStackTrace(exception);
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleUniqueEmail(UniqueEmailException exception) {
-        log.warn("{} Unique email : {}", exception.getClazz().getSimpleName(), exception.getEmail());
-        loggingWarningStackTrace(exception);
+        log.warn("{} Unique email : {}", exception.getClazz().getSimpleName(), exception.getEmail(), exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleInvalidLogin(BadCredentialsException exception) {
-        log.warn("Invalid token data : {}", exception.getMessage());
-        loggingWarningStackTrace(exception);
+        log.warn("Invalid token data : {}", exception.getMessage(), exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleInvalidLogin(IllegalArgumentException exception) {
-        log.warn("Invalid login password check : {}", exception.getMessage());
-        loggingWarningStackTrace(exception);
+        log.warn("Invalid login password check : {}", exception.getMessage(), exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleInvalidLogin(UsernameNotFoundException exception) {
-        log.warn("Invalid login email : {}", exception.getMessage());
-        loggingWarningStackTrace(exception);
+        log.warn("Invalid login email : {}", exception.getMessage(), exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleNoFriends(NoFriendsException exception) {
-        log.warn("No Friend Exception : {}", exception.getMessage());
-        loggingWarningStackTrace(exception);
+        log.warn("No Friend Exception : {}", exception.getMessage(), exception);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionResponse.from(exception.getMessage()));
     }
@@ -126,16 +115,12 @@ public class GlobalExceptionHandler {
     /* 최하단 유지 */
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
-        loggingErrorStackTrace(exception);
+        log.error("Unexpected error", exception);
 
         return ResponseEntity.internalServerError().body(
                 ExceptionResponse.from(
                         ExceptionMessageUtils.getMessage("exception")
                 )
         );
-    }
-
-    private void loggingErrorStackTrace(Exception exception) {
-        log.error("Unexpected error {}",exception.getMessage(), exception);
     }
 }
