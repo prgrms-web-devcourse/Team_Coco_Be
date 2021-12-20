@@ -14,8 +14,9 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
+
     @CreatedBy
-    @Column(name = "created_by")
+    @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
     @LastModifiedBy
@@ -28,7 +29,7 @@ public abstract class BaseEntity {
 
     @LastModifiedDate
     @Column(name = "last_modified_date")
-    private LocalDateTime modifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     protected BaseEntity() {
     }
@@ -49,7 +50,7 @@ public abstract class BaseEntity {
         return createdDate;
     }
 
-    public LocalDateTime getModifiedDate() {
-        return modifiedDate;
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
     }
 }
