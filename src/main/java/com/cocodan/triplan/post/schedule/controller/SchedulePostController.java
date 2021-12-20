@@ -137,7 +137,7 @@ public class SchedulePostController {
             @Valid @RequestBody SchedulePostLikeRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), request);
+        Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), schedulePostId, request);
         return ResponseEntity.ok(new SchedulePostLikeResponse(likeCount));
     }
 
@@ -175,6 +175,9 @@ public class SchedulePostController {
         // TODO: 2021.12.15 Teru - 댓글에 대댓글이 작성되어 있는 상태에서 댓글이 삭제되면 어떻게 할 것인지 고민
         // 방법 1. 삭제된 댓글은 공란(삭제됨 표시)으로 두고, 아래 대댓글은 표시한다.
         // 방법 2. 삭제된 댓글에 있던 대댓글도 모두 삭제한다.
+        // -> Henry 등의 의견으로 1이 좋을 것이라 생각되나, 삭제 관련 기능에서 오류가 발생합니다. (코멘트가 삭제되기 위해서는 해당 comment의 ID를 FK로 가지는 모든 대댓글이 먼저 삭제되어야 함)
+        // 그래서 일단 방법 2 쪽으로 먼저 구현합니다. (게시글 삭제 -> 대댓글, 댓글, 좋아요 순으로 선행 삭제 / 댓글 삭제 -> 대댓글, 댓글 순으로 삭제)
+        // -> TODO: 추후 연관관계 관련 문제 해결하고 방법 1로 교체
         schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, authentication.getId());
         return ResponseEntity.ok().build();
     }

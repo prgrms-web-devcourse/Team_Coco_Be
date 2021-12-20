@@ -112,7 +112,18 @@ public class SchedulePostService {
 
     @Transactional
     public void deleteSchedulePost(Long memberId, Long schedulePostId) {
+        nullCheck(memberId, schedulePostId);
         SchedulePost schedulePost = validateAuthorities(memberId, schedulePostId);
+
+        // 대댓글 -> 댓글 -> 좋아요 순으로 선행 삭제
+        List<SchedulePostComment> comments = getCommentsOf(schedulePost);
+
+        for (SchedulePostComment comment : comments) {
+            schedulePostNestedCommentRepository.deleteAllByCommentId(comment.getId());
+            schedulePostCommentRepository.delete(comment);
+        }
+        schedulePostLikeRepository.deleteAllBySchedulePostId(schedulePostId);
+
         schedulePostRepository.delete(schedulePost);
     }
 
@@ -133,9 +144,7 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public Long toggleSchedulePostLiked(Long memberId, SchedulePostLikeRequest request) {
-        // TODO: 2021.12.13 Teru - 좋아요 수에 대한 동시성 문제를 어떻게하면 더 잘 해결할 수 있을지 고민...
-        Long schedulePostId = request.getSchedulePostId();
+    public Long toggleSchedulePostLiked(Long memberId, Long schedulePostId, SchedulePostLikeRequest request) {
         Optional<Like> likeData = getLike(memberId, schedulePostId);
         SchedulePost post = getSchedulePostForLikeUpdate(schedulePostId);
 
@@ -143,15 +152,13 @@ public class SchedulePostService {
             Member member = getMember(memberId);
             Like like = new Like(member, post);
             schedulePostLikeRepository.save(like);
-            return post.increaseLiked();
-        }
-
-        if (likeData.isPresent() && !request.getFlag()) {
+            post.increaseLiked();
+        } else if (likeData.isPresent() && !request.getFlag()) {
             schedulePostLikeRepository.delete(likeData.get());
-            return post.decreaseLiked();
+            post.decreaseLiked();
         }
 
-        // Invalid Like toggle
+        schedulePostRepository.save(post);
         return post.getLiked();
     }
 
@@ -203,6 +210,8 @@ public class SchedulePostService {
     @Transactional
     public void deleteSchedulePostComment(Long schedulePostId, Long commentId, Long memberId) {
         validateCommentOwnership(schedulePostId, commentId, memberId);
+        // 대댓글 선행 삭제
+        schedulePostNestedCommentRepository.deleteAllByCommentId(commentId);
         schedulePostCommentRepository.deleteById(commentId);
     }
 

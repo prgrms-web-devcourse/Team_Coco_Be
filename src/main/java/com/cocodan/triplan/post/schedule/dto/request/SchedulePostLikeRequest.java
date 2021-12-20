@@ -12,8 +12,5 @@ import javax.validation.constraints.NotNull;
 public class SchedulePostLikeRequest {
 
     @NotNull
-    private Long schedulePostId;
-
-    @NotNull
     private Boolean flag;
 }
