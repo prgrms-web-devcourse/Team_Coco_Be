@@ -34,7 +34,7 @@ public class SchedulePostResponse {
 
     private String title;
 
-    private City city;
+    private String city;
 
     private List<Theme> themes;
 
@@ -53,7 +53,7 @@ public class SchedulePostResponse {
                 .genderType(member.getGender())
                 .postId(schedulePost.getId())
                 .title(schedulePost.getTitle())
-                .city(schedulePost.getCity())
+                .city(schedulePost.getCity().toString())
                 .themes(
                         schedule.getScheduleThemes()
                                 .stream()

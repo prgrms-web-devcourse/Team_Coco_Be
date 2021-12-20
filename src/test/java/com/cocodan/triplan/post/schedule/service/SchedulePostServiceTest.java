@@ -146,7 +146,7 @@ class SchedulePostServiceTest {
         assertThat(posts.get(0).getNickname()).isEqualTo(NICKNAME);
         assertThat(posts.get(0).getTitle()).isEqualTo("1번 여행 게시글");
         assertThat(posts.get(0).getGenderType().getTypeStr()).isEqualTo(GENDER);
-        assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL);
+        assertThat(posts.get(0).getCity()).isEqualTo(City.SEOUL.toString());
         assertThat(posts.get(0).getStartDate()).isEqualTo("2021-12-01");
         assertThat(posts.get(0).getEndDate()).isEqualTo("2021-12-03");
         assertThat(posts.get(0).getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
@@ -250,7 +250,7 @@ class SchedulePostServiceTest {
                 "As the market for personal computers expanded and evolved throughout the 1990s, Apple lost considerable market share to the lower-priced duopoly of Microsoft Windows on Intel PC clones. The board recruited CEO Gil Amelio, who prepared the struggling company for eventual success with extensive reforms, product focus and layoffs in his 500-day tenure. In 1997, Amelio bought NeXT to resolve Apple's unsuccessful operating-system strategy and entice Jobs back to the company; he replaced Amelio. Apple became profitable again through a number of tactics. First, a revitalizing campaign called \"Think different\", and by launching the iMac and iPod. In 2001, it opened a retail chain, the Apple Stores, and has acquired numerous companies to broaden its software portfolio. In 2007, the company launched the iPhone to critical acclaim and financial success. Jobs resigned in 2011 for health reasons, and died two months later. He was succeeded as CEO by Tim Cook.\n" +
                 "\n" +
                 "The company receives significant criticism regarding the labor practices of its contractors, its environmental practices, and its business ethics, including anti-competitive behavior and materials sourcing. In August 2018, Apple became the first publicly traded U.S. company to be valued at over $1 trillion,[17][18] and, two years later, the first valued at over $2 trillion.[19][20] The company enjoys a high level of brand loyalty, and is ranked as the world's most valuable brand; as of January 2021, there are 1.65 billion Apple products in active use.[21]");
-        assertThat(schedulePostDetail.getCity()).isEqualTo(City.SEOUL);
+        assertThat(schedulePostDetail.getCity()).isEqualTo(City.SEOUL.toString());
         assertThat(schedulePostDetail.getCreatedAt()).isEqualTo(post.getCreatedDate().toString());
         assertThat(schedulePostDetail.getViews()).isEqualTo(post.getViews());
         assertThat(initialViews + 1).isEqualTo(post.getViews());
@@ -595,7 +595,7 @@ class SchedulePostServiceTest {
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).size()).isEqualTo(1);
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getTitle()).isEqualTo("1번 여행 넘모 신나요~");
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getPostId()).isEqualTo(createdSchedulePostId1);
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getCity()).isEqualTo(City.SEOUL);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getCity()).isEqualTo(City.SEOUL.toString());
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getWriterId()).isEqualTo(testMemberId);
 
         // 게시글 생성 2
