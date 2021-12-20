@@ -77,7 +77,7 @@ public class SchedulePostService {
 
         SchedulePost post = SchedulePost.builder()
                 .member(member)
-                .schedule(schedule)
+                .scheduleId(schedule.getId())
                 .title(request.title)
                 .content(request.content)
                 .views(0L)
@@ -108,7 +108,9 @@ public class SchedulePostService {
 
         List<SchedulePostCommentResponse> comments = getSchedulePostComments(schedulePostId);
         Optional<Like> isLiked = getLike(memberId, schedulePostId);
-        return SchedulePostDetailResponse.of(schedulePost, comments, isLiked.isPresent());
+
+        Optional<Schedule> schedule = scheduleRepository.findById(schedulePost.getScheduleId());
+        return SchedulePostDetailResponse.of(schedulePost, schedule, comments, isLiked.isPresent());
     }
 
     @Transactional
@@ -139,7 +141,7 @@ public class SchedulePostService {
         Schedule schedule = getSchedule(request.getScheduleId());
 
         validateScheduleMember(schedule, memberId);
-        schedulePost.updateSchedule(schedule);
+        schedulePost.updateScheduleId(schedule.getId());
 
         schedulePostRepository.save(schedulePost);
     }
@@ -347,8 +349,11 @@ public class SchedulePostService {
         return schedulePostLikeRepository.findAllByMemberId(memberId);
     }
 
-    private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
-        return schedulePosts.stream().map(SchedulePostResponse::from).collect(Collectors.toList());
+    public List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
+        return schedulePosts.stream().map(schedulePost -> {
+                    Schedule schedule = getSchedule(schedulePost.getScheduleId());
+                    return SchedulePostResponse.from(schedulePost, schedule);
+                }).collect(Collectors.toList());
     }
 
     private List<SchedulePost> getSchedulePostsByMemberId(Long memberId) {
