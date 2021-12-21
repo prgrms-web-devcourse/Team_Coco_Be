@@ -43,9 +43,9 @@ public class SchedulePost extends BaseEntity {
     @JoinColumn(name = "member", referencedColumnName = "id")
     private Member member;
 
-    @Column(name = "schedule", nullable = false)
-    private Long scheduleId;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule", referencedColumnName = "id")
+    private Schedule schedule;
 
     @Column(name = "title", nullable = false)
     @Length(min = SCHEDULE_POST_TITLE_MIN_LENGTH, max = SCHEDULE_POST_TITLE_MAX_LENGTH)
@@ -68,9 +68,9 @@ public class SchedulePost extends BaseEntity {
     private City city;
 
     @Builder
-    private SchedulePost(Member member, Long scheduleId, String title, String content, long views, long liked, City city) {
+    private SchedulePost(Member member, Schedule schedule, String title, String content, long views, long liked, City city) {
         this.member = member;
-        this.scheduleId = scheduleId;
+        this.schedule = schedule;
         this.title = title;
         this.content = content;
         this.views = views;
@@ -90,8 +90,8 @@ public class SchedulePost extends BaseEntity {
         this.city = city;
     }
 
-    public void updateScheduleId(Long scheduleId) {
-        this.scheduleId = scheduleId;
+    public void updateSchedule(Schedule schedule) {
+        this.schedule = schedule;
     }
 
     public void increaseViews() {

@@ -29,7 +29,8 @@ public class CustomSchedulePostRepositoryImpl implements CustomSchedulePostRepos
     public List<SchedulePost> search(String search, City city, Theme theme, SchedulePostSortingRule sortRule) {
         JPAQuery<SchedulePost> query = queryFactory
                 .select(schedulePost)
-                .from(schedulePost);
+                .from(schedulePost)
+                .join(schedulePost.schedule, schedule).fetchJoin();
 
         if (!theme.equals(Theme.ALL)) {
             query.join(schedule.scheduleThemes, scheduleTheme)
@@ -43,7 +44,8 @@ public class CustomSchedulePostRepositoryImpl implements CustomSchedulePostRepos
 
         sortRule.sort(query);
 
-        return query.fetch();
+        return query
+                .fetch();
     }
 
     private BooleanExpression isEqualToTheme(Theme theme) {
