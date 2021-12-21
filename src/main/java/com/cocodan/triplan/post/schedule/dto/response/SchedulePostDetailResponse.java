@@ -3,15 +3,12 @@ package com.cocodan.triplan.post.schedule.dto.response;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.vo.Ages;
-import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.dto.response.DailyScheduleSpotResponse;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -52,7 +49,6 @@ public class SchedulePostDetailResponse {
 
     public static SchedulePostDetailResponse of(
             SchedulePost schedulePost,
-            Schedule schedule,
             List<SchedulePostCommentResponse> comments,
             Boolean isLiked
     ) {
@@ -62,11 +58,11 @@ public class SchedulePostDetailResponse {
                 .ages(Ages.from(schedulePost.getMember().getBirth()))
                 .gender(schedulePost.getMember().getGender())
                 .city(schedulePost.getCity().toString())
-                .startDate(schedule.getStartDate().toString())
-                .endDate(schedule.getEndDate().toString())
+                .startDate(schedulePost.getSchedule().getStartDate().toString())
+                .endDate(schedulePost.getSchedule().getEndDate().toString())
                 .title(schedulePost.getTitle())
                 .content(schedulePost.getContent())
-                .dailyScheduleSpots(schedule.getDailyScheduleSpots().stream()
+                .dailyScheduleSpots(schedulePost.getSchedule().getDailyScheduleSpots().stream()
                         .map(DailyScheduleSpotResponse::from)
                         .collect(Collectors.toList())
                 )
@@ -75,7 +71,7 @@ public class SchedulePostDetailResponse {
                 .likeCount(schedulePost.getLiked())
                 .comments(comments)
                 .isLiked(isLiked)
-                .scheduleId(schedule.getId())
+                .scheduleId(schedulePost.getSchedule().getId())
                 .build();
     }
 
