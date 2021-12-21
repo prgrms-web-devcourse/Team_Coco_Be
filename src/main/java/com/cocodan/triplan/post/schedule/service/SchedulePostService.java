@@ -27,7 +27,6 @@ import com.cocodan.triplan.util.ExceptionMessageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -406,7 +405,9 @@ public class SchedulePostService {
     private void nullCheck(Object... args) {
         for (Object obj : args) {
             if (obj == null) {
-                throw new IllegalArgumentException(ExceptionMessageUtils.getMessage("exception.argument_not_valid"));
+                throw new IllegalArgumentException(
+                        ExceptionMessageUtils
+                                .getMessage("exception.argument_not_valid"));
             }
         }
     }
