@@ -11,7 +11,7 @@ import static com.cocodan.triplan.post.schedule.domain.SchedulePostComment.COMME
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SchedulePostCommentRequest {
+public class CommentCreationRequest {
 
     @Length(min = COMMENT_MIN_LENGTH, max = COMMENT_MAX_LENGTH)
     private String content;

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SchedulePostLikeRequest {
+public class LikeToggleRequest {
 
     @NotNull
     private Boolean flag;

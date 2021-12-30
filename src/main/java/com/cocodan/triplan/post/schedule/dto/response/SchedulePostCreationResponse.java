@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class SchedulePostCreateResponse {
+public class SchedulePostCreationResponse {
     public final Long postId;
 
-    public static SchedulePostCreateResponse from(Long postId) {
-        return new SchedulePostCreateResponse(postId);
+    public static SchedulePostCreationResponse from(Long postId) {
+        return new SchedulePostCreationResponse(postId);
     }
 }

@@ -30,8 +30,11 @@ import javax.validation.constraints.PositiveOrZero;
 public class SchedulePost extends BaseEntity {
 
     public static final int SCHEDULE_POST_TITLE_MIN_LENGTH = 1;
+
     public static final int SCHEDULE_POST_TITLE_MAX_LENGTH = 16;
+
     public static final int SCHEDULE_POST_CONTENT_MIN_LENGTH = 1;
+
     public static final int SCHEDULE_POST_CONTENT_MAX_LENGTH = 10_000;
 
     @Id
@@ -68,7 +71,15 @@ public class SchedulePost extends BaseEntity {
     private City city;
 
     @Builder
-    private SchedulePost(Member member, Schedule schedule, String title, String content, long views, long liked, City city) {
+    private SchedulePost(
+            Member member,
+            Schedule schedule,
+            String title,
+            String content,
+            long views,
+            long liked,
+            City city
+    ) {
         this.member = member;
         this.schedule = schedule;
         this.title = title;

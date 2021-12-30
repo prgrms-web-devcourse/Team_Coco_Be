@@ -1,7 +1,7 @@
 package com.cocodan.triplan.post.schedule.service;
 
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostListViewResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostRepository;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
@@ -20,7 +20,7 @@ public class SchedulePostSearchService {
     private final SchedulePostRepository schedulePostRepository;
 
     @Transactional
-    public List<SchedulePostResponse> getSchedulePosts(
+    public List<SchedulePostListViewResponse> getSchedulePosts(
             String search,
             City city,
             Theme theme,
@@ -30,7 +30,7 @@ public class SchedulePostSearchService {
         List<SchedulePost> result = schedulePostRepository.search(search, city, theme, sortRule);
 
         return result.stream()
-                .map(SchedulePostResponse::from)
+                .map(SchedulePostListViewResponse::from)
                 .collect(Collectors.toList());
     }
 }

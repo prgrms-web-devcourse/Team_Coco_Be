@@ -3,13 +3,11 @@ package com.cocodan.triplan.post.schedule.dto.response;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.vo.Ages;
-import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.dto.response.DailyScheduleSpotResponse;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +41,7 @@ public class SchedulePostDetailResponse {
 
     private Long likeCount;
 
-    private List<SchedulePostCommentResponse> comments;
+    private List<CommentReadResponse> comments;
 
     private Boolean isLiked;
 
@@ -51,7 +49,7 @@ public class SchedulePostDetailResponse {
 
     public static SchedulePostDetailResponse of(
             SchedulePost schedulePost,
-            List<SchedulePostCommentResponse> comments,
+            List<CommentReadResponse> comments,
             Boolean isLiked
     ) {
         // 여행이 삭제되었을 경우 더미값을 보내준다. (여행 게시글이 존재하는 상태로 여행이 제거될 수 있다는 시나리오에 의거)

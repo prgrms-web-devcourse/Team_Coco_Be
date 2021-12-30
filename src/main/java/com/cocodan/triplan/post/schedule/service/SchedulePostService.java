@@ -8,13 +8,13 @@ import com.cocodan.triplan.post.schedule.domain.Like;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostComment;
 import com.cocodan.triplan.post.schedule.domain.SchedulePostNestedComment;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
+import com.cocodan.triplan.post.schedule.dto.request.CommentCreationRequest;
+import com.cocodan.triplan.post.schedule.dto.request.LikeToggleRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreationRequest;
+import com.cocodan.triplan.post.schedule.dto.response.CommentReadResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostNestedCommentResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.dto.response.NestedCommentReadResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostListViewResponse;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostCommentRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostLikeRepository;
 import com.cocodan.triplan.post.schedule.repository.SchedulePostNestedCommentRepository;
@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 public class SchedulePostService {
 
     private final MemberRepository memberRepository;
+
     private final ScheduleRepository scheduleRepository;
 
     private final SchedulePostLikeRepository schedulePostLikeRepository;
@@ -62,6 +63,7 @@ public class SchedulePostService {
         this.schedulePostRepository = schedulePostRepository;
     }
 
+    // TODO 2021.12.30 Teru - 테스크 코드에서만 이용되고 있는 메서드. TP-124(테스트 코드 리팩터링) 진행시 제거
     @Transactional(readOnly = true)
     public SchedulePost findById(Long id) {
         return schedulePostRepository.findById(id).orElseThrow(
@@ -69,9 +71,8 @@ public class SchedulePostService {
         );
     }
 
-
     @Transactional
-    public Long createSchedulePost(Long memberId, SchedulePostRequest request) {
+    public Long createSchedulePost(Long memberId, SchedulePostCreationRequest request) {
         Member member = getMember(memberId);
         Schedule schedule = getSchedule(request.getScheduleId());
 
@@ -89,6 +90,9 @@ public class SchedulePostService {
         return savedSchedulePost.getId();
     }
 
+    /**
+     * @return 현재 서비스에서 선택 가능한 모든 도시 목록
+     */
     public List<String> getAvailableCities() {
         return Arrays.stream(City.values())
                 .filter(city -> !city.equals(City.ALL))
@@ -106,7 +110,7 @@ public class SchedulePostService {
         schedulePost.increaseViews();
         schedulePostRepository.save(schedulePost);
 
-        List<SchedulePostCommentResponse> comments = getSchedulePostComments(schedulePostId);
+        List<CommentReadResponse> comments = getSchedulePostComments(schedulePostId);
         Optional<Like> isLiked = getLike(memberId, schedulePostId);
         return SchedulePostDetailResponse.of(schedulePost, comments, isLiked.isPresent());
     }
@@ -129,7 +133,7 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public void modifySchedulePost(Long memberId, Long schedulePostId, SchedulePostRequest request) {
+    public void modifySchedulePost(Long memberId, Long schedulePostId, SchedulePostCreationRequest request) {
         SchedulePost schedulePost = validateAuthorities(memberId, schedulePostId);
 
         schedulePost.updateTitle(request.getTitle());
@@ -145,7 +149,7 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public Long toggleSchedulePostLiked(Long memberId, Long schedulePostId, SchedulePostLikeRequest request) {
+    public Long toggleSchedulePostLiked(Long memberId, Long schedulePostId, LikeToggleRequest request) {
         Optional<Like> likeData = getLike(memberId, schedulePostId);
         SchedulePost post = getSchedulePostForLikeUpdate(schedulePostId);
 
@@ -164,7 +168,7 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public List<SchedulePostResponse> getLikedSchedulePosts(Long memberId) {
+    public List<SchedulePostListViewResponse> getLikedSchedulePosts(Long memberId) {
         List<Like> likeData = getAllLike(memberId);
         List<SchedulePost> schedulePosts = likeData.stream()
                 .map(Like::getSchedulePost)
@@ -173,17 +177,17 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public List<SchedulePostCommentResponse> getSchedulePostComments(Long schedulePostId) {
+    public List<CommentReadResponse> getSchedulePostComments(Long schedulePostId) {
         nullCheck(schedulePostId);
 
         SchedulePost schedulePost = getSchedulePost(schedulePostId);
 
         return getCommentsOf(schedulePost).stream()
-                .map(comment -> SchedulePostCommentResponse.of(
+                .map(comment -> CommentReadResponse.of(
                                 comment,
                                 getNestedCommentsOf(comment)
                                         .stream()
-                                        .map(SchedulePostNestedCommentResponse::from)
+                                        .map(NestedCommentReadResponse::from)
                                         .collect(Collectors.toList())
                         )
                 )
@@ -191,7 +195,11 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public List<SchedulePostCommentResponse> writeSchedulePostComment(Long memberId, Long schedulePostId, SchedulePostCommentRequest request) {
+    public List<CommentReadResponse> writeSchedulePostComment(
+            Long memberId,
+            Long schedulePostId,
+            CommentCreationRequest request
+    ) {
         nullCheck(memberId, schedulePostId);
 
         SchedulePost schedulePost = getSchedulePost(schedulePostId);
@@ -217,7 +225,12 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public void modifySchedulePostComment(Long schedulePostId, Long commentId, Long memberId, SchedulePostCommentRequest request) {
+    public void modifySchedulePostComment(
+            Long schedulePostId,
+            Long commentId,
+            Long memberId,
+            CommentCreationRequest request
+    ) {
         validateCommentOwnership(schedulePostId, commentId, memberId);
         SchedulePostComment comment = getComment(commentId);
         comment.updateContent(request.getContent());
@@ -225,11 +238,11 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public List<SchedulePostCommentResponse> writeNestedCommentToSchedulePostComment(
+    public List<CommentReadResponse> writeNestedCommentToSchedulePostComment(
             Long memberId,
             Long schedulePostId,
             Long commentId,
-            SchedulePostCommentRequest request
+            CommentCreationRequest request
     ) {
         nullCheck(memberId, schedulePostId, commentId);
 
@@ -247,13 +260,17 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public List<SchedulePostNestedCommentResponse> getSchedulePostNestedComments(Long schedulePostId, Long commentId, Long memberId) {
+    public List<NestedCommentReadResponse> getSchedulePostNestedComments(
+            Long schedulePostId,
+            Long commentId,
+            Long memberId
+    ) {
         nullCheck(schedulePostId, commentId, memberId);
 
         SchedulePostComment comment = getComment(commentId);
         List<SchedulePostNestedComment> nestedComments = getNestedCommentsOf(comment);
         return nestedComments.stream()
-                .map(SchedulePostNestedCommentResponse::from)
+                .map(NestedCommentReadResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -263,7 +280,7 @@ public class SchedulePostService {
             Long schedulePostId,
             Long commentId,
             Long nestedCommentId,
-            SchedulePostCommentRequest request
+            CommentCreationRequest request
     ) {
         validateNestedCommentOwnership(memberId, schedulePostId, commentId, nestedCommentId);
         SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId);
@@ -278,7 +295,7 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public List<SchedulePostResponse> getCertainMemberSchedulePostList(Long memberId) {
+    public List<SchedulePostListViewResponse> getCertainMemberSchedulePostList(Long memberId) {
         nullCheck(memberId);
 
         List<SchedulePost> schedulePosts = getSchedulePostsByMemberId(memberId);
@@ -286,7 +303,12 @@ public class SchedulePostService {
     }
 
     // private methods...
-    private void validateNestedCommentOwnership(Long memberId, Long schedulePostId, Long commentId, Long nestedCommentId) {
+    private void validateNestedCommentOwnership(
+            Long memberId,
+            Long schedulePostId,
+            Long commentId,
+            Long nestedCommentId
+    ) {
         nullCheck(memberId, schedulePostId, commentId, nestedCommentId);
 
         getSchedulePost(schedulePostId);
@@ -347,8 +369,8 @@ public class SchedulePostService {
         return schedulePostLikeRepository.findAllByMemberId(memberId);
     }
 
-    private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
-        return schedulePosts.stream().map(SchedulePostResponse::from).collect(Collectors.toList());
+    private List<SchedulePostListViewResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
+        return schedulePosts.stream().map(SchedulePostListViewResponse::from).collect(Collectors.toList());
     }
 
     private List<SchedulePost> getSchedulePostsByMemberId(Long memberId) {

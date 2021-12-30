@@ -3,13 +3,13 @@ package com.cocodan.triplan.post.schedule.service;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
+import com.cocodan.triplan.post.schedule.dto.request.CommentCreationRequest;
+import com.cocodan.triplan.post.schedule.dto.request.LikeToggleRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreationRequest;
+import com.cocodan.triplan.post.schedule.dto.response.CommentReadResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostNestedCommentResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.dto.response.NestedCommentReadResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostListViewResponse;
 import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
@@ -89,7 +89,7 @@ class SchedulePostServiceTest {
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         // 여행 공유 게시글 생성
-        SchedulePostRequest request = new SchedulePostRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
+        SchedulePostCreationRequest request = new SchedulePostCreationRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
 
         Pageable pageable = new Pageable() {
@@ -140,7 +140,7 @@ class SchedulePostServiceTest {
         };
 
         // 여행 공유 게시글 조회
-        List<SchedulePostResponse> posts = postSearchService.getSchedulePosts("1", City.ALL, Theme.ALL, SchedulePostSortingRule.RECENT);
+        List<SchedulePostListViewResponse> posts = postSearchService.getSchedulePosts("1", City.ALL, Theme.ALL, SchedulePostSortingRule.RECENT);
         assertThat(posts.size()).isEqualTo(1);
 //        assertThat(posts.getContent().get(0).getProfileImageUrl()).isEqualTo(PROFILE_IMAGE);
         assertThat(posts.get(0).getNickname()).isEqualTo(NICKNAME);
@@ -171,7 +171,7 @@ class SchedulePostServiceTest {
     private Long createSchedulePost1() {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
-        SchedulePostRequest request = new SchedulePostRequest("1번 여행!",
+        SchedulePostCreationRequest request = new SchedulePostCreationRequest("1번 여행!",
                 "Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
                         "\n" +
                         "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald Wayne to develop and sell Wozniak's Apple I personal computer. It was incorporated by Jobs and Wozniak as Apple Computer, Inc. in 1977, and sales of its computers, among them the Apple II, grew quickly. It went public in 1980, to instant financial success. Over the next few years, Apple shipped new computers featuring innovative graphical user interfaces, such as the original Macintosh, announced in a critically acclaimed advertisement, \"1984\", directed by Ridley Scott. The high cost of its products and limited application library caused problems, as did power struggles between executives. In 1985, Wozniak departed Apple amicably,[15] while Jobs resigned to found NeXT, taking some Apple employees with him.[16]\n" +
@@ -188,7 +188,7 @@ class SchedulePostServiceTest {
     private Long createSchedulePost2() {
         ScheduleCreationRequest scheduleCreationRequest2 = createScheduleCreation();
         Long createdScheduleId2 = scheduleService.saveSchedule(scheduleCreationRequest2, testMemberId);
-        SchedulePostRequest request2 = new SchedulePostRequest("2번 여행!",
+        SchedulePostCreationRequest request2 = new SchedulePostCreationRequest("2번 여행!",
                 "삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
                         "\n" +
                         "처음에는 이병철 창업주가 삼성물산이라는 이름으로 자본금 3만 원(현재가치 3억 원)에 지금의 삼성 그룹을 창립하였다.\n" +
@@ -206,8 +206,8 @@ class SchedulePostServiceTest {
         return schedulePostService.createSchedulePost(testMemberId, request2);
     }
 
-    private List<SchedulePostResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
-        return schedulePosts.stream().map(SchedulePostResponse::from).collect(Collectors.toList());
+    private List<SchedulePostListViewResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
+        return schedulePosts.stream().map(SchedulePostListViewResponse::from).collect(Collectors.toList());
     }
 
     @Test
@@ -217,16 +217,16 @@ class SchedulePostServiceTest {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
-        SchedulePostRequest request = new SchedulePostRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
+        SchedulePostCreationRequest request = new SchedulePostCreationRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
         Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
         SchedulePost post1 = schedulePostService.findById(createdSchedulePostId);
 
         assertThat(post1.getMember().getId()).isEqualTo(testMemberId);
-        assertThat(memberService.getOne(post1.getMember().getId()).getEmail()).isEqualTo(EMAIL);
-        assertThat(memberService.getOne(post1.getMember().getId()).getName()).isEqualTo(NAME);
-        assertThat(memberService.getOne(post1.getMember().getId()).getBirth()).isEqualTo(BIRTH);
-        assertThat(memberService.getOne(post1.getMember().getId()).getNickname()).isEqualTo(NICKNAME);
-        assertThat(memberService.getOne(post1.getMember().getId()).getProfileImage()).isEqualTo(PROFILE_IMAGE);
+        assertThat(post1.getMember().getEmail()).isEqualTo(EMAIL);
+        assertThat(post1.getMember().getName()).isEqualTo(NAME);
+        assertThat(post1.getMember().getBirth()).isEqualTo(BIRTH);
+        assertThat(post1.getMember().getNickname()).isEqualTo(NICKNAME);
+        assertThat(post1.getMember().getProfileImage()).isEqualTo(PROFILE_IMAGE);
         assertThat(post1.getTitle()).isEqualTo("1번 여행 게시글");
         assertThat(post1.getContent()).isEqualTo("1번 여행 게시글 본문");
         assertThat(post1.getCity()).isEqualTo(City.SEOUL);
@@ -304,7 +304,7 @@ class SchedulePostServiceTest {
         ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
         Long newScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
-        SchedulePostRequest modifyRequest = new SchedulePostRequest("가자 우주로!",
+        SchedulePostCreationRequest modifyRequest = new SchedulePostCreationRequest("가자 우주로!",
                 "삼성 그룹(三星-, The Samsung Group, 약칭: 삼성, Samsung)은 대한민국에 본사를 둔 다국적 기업집단이다.\n" +
                         "\n" +
                         "처음에는 이병철 창업주가 삼성물산이라는 이름으로 자본금 3만 원(현재가치 3억 원)에 지금의 삼성 그룹을 창립하였다.\n" +
@@ -349,10 +349,10 @@ class SchedulePostServiceTest {
         long beforeLiked = post.getLiked();
 
         // 좋아요 누르기
-        SchedulePostLikeRequest doSchedulePostLike = new SchedulePostLikeRequest(true);
+        LikeToggleRequest doSchedulePostLike = new LikeToggleRequest(true);
         Long afterLiked = schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId, doSchedulePostLike);
         // 좋아요 취소
-        SchedulePostLikeRequest doSchedulePostLikeAgain = new SchedulePostLikeRequest(false);
+        LikeToggleRequest doSchedulePostLikeAgain = new LikeToggleRequest(false);
         Long afterLikedAgain = schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId, doSchedulePostLikeAgain);
         
         // 좋아요 누른 후 좋아요 수
@@ -368,22 +368,22 @@ class SchedulePostServiceTest {
         Long createdSchedulePostId1 = createSchedulePost1();
         Long createdSchedulePostId2 = createSchedulePost2();
         // 좋아요 한 게시글 없음
-        List<SchedulePostResponse> emptySchedulePostList = schedulePostService.getLikedSchedulePosts(testMemberId);
+        List<SchedulePostListViewResponse> emptySchedulePostList = schedulePostService.getLikedSchedulePosts(testMemberId);
         // 1번 여행 좋아요!
-        SchedulePostLikeRequest doSchedulePostLike1 = new SchedulePostLikeRequest(true);
+        LikeToggleRequest doSchedulePostLike1 = new LikeToggleRequest(true);
         schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId1, doSchedulePostLike1);
-        List<SchedulePostResponse> schedulePostListAfterLikeTrip1 = schedulePostService.getLikedSchedulePosts(testMemberId);
+        List<SchedulePostListViewResponse> schedulePostListAfterLikeTrip1 = schedulePostService.getLikedSchedulePosts(testMemberId);
         // 2번 여행도 좋아요!
-        SchedulePostLikeRequest doSchedulePostLike2 = new SchedulePostLikeRequest(true);
+        LikeToggleRequest doSchedulePostLike2 = new LikeToggleRequest(true);
         schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId2, doSchedulePostLike2);
-        List<SchedulePostResponse> schedulePostListAfterLikeTrip2 = schedulePostService.getLikedSchedulePosts(testMemberId);
+        List<SchedulePostListViewResponse> schedulePostListAfterLikeTrip2 = schedulePostService.getLikedSchedulePosts(testMemberId);
 
         // then
         assertThat(emptySchedulePostList).isEmpty();
         assertThat(schedulePostListAfterLikeTrip1.size()).isEqualTo(1);
         List<SchedulePost> post1 = new ArrayList<>();
         post1.add(schedulePostService.findById(createdSchedulePostId1));
-        SchedulePostResponse response1 = convertToSchedulePostResponseList(post1).get(0);
+        SchedulePostListViewResponse response1 = convertToSchedulePostResponseList(post1).get(0);
 
         assertThat(schedulePostListAfterLikeTrip1.get(0).getProfileImageUrl()).isEqualTo(response1.getProfileImageUrl());
         assertThat(schedulePostListAfterLikeTrip1.get(0).getNickname()).isEqualTo(response1.getNickname());
@@ -403,8 +403,8 @@ class SchedulePostServiceTest {
     @Transactional
     void writeCommentToSchedulePost() {
         Long createdSchedulePostId1 = createSchedulePost1();
-        SchedulePostCommentRequest comment1 = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        CommentCreationRequest comment1 = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
 
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
@@ -417,8 +417,8 @@ class SchedulePostServiceTest {
     void deleteCommentFromSchedulePost() {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
-        SchedulePostCommentRequest comment1 = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        CommentCreationRequest comment1 = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
         // 댓글 작성 확인
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
@@ -427,7 +427,7 @@ class SchedulePostServiceTest {
         // 댓글 삭제
         schedulePostService.deleteSchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
         // 댓글 삭제 확인
-        List<SchedulePostCommentResponse> commentsAfterDeletion = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        List<CommentReadResponse> commentsAfterDeletion = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
         assertThat(commentsAfterDeletion.size()).isEqualTo(0);
     }
 
@@ -437,18 +437,18 @@ class SchedulePostServiceTest {
     void modifyCommentOfASchedulePost() {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
-        SchedulePostCommentRequest comment1 = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        CommentCreationRequest comment1 = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
         // 댓글 작성 확인
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
         assertThat(comments.get(0).getNickname()).isEqualTo(NICKNAME);
 
         // 댓글 수정
-        SchedulePostCommentRequest modifyRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        CommentCreationRequest modifyRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         schedulePostService.modifySchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId, modifyRequest);
         // 댓글 수정 확인
-        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        List<CommentReadResponse> schedulePostComments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
         assertThat(schedulePostComments.size()).isEqualTo(1);
         assertThat(schedulePostComments.get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
     }
@@ -459,11 +459,11 @@ class SchedulePostServiceTest {
     void writeNestedCommentsToCommentOfSchedulePost() {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
-        SchedulePostCommentRequest commentRequest = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
-        SchedulePostCommentRequest nestedCommentRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
@@ -485,11 +485,11 @@ class SchedulePostServiceTest {
     void getNestedCommentsOfACommentOfASchedulePost() {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
-        SchedulePostCommentRequest commentRequest = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
-        SchedulePostCommentRequest nestedCommentRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
@@ -497,10 +497,10 @@ class SchedulePostServiceTest {
                 nestedCommentRequest
         );
         // 1차 확인
-        List<SchedulePostNestedCommentResponse> nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
+        List<NestedCommentReadResponse> nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
         assertThat(nestedComments.get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
 
-        SchedulePostCommentRequest nestedCommentRequest2 = new SchedulePostCommentRequest("아이클리어 루테인지아잔틴");
+        CommentCreationRequest nestedCommentRequest2 = new CommentCreationRequest("아이클리어 루테인지아잔틴");
         schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
@@ -519,11 +519,11 @@ class SchedulePostServiceTest {
     void modifySchedulePostNestedComment() {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
-        SchedulePostCommentRequest commentRequest = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
-        SchedulePostCommentRequest nestedCommentRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         comments = schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
@@ -532,7 +532,7 @@ class SchedulePostServiceTest {
         );
 
         // 대댓글 수정
-        SchedulePostCommentRequest nestedCommentModifyRequest = new SchedulePostCommentRequest("나랏말싸미 듕귁에달아 문자와로 서로 사맛디 아니할새 이런 젼챠로 어린 백셩이 니르고져 할 배 이셔도 못 할 노미 하니라");
+        CommentCreationRequest nestedCommentModifyRequest = new CommentCreationRequest("나랏말싸미 듕귁에달아 문자와로 서로 사맛디 아니할새 이런 젼챠로 어린 백셩이 니르고져 할 배 이셔도 못 할 노미 하니라");
         schedulePostService.modifySchedulePostNestedComment(
                 testMemberId,
                 createdSchedulePostId1,
@@ -552,11 +552,11 @@ class SchedulePostServiceTest {
     void deleteSchedulePostNestedComment() {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
-        SchedulePostCommentRequest commentRequest = new SchedulePostCommentRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<SchedulePostCommentResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
-        SchedulePostCommentRequest nestedCommentRequest = new SchedulePostCommentRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
+        CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         comments = schedulePostService.writeNestedCommentToSchedulePostComment(
                 testMemberId,
                 createdSchedulePostId1,
@@ -588,7 +588,7 @@ class SchedulePostServiceTest {
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         // 게시글 생성1
-        SchedulePostRequest request1 = new SchedulePostRequest("1번 여행 넘모 신나요~", "신나씐나신나씐나", "서울", createdScheduleId);
+        SchedulePostCreationRequest request1 = new SchedulePostCreationRequest("1번 여행 넘모 신나요~", "신나씐나신나씐나", "서울", createdScheduleId);
         Long createdSchedulePostId1 = schedulePostService.createSchedulePost(testMemberId, request1);
         SchedulePost post1 = schedulePostService.findById(createdSchedulePostId1);
 
@@ -600,7 +600,7 @@ class SchedulePostServiceTest {
         assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getWriterId()).isEqualTo(testMemberId);
 
         // 게시글 생성 2
-        SchedulePostRequest request2 = new SchedulePostRequest("1번 여행 다녀왔어요~", "갔다왔어요~", "서울", createdScheduleId);
+        SchedulePostCreationRequest request2 = new SchedulePostCreationRequest("1번 여행 다녀왔어요~", "갔다왔어요~", "서울", createdScheduleId);
         Long createdSchedulePostId2 = schedulePostService.createSchedulePost(testMemberId, request2);
         SchedulePost post2 = schedulePostService.findById(createdSchedulePostId2);
 

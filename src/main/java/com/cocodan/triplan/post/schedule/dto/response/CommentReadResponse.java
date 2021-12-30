@@ -8,12 +8,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class SchedulePostCommentResponse {
+public class CommentReadResponse {
 
     private Long commentId;
 
@@ -27,18 +26,18 @@ public class SchedulePostCommentResponse {
 
     private String createdAt;
 
-    private List<SchedulePostNestedCommentResponse> nestedComments;
+    private List<NestedCommentReadResponse> nestedComments;
 
     private Long writerId; // 이 댓글을 쓴 사람의 memberId
 
     private boolean schedulePostWriter; // 게시글의 작성자인지 여부
 
-    public static SchedulePostCommentResponse of(
+    public static CommentReadResponse of(
             SchedulePostComment comment,
-            List<SchedulePostNestedCommentResponse> nestedComments
+            List<NestedCommentReadResponse> nestedComments
     ) {
         Member member = comment.getMember();
-        return SchedulePostCommentResponse.builder()
+        return CommentReadResponse.builder()
                 .commentId(comment.getId())
                 .writerId(member.getId())
                 .nickname(member.getNickname())
