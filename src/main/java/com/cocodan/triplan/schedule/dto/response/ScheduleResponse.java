@@ -20,19 +20,19 @@ import java.util.stream.Collectors;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ScheduleResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final String title;
+    private String title;
 
-    private final String startDate;
+    private String startDate;
 
-    private final String endDate;
+    private String endDate;
 
-    private final List<Theme> themes;
+    private List<Theme> themes;
 
-    private final List<ScheduleSpotResponse> spotResponseList;
+    private List<ScheduleSpotResponse> spotResponseList;
 
-    private final List<MemberSimpleResponse> memberSimpleResponses;
+    private List<MemberSimpleResponse> memberSimpleResponses;
 
     public static ScheduleResponse from(Schedule schedule) {
         return ScheduleResponse.builder()

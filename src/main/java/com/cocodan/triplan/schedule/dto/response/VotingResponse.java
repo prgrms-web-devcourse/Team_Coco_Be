@@ -14,17 +14,17 @@ import java.util.stream.Collectors;
 @Builder(access = AccessLevel.PRIVATE)
 public class VotingResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final String title;
+    private String title;
 
-    private final int numOfTotalParticipants;
+    private int numOfTotalParticipants;
 
-    private final List<VotingContentResponse> votingContentResponses;
+    private List<VotingContentResponse> votingContentResponses;
 
-    private final MemberSimpleResponse memberSimpleResponse;
+    private MemberSimpleResponse memberSimpleResponse;
 
-    private final boolean multipleFlag;
+    private boolean multipleFlag;
 
     public static VotingResponse from(Voting voting) {
         return VotingResponse.builder()
