@@ -13,13 +13,13 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MemoResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final String title;
+    private String title;
 
-    private final String content;
+    private String content;
 
-    private final MemberSimpleResponse memberSimpleResponse;
+    private MemberSimpleResponse memberSimpleResponse;
 
     public static MemoResponse from(Memo memo) {
         return MemoResponse.builder()

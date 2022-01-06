@@ -11,23 +11,23 @@ import lombok.Getter;
 @Builder(access = AccessLevel.PRIVATE)
 public class ScheduleSpotResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final int dateOrder;
+    private int dateOrder;
 
-    private final int spotOrder;
+    private int spotOrder;
 
-    private final Long spotId;
+    private Long spotId;
 
-    private final String placeName;
+    private String placeName;
 
-    private final String addressName;
+    private String addressName;
 
-    private final String roadAddressName;
+    private String roadAddressName;
 
-    private final String phone;
+    private String phone;
 
-    private final Position position;
+    private Position position;
 
     public static ScheduleSpotResponse of(Spot spot, DailyScheduleSpot dailyScheduleSpot) {
         return ScheduleSpotResponse.builder()

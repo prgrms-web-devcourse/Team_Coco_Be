@@ -9,13 +9,13 @@ import lombok.Getter;
 @Builder(access = AccessLevel.PRIVATE)
 public class ChecklistResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final String content;
+    private String content;
 
-    private final boolean checked;
+    private boolean checked;
 
-    private final int day;
+    private int day;
 
     public static ChecklistResponse from(Checklist checklist) {
         return ChecklistResponse.builder()
