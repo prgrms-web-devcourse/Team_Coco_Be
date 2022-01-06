@@ -107,10 +107,13 @@ public class ScheduleService {
 
     private void createScheduleDailySpots(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
-                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
+                .forEach(request -> createDailyScheduleSpot(schedule, request));
     }
 
-    private void createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+    private void createDailyScheduleSpot(
+            Schedule schedule,
+            DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest
+    ) {
         DailyScheduleSpot.builder()
                 .spotId(dailyScheduleSpotCreationRequest.getSpotId())
                 .placeName(dailyScheduleSpotCreationRequest.getPlaceName())
@@ -187,9 +190,12 @@ public class ScheduleService {
         }
     }
 
-    private void convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
+    private void convertDailyScheduleSpotList(
+            Schedule schedule,
+            ScheduleModificationRequest scheduleModificationRequest
+    ) {
         scheduleModificationRequest.getDailyScheduleSpotCreationRequests()
-                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
+                .forEach(request -> createDailyScheduleSpot(schedule, request));
     }
 
     @Transactional
@@ -527,7 +533,11 @@ public class ScheduleService {
         return schedule.getScheduleMembers().stream()
                 .filter(scheduleMember -> scheduleMember.getMemberId().equals(deletedId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(ExceptionMessageUtils.getMessage("exception.bad_request")));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                ExceptionMessageUtils.getMessage("exception.bad_request")
+                        )
+                );
     }
 
     @Transactional

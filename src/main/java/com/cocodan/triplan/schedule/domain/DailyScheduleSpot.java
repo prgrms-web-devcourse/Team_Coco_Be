@@ -45,9 +45,16 @@ public class DailyScheduleSpot extends BaseEntity {
         checkArgument(spotId != null, "SpotId is required");
         checkArgument(placeName != null, "PlaceName is required");
         checkArgument(spotId > 0 ,"SpotId must be greater than 0");
-        checkArgument(Range.closed(Spot.PLACE_NAME_MIN_LENGTH, Spot.PLACE_NAME_MAX_LENGTH).contains(placeName.length()), "PlaceName is invalid");
         checkArgument(Range.closed(DAY_MIN, DAY_MAX).contains(dateOrder), "DateOrder is invalid");
-        checkArgument((Range.closed(NUM_OF_SPOT_MIN, NUM_OF_SPOT_MAX).contains(spotOrder)),"SpotOrder is invalid");
+        checkArgument(
+                Range.closed(Spot.PLACE_NAME_MIN_LENGTH,
+                Spot.PLACE_NAME_MAX_LENGTH).contains(placeName.length()),
+                "PlaceName is invalid"
+        );
+        checkArgument(
+                Range.closed(NUM_OF_SPOT_MIN, NUM_OF_SPOT_MAX).contains(spotOrder),
+                "SpotOrder is invalid"
+        );
 
         this.schedule = schedule;
         this.spotId = spotId;

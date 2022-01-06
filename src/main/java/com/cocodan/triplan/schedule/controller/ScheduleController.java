@@ -27,7 +27,10 @@ public class ScheduleController {
     // 일정
     @ApiOperation("일정 생성")
     @PostMapping()
-    public ResponseEntity<IdResponse> createSchedule(@Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ResponseEntity<IdResponse> createSchedule(
+            @Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         Long savedId = scheduleService.saveSchedule(scheduleCreationRequest, authentication.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
@@ -35,7 +38,9 @@ public class ScheduleController {
 
     @ApiOperation("회원이 속한 일정 목록 조회")
     @GetMapping()
-    public ResponseEntity<List<ScheduleSimpleResponse>> getSchedules(@AuthenticationPrincipal JwtAuthentication authentication) {
+    public ResponseEntity<List<ScheduleSimpleResponse>> getSchedules(
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         List<ScheduleSimpleResponse> schedules = scheduleService.getSchedules(authentication.getId());
 
         return ResponseEntity.ok(schedules);
@@ -63,7 +68,10 @@ public class ScheduleController {
 
     @ApiOperation("일정 삭제")
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ResponseEntity<Void> deleteSchedule(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         scheduleService.deleteSchedule(scheduleId, authentication.getId());
 
         return ResponseEntity.ok().build();
@@ -84,7 +92,10 @@ public class ScheduleController {
 
     @ApiOperation("일정에 속한 메모 목록 조회")
     @GetMapping("/{scheduleId}/memos")
-    public ResponseEntity<List<MemoSimpleResponse>> getMemos(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ResponseEntity<List<MemoSimpleResponse>> getMemos(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         List<MemoSimpleResponse> memos = scheduleService.getMemos(scheduleId, authentication.getId());
 
         return ResponseEntity.ok(memos);
@@ -142,7 +153,10 @@ public class ScheduleController {
 
     @ApiOperation("일정에 속한 체크리스트 목록 조회")
     @GetMapping("/{scheduleId}/checklists")
-    public ResponseEntity<List<ChecklistResponse>> getChecklists(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ResponseEntity<List<ChecklistResponse>> getChecklists(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         List<ChecklistResponse> checklistResponses = scheduleService.getChecklists(scheduleId, authentication.getId());
 
         return ResponseEntity.ok(checklistResponses);
@@ -192,7 +206,8 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<VotingSimpleResponse> votingSimpleResponses = scheduleService.getVotingList(scheduleId, authentication.getId());
+        List<VotingSimpleResponse> votingSimpleResponses =
+                scheduleService.getVotingList(scheduleId, authentication.getId());
 
         return ResponseEntity.ok(votingSimpleResponses);
     }
@@ -204,7 +219,8 @@ public class ScheduleController {
             @PathVariable Long votingId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        VotingDetailResponse votingDetailResponse = scheduleService.getVoting(scheduleId, votingId, authentication.getId());
+        VotingDetailResponse votingDetailResponse =
+                scheduleService.getVoting(scheduleId, votingId, authentication.getId());
 
         return ResponseEntity.ok(votingDetailResponse);
     }
@@ -253,7 +269,8 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<MemberSimpleResponse> memberSimpleResponses = scheduleService.getScheduleMembers(scheduleId, authentication.getId());
+        List<MemberSimpleResponse> memberSimpleResponses =
+                scheduleService.getScheduleMembers(scheduleId, authentication.getId());
 
         return ResponseEntity.ok(memberSimpleResponses);
     }
@@ -272,7 +289,10 @@ public class ScheduleController {
 
     @ApiOperation("여행에서 나가기")
     @DeleteMapping("/{scheduleId}/members/exit")
-    public ResponseEntity<Void> exitSchedule(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ResponseEntity<Void> exitSchedule(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         scheduleService.exitSchedule(scheduleId, authentication.getId());
 
         return ResponseEntity.ok().build();
