@@ -1,5 +1,6 @@
 package com.cocodan.triplan.member.controller;
 
+import com.cocodan.triplan.common.dto.ApiResponse;
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.jwt.JwtAuthenticationToken;
@@ -11,6 +12,7 @@ import com.cocodan.triplan.member.dto.response.*;
 import com.cocodan.triplan.member.service.MemberService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -34,7 +36,7 @@ public class MemberController {
 
     @ApiOperation("회원(Member) 신규 추가, 성공시 생성된 Member ID 반환")
     @PostMapping("/register")
-    public ResponseEntity<MemberCreateResponse> signUp(@Valid @RequestBody MemberCreateRequest request) {
+    public ApiResponse<MemberCreateResponse> signUp(@Valid @RequestBody MemberCreateRequest request) {
         MemberCreateResponse response = memberService.validCreate(
                 request.getEmail(),
                 request.getName(),
@@ -46,28 +48,28 @@ public class MemberController {
                 GROUP_ID
         );
 
-        return ResponseEntity.ok(response);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), response);
     }
 
     @ApiOperation("회원(Member) 단건 조회, 성공시 Member 정보 반환")
     @GetMapping(value = "/users/{memberId}")
-    public ResponseEntity<MemberGetOneResponse> readSingleData(@PathVariable Long memberId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ApiResponse<MemberGetOneResponse> readSingleData(@PathVariable Long memberId, @AuthenticationPrincipal JwtAuthentication authentication) {
         MemberGetOneResponse response = memberService.getOne(memberId);
 
-        return ResponseEntity.ok(response);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), response);
     }
 
     @ApiOperation("닉네임으로 회원 조회")
     @GetMapping("/users")
-    public ResponseEntity<List<MemberSimpleResponse>> findMemberByNickname(@RequestParam String nickname) {
+    public ApiResponse<List<MemberSimpleResponse>> findMemberByNickname(@RequestParam String nickname) {
         List<MemberSimpleResponse> responses = memberService.findMemberByNickname(nickname);
 
-        return ResponseEntity.ok(responses);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), responses);
     }
 
     @ApiOperation("회원(Member) 단건 수정, 성공시 수정된 Member 정보 반환")
     @PutMapping(value = "/users/{memberId}")
-    public ResponseEntity<MemberUpdateResponse> editInfo(@PathVariable Long memberId, @Valid @RequestBody MemberUpdateRequest request) {
+    public ApiResponse<MemberUpdateResponse> editInfo(@PathVariable Long memberId, @Valid @RequestBody MemberUpdateRequest request) {
         MemberUpdateResponse response = memberService.update(
                 memberId,
                 request.getName(),
@@ -75,19 +77,19 @@ public class MemberController {
                 request.getProfileImage()
         );
 
-        return ResponseEntity.ok(response);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), response);
     }
 
     @ApiOperation("회원(Member) 단건 삭제, 성공시 삭제된 Member ID 반환")
     @DeleteMapping(value = "/users/{memberId}")
-    public ResponseEntity<MemberDeleteResponse> delete(@Valid @PathVariable Long memberId) {
+    public ApiResponse<MemberDeleteResponse> delete(@Valid @PathVariable Long memberId) {
         MemberDeleteResponse response = memberService.delete(memberId);
 
-        return ResponseEntity.ok(response);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), response);
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request, HttpServletResponse httpServletResponse) {
+    public ApiResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest request, HttpServletResponse httpServletResponse) {
         JwtAuthenticationToken authToken = new JwtAuthenticationToken(request.getEmail(), request.getPassword());
         Authentication resultToken = authenticationManager.authenticate(authToken);
         JwtAuthentication authentication = (JwtAuthentication) resultToken.getPrincipal();
@@ -96,19 +98,18 @@ public class MemberController {
 
         MemberLoginResponse response = new MemberLoginResponse(authentication.getToken(), authentication.getId());
 
-        return ResponseEntity.ok(response);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), response);
     }
 
     @ApiOperation("내 프로필 조회")
     @GetMapping("/profiles")
-    public ResponseEntity<MemberGetOneResponse> readProfile(@AuthenticationPrincipal JwtAuthentication authentication) {
+    public ApiResponse<MemberGetOneResponse> readProfile(@AuthenticationPrincipal JwtAuthentication authentication) {
         Long memberId = authentication.getId();
-        if (memberId == 0)
-        {
+        if (memberId == 0) {
             throw new NotFoundException(Member.class, memberId);
         }
         MemberGetOneResponse response = memberService.getOne(memberId);
 
-        return ResponseEntity.ok(response);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), response);
     }
 }
