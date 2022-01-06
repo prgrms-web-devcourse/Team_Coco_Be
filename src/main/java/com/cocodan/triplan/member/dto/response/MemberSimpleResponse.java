@@ -1,7 +1,6 @@
 package com.cocodan.triplan.member.dto.response;
 
 import com.cocodan.triplan.member.domain.Member;
-import com.cocodan.triplan.schedule.dto.response.MemoSimpleResponse;
 import lombok.Builder;
 import lombok.Getter;
 

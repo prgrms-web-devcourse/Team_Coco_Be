@@ -10,7 +10,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,18 +38,18 @@ public class ScheduleController {
 
     @ApiOperation("회원이 속한 일정 목록 조회")
     @GetMapping()
-    public ApiResponse<List<ScheduleSimpleResponse>> getSchedules(
+    public ApiResponse<List<ScheduleResponse>> getSchedules(
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<ScheduleSimpleResponse> schedules = scheduleService.getSchedules(authentication.getId());
+        List<ScheduleResponse> schedules = scheduleService.getSchedules(authentication.getId());
 
         return ApiResponse.createApiResponse(HttpStatus.OK.value(), schedules);
     }
 
     @ApiOperation("일정 상세 조회")
     @GetMapping("/{scheduleId}")
-    public ApiResponse<ScheduleDetailResponse> getSchedule(@PathVariable Long scheduleId) {
-        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId);
+    public ApiResponse<ScheduleResponse> getSchedule(@PathVariable Long scheduleId) {
+        ScheduleResponse schedule = scheduleService.getSchedule(scheduleId);
 
         return ApiResponse.createApiResponse(HttpStatus.OK.value(), schedule);
     }
@@ -93,25 +92,25 @@ public class ScheduleController {
 
     @ApiOperation("일정에 속한 메모 목록 조회")
     @GetMapping("/{scheduleId}/memos")
-    public ApiResponse<List<MemoSimpleResponse>> getMemos(
+    public ApiResponse<List<MemoResponse>> getMemos(
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<MemoSimpleResponse> memos = scheduleService.getMemos(scheduleId, authentication.getId());
+        List<MemoResponse> memos = scheduleService.getMemos(scheduleId, authentication.getId());
 
         return ApiResponse.createApiResponse(HttpStatus.OK.value(), memos);
     }
 
     @ApiOperation("메모 상세 조회")
     @GetMapping("/{scheduleId}/memos/{memoId}")
-    public ApiResponse<MemoDetailResponse> getMemo(
+    public ApiResponse<MemoResponse> getMemo(
             @PathVariable Long scheduleId,
             @PathVariable Long memoId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        MemoDetailResponse memoDetailResponse = scheduleService.getMemo(scheduleId, memoId, authentication.getId());
+        MemoResponse memoResponse = scheduleService.getMemo(scheduleId, memoId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), memoDetailResponse);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), memoResponse);
     }
 
     @ApiOperation("메모 수정")
@@ -203,11 +202,11 @@ public class ScheduleController {
 
     @ApiOperation("일정에 속한 투표 목록 조회")
     @GetMapping("/{scheduleId}/votings")
-    public ApiResponse<List<VotingSimpleResponse>> getVotingList(
+    public ApiResponse<List<VotingResponse>> getVotingList(
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<VotingSimpleResponse> votingSimpleResponses =
+        List<VotingResponse> votingSimpleResponses =
                 scheduleService.getVotingList(scheduleId, authentication.getId());
 
         return ApiResponse.createApiResponse(HttpStatus.OK.value(), votingSimpleResponses);
@@ -215,15 +214,15 @@ public class ScheduleController {
 
     @ApiOperation("투표 상세 조회")
     @GetMapping("/{scheduleId}/votings/{votingId}")
-    public ApiResponse<VotingDetailResponse> getVoting(
+    public ApiResponse<VotingResponse> getVoting(
             @PathVariable Long scheduleId,
             @PathVariable Long votingId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        VotingDetailResponse votingDetailResponse =
+        VotingResponse votingResponse =
                 scheduleService.getVoting(scheduleId, votingId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), votingDetailResponse);
+        return ApiResponse.createApiResponse(HttpStatus.OK.value(), votingResponse);
     }
 
     @ApiOperation("투표 행사")
