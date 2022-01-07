@@ -288,7 +288,12 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public void deleteSchedulePostNestedComment(Long memberId, Long schedulePostId, Long commentId, Long nestedCommentId) {
+    public void deleteSchedulePostNestedComment(
+            Long memberId,
+            Long schedulePostId,
+            Long commentId,
+            Long nestedCommentId
+    ) {
         validateNestedCommentOwnership(memberId, schedulePostId, commentId, nestedCommentId);
         SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId);
         schedulePostNestedCommentRepository.delete(nestedComment);
