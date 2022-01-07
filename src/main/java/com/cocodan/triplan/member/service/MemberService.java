@@ -1,5 +1,6 @@
 package com.cocodan.triplan.member.service;
 
+import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.UniqueEmailException;
 import com.cocodan.triplan.member.dto.response.*;
 import com.cocodan.triplan.util.MemberConverter;
@@ -12,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,5 +108,14 @@ public class MemberService {
         }
 
         return member;
+    }
+
+    public Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException(MessageFormat.format(
+                        "{} :: Member Not Found. " +
+                                "There does not exist a Member with the given ID : {}",
+                        LocalDateTime.now(), memberId
+                )));
     }
 }

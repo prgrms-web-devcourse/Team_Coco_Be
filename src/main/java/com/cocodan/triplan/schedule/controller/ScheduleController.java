@@ -5,7 +5,7 @@ import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.dto.request.*;
 import com.cocodan.triplan.schedule.dto.response.*;
-import com.cocodan.triplan.schedule.service.ScheduleService;
+import com.cocodan.triplan.schedule.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,14 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+
+    private final MemoService memoService;
+
+    private final VotingService votingService;
+
+    private final ChecklistService checklistService;
+
+    private final ScheduleMemberService scheduleMemberService;
 
     // 일정
     @ApiOperation("일정 생성")
@@ -85,7 +93,7 @@ public class ScheduleController {
             @RequestBody @Valid MemoRequest memoRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long savedId = scheduleService.saveMemo(scheduleId, memoRequest, authentication.getId());
+        Long savedId = memoService.saveMemo(scheduleId, memoRequest, authentication.getId());
 
         return ApiResponse.created(new IdResponse(savedId));
     }
@@ -96,7 +104,7 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<MemoResponse> memos = scheduleService.getMemos(scheduleId, authentication.getId());
+        List<MemoResponse> memos = memoService.getMemos(scheduleId, authentication.getId());
 
         return ApiResponse.ok(memos);
     }
@@ -108,7 +116,7 @@ public class ScheduleController {
             @PathVariable Long memoId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        MemoResponse memoResponse = scheduleService.getMemo(scheduleId, memoId, authentication.getId());
+        MemoResponse memoResponse = memoService.getMemo(scheduleId, memoId, authentication.getId());
 
         return ApiResponse.ok(memoResponse);
     }
@@ -121,7 +129,7 @@ public class ScheduleController {
             @RequestBody @Valid MemoRequest memoRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.modifyMemo(scheduleId, memoId, memoRequest, authentication.getId());
+        memoService.modifyMemo(scheduleId, memoId, memoRequest, authentication.getId());
 
         return ApiResponse.ok();
     }
@@ -133,7 +141,7 @@ public class ScheduleController {
             @PathVariable Long memoId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.deleteMemo(scheduleId, memoId, authentication.getId());
+        memoService.deleteMemo(scheduleId, memoId, authentication.getId());
 
         return ApiResponse.ok();
     }
@@ -146,7 +154,7 @@ public class ScheduleController {
             @RequestBody @Valid ChecklistCreationRequest checklistCreationRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest, authentication.getId());
+        Long savedId = checklistService.saveChecklist(scheduleId, checklistCreationRequest, authentication.getId());
 
         return ApiResponse.created(new IdResponse(savedId));
     }
@@ -157,7 +165,7 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<ChecklistResponse> checklistResponses = scheduleService.getChecklists(scheduleId, authentication.getId());
+        List<ChecklistResponse> checklistResponses = checklistService.getChecklists(scheduleId, authentication.getId());
 
         return ApiResponse.ok(checklistResponses);
     }
@@ -170,7 +178,7 @@ public class ScheduleController {
             @RequestParam boolean flag,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.doCheck(scheduleId, checklistId, authentication.getId(), flag);
+        checklistService.doCheck(scheduleId, checklistId, authentication.getId(), flag);
 
         return ApiResponse.ok();
     }
@@ -182,7 +190,7 @@ public class ScheduleController {
             @PathVariable Long checklistId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.deleteChecklist(scheduleId, checklistId, authentication.getId());
+        checklistService.deleteChecklist(scheduleId, checklistId, authentication.getId());
 
         return ApiResponse.ok();
     }
@@ -195,7 +203,7 @@ public class ScheduleController {
             @RequestBody @Valid VotingCreationRequest votingCreationRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long savedId = scheduleService.saveVoting(scheduleId, votingCreationRequest, authentication.getId());
+        Long savedId = votingService.saveVoting(scheduleId, votingCreationRequest, authentication.getId());
 
         return ApiResponse.created(new IdResponse(savedId));
     }
@@ -207,7 +215,7 @@ public class ScheduleController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<VotingResponse> votingSimpleResponses =
-                scheduleService.getVotingList(scheduleId, authentication.getId());
+                votingService.getVotingList(scheduleId, authentication.getId());
 
         return ApiResponse.ok(votingSimpleResponses);
     }
@@ -220,7 +228,7 @@ public class ScheduleController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         VotingResponse votingResponse =
-                scheduleService.getVoting(scheduleId, votingId, authentication.getId());
+                votingService.getVoting(scheduleId, votingId, authentication.getId());
 
         return ApiResponse.ok(votingResponse);
     }
@@ -233,7 +241,7 @@ public class ScheduleController {
             @RequestBody @Valid VotingRequest votingRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.doVote(scheduleId, votingId, votingRequest, authentication.getId());
+        votingService.doVote(scheduleId, votingId, votingRequest, authentication.getId());
 
         return ApiResponse.ok();
     }
@@ -245,7 +253,7 @@ public class ScheduleController {
             @PathVariable Long votingId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.deleteVoting(scheduleId, votingId, authentication.getId());
+        votingService.deleteVoting(scheduleId, votingId, authentication.getId());
 
         return ApiResponse.ok();
     }
@@ -258,7 +266,7 @@ public class ScheduleController {
             @Valid @RequestBody ScheduleMemberRequest scheduleMemberRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.addScheduleMember(scheduleId, scheduleMemberRequest, authentication.getId());
+        scheduleMemberService.addScheduleMember(scheduleId, scheduleMemberRequest, authentication.getId());
 
         return ApiResponse.ok();
     }
@@ -270,7 +278,7 @@ public class ScheduleController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<MemberSimpleResponse> memberSimpleResponses =
-                scheduleService.getScheduleMembers(scheduleId, authentication.getId());
+                scheduleMemberService.getScheduleMembers(scheduleId, authentication.getId());
 
         return ApiResponse.ok(memberSimpleResponses);
     }
@@ -282,7 +290,7 @@ public class ScheduleController {
             @PathVariable(name = "memberId") Long deletedId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.deleteScheduleMember(scheduleId, deletedId, authentication.getId());
+        scheduleMemberService.deleteScheduleMember(scheduleId, deletedId, authentication.getId());
 
         return ApiResponse.ok();
     }
@@ -293,7 +301,7 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        scheduleService.exitSchedule(scheduleId, authentication.getId());
+        scheduleMemberService.exitSchedule(scheduleId, authentication.getId());
 
         return ApiResponse.ok();
     }

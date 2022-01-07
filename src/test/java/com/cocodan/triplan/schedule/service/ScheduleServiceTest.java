@@ -41,15 +41,6 @@ class ScheduleServiceTest {
     private ScheduleRepository scheduleRepository;
 
     @Autowired
-    private MemoRepository memoRepository;
-
-    @Autowired
-    private ChecklistRepository checklistRepository;
-
-    @Autowired
-    private VotingRepository votingRepository;
-
-    @Autowired
     private MemberService memberService;
 
     @PostConstruct
@@ -70,7 +61,7 @@ class ScheduleServiceTest {
     @DisplayName("여행 일정을 생성한다.")
     void createSchedule() {
         // Given
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        ScheduleCreationRequest scheduleCreationRequest = TestDataFactory.createScheduleCreation();
 
         // When
         Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
@@ -82,25 +73,11 @@ class ScheduleServiceTest {
         assertThat(schedule.getCreatedDate()).isNotNull();
     }
 
-    private ScheduleCreationRequest createScheduleCreation() {
-        return new ScheduleCreationRequest("title", LocalDate.of(2021, 12, 1), LocalDate.of(2021, 12, 3), List.of("activity", "food"),
-                List.of(new DailyScheduleSpotCreationRequest(11L, "address1", "roadAddress1", "010-1111-2222", "불국사1", new Position(37.1234, 125.3333), 1, 1),
-                        new DailyScheduleSpotCreationRequest(21L, "address2", "roadAddress2", "010-1111-2223", "불국사2", new Position(37.1234, 125.3333), 1, 2),
-                        new DailyScheduleSpotCreationRequest(31L, "address3", "roadAddress3", "010-1111-2224", "불국사3", new Position(37.1234, 125.3333), 1, 3),
-                        new DailyScheduleSpotCreationRequest(41L, "address4", "roadAddress4", "010-1111-2225", "불국사4", new Position(37.1234, 125.3333), 2, 1),
-                        new DailyScheduleSpotCreationRequest(51L, "address5", "roadAddress5", "010-1111-2226", "불국사5", new Position(37.1234, 125.3333), 2, 2),
-                        new DailyScheduleSpotCreationRequest(61L, "address6", "roadAddress6", "010-1111-2227", "불국사6", new Position(37.1234, 125.3333), 2, 3),
-                        new DailyScheduleSpotCreationRequest(71L, "address7", "roadAddress7", "010-1111-2228", "불국사7", new Position(37.1234, 125.3333), 3, 1),
-                        new DailyScheduleSpotCreationRequest(81L, "address8", "roadAddress8", "010-1111-2229", "불국사8", new Position(37.1234, 125.3333), 3, 2)
-                ),
-                List.of());
-    }
-
     @Test
     @DisplayName("일정 목록을 조회한다.")
     void getSchedules() {
         // Given
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        ScheduleCreationRequest scheduleCreationRequest = TestDataFactory.createScheduleCreation();
         Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
@@ -119,7 +96,7 @@ class ScheduleServiceTest {
     @DisplayName("일정을 상세 조회한다.")
     void getSchedule() {
         // Given
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        ScheduleCreationRequest scheduleCreationRequest = TestDataFactory.createScheduleCreation();
         Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
@@ -154,7 +131,7 @@ class ScheduleServiceTest {
     @DisplayName("일정 장소 리스트를 수정한다")
     void modifySpots() {
         // Given
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        ScheduleCreationRequest scheduleCreationRequest = TestDataFactory.createScheduleCreation();
         Long schedule = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         ScheduleModificationRequest scheduleModificationRequest = new ScheduleModificationRequest("updated Title", List.of("NATURE"),
@@ -185,7 +162,7 @@ class ScheduleServiceTest {
     @DisplayName("일정을 삭제한다")
     void deleteSchedule() {
         // Given
-        ScheduleCreationRequest scheduleCreationRequest = createScheduleCreation();
+        ScheduleCreationRequest scheduleCreationRequest = TestDataFactory.createScheduleCreation();
         Long schedule = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
@@ -193,291 +170,5 @@ class ScheduleServiceTest {
 
         // Then
         assertThat(scheduleRepository.findById(schedule)).isNotPresent();
-    }
-
-    @Test
-    @DisplayName("메모를 추가한다")
-    void createMemo() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
-
-        // When
-        Long memo = scheduleService.saveMemo(schedule, memoRequest, MEMBER_ID);
-
-        Memo actual = memoRepository.findById(memo).get();
-
-        // Then
-        assertThat(actual.getTitle()).isEqualTo("memotitle");
-        assertThat(actual.getContent()).isEqualTo("JIFEOgoiioghiohgieogio");
-    }
-
-    @Test
-    @DisplayName("메모 목록을 조회한다")
-    void getMemos() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
-        MemoRequest memoRequest2 = new MemoRequest("memotitle2", "JIFEOgoiioghiohgieogio2");
-        MemoRequest memoRequest3 = new MemoRequest("memotitle3", "JIFEOgoiioghiohgieogio3");
-
-        Long memo1 = scheduleService.saveMemo(schedule, memoRequest1, MEMBER_ID);
-        Long memo2 = scheduleService.saveMemo(schedule, memoRequest2, MEMBER_ID);
-        Long memo3 = scheduleService.saveMemo(schedule, memoRequest3, MEMBER_ID);
-
-        // When
-        List<MemoResponse> memos = scheduleService.getMemos(schedule, MEMBER_ID);
-
-        List<String> titles = memos.stream()
-                .map(MemoResponse::getTitle)
-                .collect(Collectors.toList());
-
-        List<String> contents = memos.stream()
-                .map((MemoResponse::getContent))
-                .collect(Collectors.toList());
-
-        List<Long> ids = memos.stream()
-                .map((MemoResponse::getId))
-                .collect(Collectors.toList());
-
-
-        // Then
-        assertThat(ids).containsExactly(memo1, memo2, memo3);
-        assertThat(titles).containsExactlyInAnyOrder("memotitle1", "memotitle2", "memotitle3");
-        assertThat(contents).containsExactlyInAnyOrder("JIFEOgoiioghiohgieogio1", "JIFEOgoiioghiohgieogio2", "JIFEOgoiioghiohgieogio3");
-    }
-
-    @Test
-    @DisplayName("메모를 상세 조회 한다")
-    void getMemo() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest1 = new MemoRequest("memotitle1", "JIFEOgoiioghiohgieogio1");
-        Long memo = scheduleService.saveMemo(schedule, memoRequest1, MEMBER_ID);
-
-        // When
-        MemoResponse actual = scheduleService.getMemo(schedule, memo, MEMBER_ID);
-
-        // Then
-        assertThat(actual.getTitle()).isEqualTo("memotitle1");
-        assertThat(actual.getContent()).isEqualTo("JIFEOgoiioghiohgieogio1");
-        assertThat(actual.getMemberSimpleResponse().getId()).isEqualTo(MEMBER_ID);
-    }
-
-    @Test
-    @DisplayName("메모를 수정한다")
-    void modifyMemo() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
-        Long memo = scheduleService.saveMemo(schedule, memoRequest, MEMBER_ID);
-
-        // When
-        MemoRequest updateRequest = new MemoRequest("핫둘셋넷다여일여아열핫둘셋넷닷엿", "Updated Memo Content");
-        scheduleService.modifyMemo(schedule, memo, updateRequest, MEMBER_ID);
-
-        // Then
-        Memo updated = memoRepository.findById(memo).get();
-        assertThat(updated.getContent()).isEqualTo(updateRequest.getContent());
-        assertThat(updated.getTitle()).isEqualTo(updateRequest.getTitle());
-    }
-
-    @Test
-    @DisplayName("메모를 삭제한다")
-    void deleteMemo() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        MemoRequest memoRequest = new MemoRequest("memotitle", "JIFEOgoiioghiohgieogio");
-        Long memo = scheduleService.saveMemo(schedule, memoRequest, MEMBER_ID);
-
-        // When
-        scheduleService.deleteMemo(schedule, memo, MEMBER_ID);
-
-        // Then
-        Optional<Memo> optionalMemo = memoRepository.findById(memo);
-        assertThat(optionalMemo).isEqualTo(Optional.empty());
-    }
-
-    @Test
-    @DisplayName("체크리스트를 추가한다")
-    void createChecklist() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(0, "밥 먹을 사람");
-
-        // When
-        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
-
-        // Then
-        assertThat(checklist).isEqualTo(1L);
-    }
-
-    @DisplayName("체크리스트 선택 및 해제")
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void doCheck(boolean flag) {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(1, "밥 먹을 사람");
-        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
-
-        // When
-        scheduleService.doCheck(schedule, checklist, MEMBER_ID, flag);
-        Checklist saved = checklistRepository.findById(checklist).get();
-
-        // Then
-        assertThat(saved.isChecked()).isEqualTo(flag);
-    }
-
-    @Test
-    @DisplayName("체크리스트를 삭제한다")
-    void deleteChecklist() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        ChecklistCreationRequest checklistCreationRequest = new ChecklistCreationRequest(1, "밥 먹을 사람");
-        Long checklist = scheduleService.saveChecklist(schedule, checklistCreationRequest, MEMBER_ID);
-
-        // When
-        scheduleService.deleteChecklist(schedule, checklist, MEMBER_ID);
-        Optional<Checklist> saved = checklistRepository.findById(checklist);
-
-        // Then
-        assertThat(saved).isEqualTo(Optional.empty());
-    }
-
-    @Test
-    @DisplayName("투표를 추가한다")
-    void createVoting() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
-
-        // When
-        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
-        Voting savedVoting = votingRepository.findById(voting).get();
-
-
-        List<String> contentList = savedVoting.getVotingContents()
-                .stream()
-                .map(votingContent -> votingContent.getContent())
-                .collect(Collectors.toList());
-
-        // Then
-        assertThat(savedVoting.getTitle()).isEqualTo("무슨 요일날 갈까요?");
-        assertThat(savedVoting.isMultipleFlag()).isFalse();
-        assertThat(contentList).containsExactly("월", "화", "수", "목");
-    }
-
-    @Test
-    @DisplayName("투표 목록을 조회한다")
-    void getVotings() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        VotingCreationRequest votingCreationRequest1 = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
-        VotingCreationRequest votingCreationRequest2 = new VotingCreationRequest("어디 여행 갈래", List.of("서울", "부산", "제주도", "안 가"), true);
-
-        Long voting1 = scheduleService.saveVoting(schedule, votingCreationRequest1, MEMBER_ID);
-        Long voting2 = scheduleService.saveVoting(schedule, votingCreationRequest2, MEMBER_ID);
-
-        // When
-        List<VotingResponse> votingList = scheduleService.getVotingList(schedule, MEMBER_ID);
-
-        List<String> titles = votingList.stream()
-                .map(VotingResponse::getTitle)
-                .collect(Collectors.toList());
-
-        List<Integer> counts = votingList.stream()
-                .map(VotingResponse::getNumOfTotalParticipants)
-                .collect(Collectors.toList());
-
-        // Then
-        assertThat(titles).contains("무슨 요일날 갈까요?", "어디 여행 갈래");
-        assertThat(counts).containsExactly(0, 0);
-    }
-
-    @Test
-    @DisplayName("투표의 상세 정보를 조회한다")
-    void getVoting() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
-
-        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
-
-        // When
-        VotingResponse response = scheduleService.getVoting(schedule, voting, MEMBER_ID);
-
-        List<String> contents = response.getVotingContentResponses().stream()
-                .map(VotingContentResponse::getContent)
-                .collect(Collectors.toList());
-
-        // Then
-        assertThat(response.getId()).isEqualTo(voting);
-        assertThat(response.getTitle()).isEqualTo("무슨 요일날 갈까요?");
-        assertThat(response.getNumOfTotalParticipants()).isZero();
-        assertThat(response.getMemberSimpleResponse().getId()).isEqualTo(MEMBER_ID);
-        assertThat(contents).containsExactly("월", "화", "수", "목");
-    }
-
-    @Test
-    @DisplayName("투표를 행사 한다")
-    void vote() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
-
-        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
-        Voting saved = votingRepository.findById(voting).get();
-
-        List<Long> ids = saved.getVotingContents().stream()
-                .map(VotingContent::getId)
-                .collect(Collectors.toList());
-
-        Map<Long, Boolean> votingMap = Map.of(ids.get(0), true, ids.get(1), false, ids.get(2), false, ids.get(3), false);
-        VotingRequest votingRequest = new VotingRequest(votingMap);
-
-        // When
-        scheduleService.doVote(schedule, voting, votingRequest, MEMBER_ID);
-
-        List<VotingContent> votingContents = saved.getVotingContents();
-
-        List<Integer> votingCountList = votingContents.stream()
-                .map(VotingContent::getNumOfParticipants)
-                .collect(Collectors.toList());
-
-        // Then
-        votingContents.forEach(votingContent -> {
-            if (votingMap.get(votingContent.getId())) {
-                assertThat(getVotingMemberIds(votingContent)).contains(MEMBER_ID);
-            } else {
-                assertThat(getVotingMemberIds(votingContent)).doesNotContain(MEMBER_ID);
-            }
-        });
-
-        assertThat(votingCountList).containsExactly(1, 0, 0, 0);
-        assertThat(saved.getNumOfTotalParticipants()).isEqualTo(1);
-    }
-
-    private List<Long> getVotingMemberIds(VotingContent votingContent) {
-        return votingContent.getVotingContentMembers()
-                .stream()
-                .map(VotingContentMember::getMemberId)
-                .collect(Collectors.toList());
-    }
-
-    @Test
-    @DisplayName("투표를 삭제한다")
-    void deleteVoting() {
-        // Given
-        Long schedule = scheduleService.saveSchedule(createScheduleCreation(), MEMBER_ID);
-        VotingCreationRequest votingCreationRequest = new VotingCreationRequest("무슨 요일날 갈까요?", List.of("월", "화", "수", "목"), false);
-        Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
-
-        // When
-        scheduleService.deleteVoting(schedule, voting, MEMBER_ID);
-        Optional<Voting> actual = votingRepository.findById(voting);
-
-        // Then
-        assertThat(actual).isNotPresent();
     }
 }
