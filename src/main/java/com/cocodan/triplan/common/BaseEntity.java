@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
+public abstract class BaseEntity extends BaseTimeEntity{
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)
@@ -22,14 +22,6 @@ public abstract class BaseEntity {
     @LastModifiedBy
     @Column(name = "last_modified_by")
     private Long lastModifiedBy;
-
-    @CreatedDate
-    @Column(name = "created_date")
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    @Column(name = "last_modified_date")
-    private LocalDateTime lastModifiedDate;
 
     protected BaseEntity() {
     }
@@ -44,13 +36,5 @@ public abstract class BaseEntity {
 
     public Long getLastModifiedBy() {
         return lastModifiedBy;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public LocalDateTime getLastModifiedDate() {
-        return lastModifiedDate;
     }
 }
