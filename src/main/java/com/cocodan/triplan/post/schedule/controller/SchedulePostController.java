@@ -76,7 +76,7 @@ public class SchedulePostController {
             @Valid @RequestBody SchedulePostCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long postId = schedulePostService.createSchedulePost(authentication.getId(), request);
+        Long postId = schedulePostService.createSchedulePost(authentication, request);
         return ApiResponse.ok(SchedulePostCreationResponse.from(postId));
     }
 
@@ -92,19 +92,19 @@ public class SchedulePostController {
     public ApiResponse<List<SchedulePostListViewResponse>> getMySchedulePostList(
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long memberId = authentication.getId();
         List<SchedulePostListViewResponse> schedulePosts =
-                schedulePostService.getCertainMemberSchedulePostList(memberId);
+                schedulePostService.getCertainMemberSchedulePostList(authentication);
         return ApiResponse.ok(schedulePosts);
     }
 
     @ApiOperation("특정 멤버가 작성한 여행 공유 게시글 모아보기")
     @GetMapping("/schedules/writers/{writerId}")
     public ApiResponse<List<SchedulePostListViewResponse>> getCertainMembersSchedulePostList(
-            @PathVariable("writerId") Long writerId
+            @PathVariable("writerId") Long writerId,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<SchedulePostListViewResponse> schedulePosts =
-                schedulePostService.getCertainMemberSchedulePostList(writerId);
+                schedulePostService.getCertainMemberSchedulePostList(writerId, authentication);
         return ApiResponse.ok(schedulePosts);
     }
 
@@ -115,7 +115,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         SchedulePostDetailResponse schedulePostDetail =
-                schedulePostService.getSchedulePostDetail(schedulePostId, authentication.getId());
+                schedulePostService.getSchedulePostDetail(schedulePostId, authentication);
         return ApiResponse.ok(schedulePostDetail);
     }
 
@@ -125,7 +125,7 @@ public class SchedulePostController {
             @PathVariable("schedulePostId") Long schedulePostId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        schedulePostService.deleteSchedulePost(authentication.getId(), schedulePostId);
+        schedulePostService.deleteSchedulePost(authentication, schedulePostId);
         return ApiResponse.ok();
     }
 
@@ -136,7 +136,7 @@ public class SchedulePostController {
             @Valid @RequestBody SchedulePostCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        schedulePostService.modifySchedulePost(authentication.getId(), schedulePostId, request);
+        schedulePostService.modifySchedulePost(authentication, schedulePostId, request);
         return ApiResponse.ok();
     }
 
@@ -148,7 +148,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long likeCount =
-                schedulePostService.toggleSchedulePostLiked(authentication.getId(), schedulePostId, request);
+                schedulePostService.toggleSchedulePostLiked(authentication, schedulePostId, request);
         return ApiResponse.ok(new LikeToggleResponse(likeCount));
     }
 
@@ -163,10 +163,11 @@ public class SchedulePostController {
     @ApiOperation("여행 공유 게시글에 작성된 댓글 조회하기")
     @GetMapping("/schedules/{schedulePostId}/comments")
     public ApiResponse<List<CommentReadResponse>> getSchedulePostComments(
-            @PathVariable("schedulePostId") Long schedulePostId
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<CommentReadResponse> schedulePostComments =
-                schedulePostService.getSchedulePostComments(schedulePostId);
+                schedulePostService.getSchedulePostComments(schedulePostId, authentication);
         return ApiResponse.ok(schedulePostComments);
     }
 
@@ -178,7 +179,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<CommentReadResponse> schedulePostComments =
-                schedulePostService.writeSchedulePostComment(authentication.getId(), schedulePostId, request);
+                schedulePostService.writeSchedulePostComment(authentication, schedulePostId, request);
         return ApiResponse.created(schedulePostComments);
     }
 
@@ -195,7 +196,7 @@ public class SchedulePostController {
         // -> Henry 등의 의견으로 1이 좋을 것이라 생각되나, 삭제 관련 기능에서 오류가 발생합니다. (코멘트가 삭제되기 위해서는 해당 comment의 ID를 FK로 가지는 모든 대댓글이 먼저 삭제되어야 함)
         // 그래서 일단 방법 2 쪽으로 먼저 구현합니다. (게시글 삭제 -> 대댓글, 댓글, 좋아요 순으로 선행 삭제 / 댓글 삭제 -> 대댓글, 댓글 순으로 삭제)
         // -> TODO: 추후 연관관계 관련 문제 해결하고 방법 1로 교체
-        schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, authentication.getId());
+        schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, authentication);
         return ApiResponse.ok();
     }
 
@@ -207,7 +208,7 @@ public class SchedulePostController {
             @Valid @RequestBody CommentCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        schedulePostService.modifySchedulePostComment(schedulePostId, commentId, authentication.getId(), request);
+        schedulePostService.modifySchedulePostComment(schedulePostId, commentId, authentication, request);
         return ApiResponse.ok();
     }
 
@@ -219,7 +220,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         List<NestedCommentReadResponse> schedulePostNestedComments =
-                schedulePostService.getSchedulePostNestedComments(schedulePostId, commentId, authentication.getId());
+                schedulePostService.getSchedulePostNestedComments(schedulePostId, commentId, authentication);
         return ApiResponse.ok(schedulePostNestedComments);
     }
 
@@ -233,7 +234,7 @@ public class SchedulePostController {
     ) {
         List<CommentReadResponse> commentReadResponses =
                 schedulePostService.writeNestedCommentToSchedulePostComment(
-                        authentication.getId(),
+                        authentication,
                         schedulePostId,
                         commentId,
                         request
@@ -251,7 +252,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         schedulePostService.modifySchedulePostNestedComment(
-                authentication.getId(),
+                authentication,
                 schedulePostId,
                 commentId,
                 nestedCommentId,
@@ -269,7 +270,7 @@ public class SchedulePostController {
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         schedulePostService.deleteSchedulePostNestedComment(
-                authentication.getId(),
+                authentication,
                 schedulePostId,
                 commentId,
                 nestedCommentId

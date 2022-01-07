@@ -20,6 +20,8 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Api(tags = "Member")
@@ -103,9 +105,16 @@ public class MemberController {
     @GetMapping("/profiles")
     public ResponseEntity<MemberGetOneResponse> readProfile(@AuthenticationPrincipal JwtAuthentication authentication) {
         Long memberId = authentication.getId();
-        if (memberId == 0)
-        {
-            throw new NotFoundException(Member.class, memberId);
+        if (memberId == 0) {
+            throw new NotFoundException(
+                    MessageFormat.format(
+                            "{} :: Member Not Found. There does not exist a Member with the given ID : {}" +
+                                    "\n\tRequested by a member(ID: {}, Token: {}",
+                            LocalDateTime.now(),
+                            memberId,
+                            authentication.getId(),
+                            authentication.getToken()
+                    ));
         }
         MemberGetOneResponse response = memberService.getOne(memberId);
 

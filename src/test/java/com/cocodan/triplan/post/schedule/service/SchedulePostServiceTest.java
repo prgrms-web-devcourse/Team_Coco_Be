@@ -1,5 +1,6 @@
 package com.cocodan.triplan.post.schedule.service;
 
+import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.member.service.MemberService;
 import com.cocodan.triplan.post.schedule.domain.SchedulePost;
@@ -66,6 +67,8 @@ class SchedulePostServiceTest {
     private static final String PASSWORD = "asdf123";
     private static final Long GROUP_ID = 1L;
 
+    private static JwtAuthentication authentication;
+
     @BeforeAll
     void setup() {
         testMemberId = memberService.create(
@@ -78,6 +81,8 @@ class SchedulePostServiceTest {
                 PASSWORD,
                 GROUP_ID
         ).getId();
+
+        authentication = new JwtAuthentication("JWT Token String For Test", testMemberId);
     }
 
     @Test
@@ -90,7 +95,7 @@ class SchedulePostServiceTest {
 
         // 여행 공유 게시글 생성
         SchedulePostCreationRequest request = new SchedulePostCreationRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
-        Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
+        Long createdSchedulePostId = schedulePostService.createSchedulePost(authentication, request);
 
         Pageable pageable = new Pageable() {
             @Override
@@ -182,7 +187,7 @@ class SchedulePostServiceTest {
                 "서울",
                 createdScheduleId
         );
-        return schedulePostService.createSchedulePost(testMemberId, request);
+        return schedulePostService.createSchedulePost(authentication, request);
     }
 
     private Long createSchedulePost2() {
@@ -203,7 +208,7 @@ class SchedulePostServiceTest {
                 "부산",
                 createdScheduleId
                 );
-        return schedulePostService.createSchedulePost(testMemberId, request2);
+        return schedulePostService.createSchedulePost(authentication, request2);
     }
 
     private List<SchedulePostListViewResponse> convertToSchedulePostResponseList(List<SchedulePost> schedulePosts) {
@@ -218,7 +223,7 @@ class SchedulePostServiceTest {
         Long createdScheduleId = scheduleService.saveSchedule(scheduleCreationRequest, testMemberId);
 
         SchedulePostCreationRequest request = new SchedulePostCreationRequest("1번 여행 게시글", "1번 여행 게시글 본문", "서울", createdScheduleId);
-        Long createdSchedulePostId = schedulePostService.createSchedulePost(testMemberId, request);
+        Long createdSchedulePostId = schedulePostService.createSchedulePost(authentication, request);
         SchedulePost post1 = schedulePostService.findById(createdSchedulePostId);
 
         assertThat(post1.getMember().getId()).isEqualTo(testMemberId);
@@ -241,7 +246,7 @@ class SchedulePostServiceTest {
         SchedulePost post = schedulePostService.findById(createdSchedulePostId);
         long initialViews = post.getViews();
 
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId, testMemberId);
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId, authentication);
 
         assertThat(schedulePostDetail.getTitle()).isEqualTo("1번 여행!");
         assertThat(schedulePostDetail.getContent()).isEqualTo("Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software and online services. Apple is the largest information technology company by revenue (totaling $274.5 billion in 2020) and, since January 2021, the world's most valuable company. As of 2021, Apple is the fourth-largest PC vendor by unit sales[9] and fourth-largest smartphone manufacturer.[10][11] It is one of the Big Five American information technology companies, alongside Amazon, Google (Alphabet), Facebook (Meta), and Microsoft.[12][13][14]\n" +
@@ -284,7 +289,7 @@ class SchedulePostServiceTest {
         assertThat(post.getId()).isEqualTo(createdSchedulePostId);
 
         // 게시글 삭제하기
-        schedulePostService.deleteSchedulePost(testMemberId, createdSchedulePostId);
+        schedulePostService.deleteSchedulePost(authentication, createdSchedulePostId);
 
         // 게시글이 삭제되었는지 검증하기
         Assertions.assertThrows(RuntimeException.class,
@@ -319,7 +324,7 @@ class SchedulePostServiceTest {
                 "부산",
                 newScheduleId
         );
-        schedulePostService.modifySchedulePost(testMemberId, post.getId(), modifyRequest);
+        schedulePostService.modifySchedulePost(authentication, post.getId(), modifyRequest);
 
         // assert
         SchedulePost modifiedPost = schedulePostService.findById(createdSchedulePostId);
@@ -350,10 +355,10 @@ class SchedulePostServiceTest {
 
         // 좋아요 누르기
         LikeToggleRequest doSchedulePostLike = new LikeToggleRequest(true);
-        Long afterLiked = schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId, doSchedulePostLike);
+        Long afterLiked = schedulePostService.toggleSchedulePostLiked(authentication, createdSchedulePostId, doSchedulePostLike);
         // 좋아요 취소
         LikeToggleRequest doSchedulePostLikeAgain = new LikeToggleRequest(false);
-        Long afterLikedAgain = schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId, doSchedulePostLikeAgain);
+        Long afterLikedAgain = schedulePostService.toggleSchedulePostLiked(authentication, createdSchedulePostId, doSchedulePostLikeAgain);
         
         // 좋아요 누른 후 좋아요 수
         assertThat(beforeLiked + 1).isEqualTo(afterLiked);
@@ -371,11 +376,11 @@ class SchedulePostServiceTest {
         List<SchedulePostListViewResponse> emptySchedulePostList = schedulePostService.getLikedSchedulePosts(testMemberId);
         // 1번 여행 좋아요!
         LikeToggleRequest doSchedulePostLike1 = new LikeToggleRequest(true);
-        schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId1, doSchedulePostLike1);
+        schedulePostService.toggleSchedulePostLiked(authentication, createdSchedulePostId1, doSchedulePostLike1);
         List<SchedulePostListViewResponse> schedulePostListAfterLikeTrip1 = schedulePostService.getLikedSchedulePosts(testMemberId);
         // 2번 여행도 좋아요!
         LikeToggleRequest doSchedulePostLike2 = new LikeToggleRequest(true);
-        schedulePostService.toggleSchedulePostLiked(testMemberId, createdSchedulePostId2, doSchedulePostLike2);
+        schedulePostService.toggleSchedulePostLiked(authentication, createdSchedulePostId2, doSchedulePostLike2);
         List<SchedulePostListViewResponse> schedulePostListAfterLikeTrip2 = schedulePostService.getLikedSchedulePosts(testMemberId);
 
         // then
@@ -404,7 +409,7 @@ class SchedulePostServiceTest {
     void writeCommentToSchedulePost() {
         Long createdSchedulePostId1 = createSchedulePost1();
         CommentCreationRequest comment1 = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(authentication, createdSchedulePostId1, comment1);
 
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
@@ -418,16 +423,16 @@ class SchedulePostServiceTest {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
         CommentCreationRequest comment1 = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(authentication, createdSchedulePostId1, comment1);
         // 댓글 작성 확인
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
         assertThat(comments.get(0).getNickname()).isEqualTo(NICKNAME);
 
         // 댓글 삭제
-        schedulePostService.deleteSchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
+        schedulePostService.deleteSchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), authentication);
         // 댓글 삭제 확인
-        List<CommentReadResponse> commentsAfterDeletion = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        List<CommentReadResponse> commentsAfterDeletion = schedulePostService.getSchedulePostComments(createdSchedulePostId1, authentication);
         assertThat(commentsAfterDeletion.size()).isEqualTo(0);
     }
 
@@ -438,7 +443,7 @@ class SchedulePostServiceTest {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
         CommentCreationRequest comment1 = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, comment1);
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(authentication, createdSchedulePostId1, comment1);
         // 댓글 작성 확인
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
@@ -446,9 +451,9 @@ class SchedulePostServiceTest {
 
         // 댓글 수정
         CommentCreationRequest modifyRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
-        schedulePostService.modifySchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId, modifyRequest);
+        schedulePostService.modifySchedulePostComment(createdSchedulePostId1, comments.get(0).getCommentId(), authentication, modifyRequest);
         // 댓글 수정 확인
-        List<CommentReadResponse> schedulePostComments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        List<CommentReadResponse> schedulePostComments = schedulePostService.getSchedulePostComments(createdSchedulePostId1, authentication);
         assertThat(schedulePostComments.size()).isEqualTo(1);
         assertThat(schedulePostComments.get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
     }
@@ -460,19 +465,19 @@ class SchedulePostServiceTest {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
         CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(authentication, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
         CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         schedulePostService.writeNestedCommentToSchedulePostComment(
-                testMemberId,
+                authentication,
                 createdSchedulePostId1,
                 comments.get(0).getCommentId(),
                 nestedCommentRequest
         );
 
         // 대댓글 확인
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1, testMemberId);
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1, authentication);
         assertThat(schedulePostDetail.getComments().size()).isEqualTo(1);
         assertThat(schedulePostDetail.getComments().get(0).getContent()).isEqualTo("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().size()).isEqualTo(1);
@@ -486,30 +491,30 @@ class SchedulePostServiceTest {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
         CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(authentication, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
         CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         schedulePostService.writeNestedCommentToSchedulePostComment(
-                testMemberId,
+                authentication,
                 createdSchedulePostId1,
                 comments.get(0).getCommentId(),
                 nestedCommentRequest
         );
         // 1차 확인
-        List<NestedCommentReadResponse> nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
+        List<NestedCommentReadResponse> nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), authentication);
         assertThat(nestedComments.get(0).getContent()).isEqualTo("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
 
         CommentCreationRequest nestedCommentRequest2 = new CommentCreationRequest("아이클리어 루테인지아잔틴");
         schedulePostService.writeNestedCommentToSchedulePostComment(
-                testMemberId,
+                authentication,
                 createdSchedulePostId1,
                 comments.get(0).getCommentId(),
                 nestedCommentRequest2
         );
 
         // 2차 확인
-        nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), testMemberId);
+        nestedComments = schedulePostService.getSchedulePostNestedComments(createdSchedulePostId1, comments.get(0).getCommentId(), authentication);
         assertThat(nestedComments.size()).isEqualTo(2);
     }
 
@@ -520,12 +525,12 @@ class SchedulePostServiceTest {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
         CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(authentication, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
         CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         comments = schedulePostService.writeNestedCommentToSchedulePostComment(
-                testMemberId,
+                authentication,
                 createdSchedulePostId1,
                 comments.get(0).getCommentId(),
                 nestedCommentRequest
@@ -534,7 +539,7 @@ class SchedulePostServiceTest {
         // 대댓글 수정
         CommentCreationRequest nestedCommentModifyRequest = new CommentCreationRequest("나랏말싸미 듕귁에달아 문자와로 서로 사맛디 아니할새 이런 젼챠로 어린 백셩이 니르고져 할 배 이셔도 못 할 노미 하니라");
         schedulePostService.modifySchedulePostNestedComment(
-                testMemberId,
+                authentication,
                 createdSchedulePostId1,
                 comments.get(0).getCommentId(),
                 comments.get(0).getNestedComments().get(0).getNestedCommentId(),
@@ -542,7 +547,7 @@ class SchedulePostServiceTest {
         );
 
         // 대댓글 확인
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1, testMemberId);
+        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(createdSchedulePostId1, authentication);
         assertThat(schedulePostDetail.getComments().get(0).getNestedComments().get(0).getContent()).isEqualTo("나랏말싸미 듕귁에달아 문자와로 서로 사맛디 아니할새 이런 젼챠로 어린 백셩이 니르고져 할 배 이셔도 못 할 노미 하니라");
     }
 
@@ -553,12 +558,12 @@ class SchedulePostServiceTest {
         // 댓글 작성
         Long createdSchedulePostId1 = createSchedulePost1();
         CommentCreationRequest commentRequest = new CommentCreationRequest("타트타팟틋타팟틋타훗툿타들숨틋틋타흡틋트타치크틋틋타타타타찻차흙흙파치크풋풋파흡파");
-        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(testMemberId, createdSchedulePostId1, commentRequest);
+        List<CommentReadResponse> comments = schedulePostService.writeSchedulePostComment(authentication, createdSchedulePostId1, commentRequest);
 
         // 대댓글 작성
         CommentCreationRequest nestedCommentRequest = new CommentCreationRequest("無無明 亦無無明盡 乃至 無老死 亦無老死盡");
         comments = schedulePostService.writeNestedCommentToSchedulePostComment(
-                testMemberId,
+                authentication,
                 createdSchedulePostId1,
                 comments.get(0).getCommentId(),
                 nestedCommentRequest
@@ -569,14 +574,14 @@ class SchedulePostServiceTest {
 
         // 대댓글 삭제
         schedulePostService.deleteSchedulePostNestedComment(
-                testMemberId,
+                authentication,
                 createdSchedulePostId1,
                 comments.get(0).getCommentId(),
                 comments.get(0).getNestedComments().get(0).getNestedCommentId()
         );
 
         // 대댓글 삭제 확인
-        comments = schedulePostService.getSchedulePostComments(createdSchedulePostId1);
+        comments = schedulePostService.getSchedulePostComments(createdSchedulePostId1, authentication);
         assertThat(comments.get(0).getNestedComments().size()).isEqualTo(0);
     }
 
@@ -589,25 +594,26 @@ class SchedulePostServiceTest {
 
         // 게시글 생성1
         SchedulePostCreationRequest request1 = new SchedulePostCreationRequest("1번 여행 넘모 신나요~", "신나씐나신나씐나", "서울", createdScheduleId);
-        Long createdSchedulePostId1 = schedulePostService.createSchedulePost(testMemberId, request1);
+        Long createdSchedulePostId1 = schedulePostService.createSchedulePost(authentication, request1);
         SchedulePost post1 = schedulePostService.findById(createdSchedulePostId1);
 
         // 생성된 게시글 디테일 확인
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).size()).isEqualTo(1);
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getTitle()).isEqualTo("1번 여행 넘모 신나요~");
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getPostId()).isEqualTo(createdSchedulePostId1);
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getCity()).isEqualTo(City.SEOUL.toString());
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).get(0).getWriterId()).isEqualTo(testMemberId);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(authentication).size()).isEqualTo(1);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(authentication).get(0).getTitle()).isEqualTo("1번 여행 넘모 신나요~");
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(authentication).get(0).getPostId()).isEqualTo(createdSchedulePostId1);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(authentication).get(0).getCity()).isEqualTo(City.SEOUL.toString());
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(authentication).get(0).getWriterId()).isEqualTo(testMemberId);
 
         // 게시글 생성 2
         SchedulePostCreationRequest request2 = new SchedulePostCreationRequest("1번 여행 다녀왔어요~", "갔다왔어요~", "서울", createdScheduleId);
-        Long createdSchedulePostId2 = schedulePostService.createSchedulePost(testMemberId, request2);
+        Long createdSchedulePostId2 = schedulePostService.createSchedulePost(authentication, request2);
         SchedulePost post2 = schedulePostService.findById(createdSchedulePostId2);
 
         // 생성된 게시글 갯수 확인
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(testMemberId).size()).isEqualTo(2);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(authentication).size()).isEqualTo(2);
         // 존재하지 않는 유저 게시글 조회 요청
-        assertThat(schedulePostService.getCertainMemberSchedulePostList(-1L).size()).isEqualTo(0);
+        JwtAuthentication fakeAuth = new JwtAuthentication("Fake Token", -999L);
+        assertThat(schedulePostService.getCertainMemberSchedulePostList(fakeAuth).size()).isEqualTo(0);
     }
 
     @Test

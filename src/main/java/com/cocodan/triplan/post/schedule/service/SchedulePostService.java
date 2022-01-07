@@ -2,6 +2,7 @@ package com.cocodan.triplan.post.schedule.service;
 
 import com.cocodan.triplan.exception.common.ForbiddenException;
 import com.cocodan.triplan.exception.common.NotFoundException;
+import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.repository.MemberRepository;
 import com.cocodan.triplan.post.schedule.domain.Like;
@@ -27,6 +28,8 @@ import com.cocodan.triplan.util.ExceptionMessageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -72,9 +75,9 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public Long createSchedulePost(Long memberId, SchedulePostCreationRequest request) {
-        Member member = getMember(memberId);
-        Schedule schedule = getSchedule(request.getScheduleId());
+    public Long createSchedulePost(JwtAuthentication authentication, SchedulePostCreationRequest request) {
+        Member member = getMember(authentication);
+        Schedule schedule = getSchedule(request.getScheduleId(), authentication);
 
         SchedulePost post = SchedulePost.builder()
                 .member(member)
@@ -101,24 +104,24 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public SchedulePostDetailResponse getSchedulePostDetail(Long schedulePostId, Long memberId) {
-        nullCheck(schedulePostId, memberId);
+    public SchedulePostDetailResponse getSchedulePostDetail(Long schedulePostId, JwtAuthentication authentication) {
+        nullCheck(authentication, schedulePostId, authentication.getId());
 
-        SchedulePost schedulePost = getSchedulePost(schedulePostId);
+        SchedulePost schedulePost = getSchedulePost(schedulePostId, authentication);
 
         // TODO: 2021.12.13 Teru - 조회수에 대한 동시성 문제를 어떻게 해야 잘 해결할 수 있을지 고민... 현재는 별다른 처리를 해두지 않은 상태
         schedulePost.increaseViews();
         schedulePostRepository.save(schedulePost);
 
-        List<CommentReadResponse> comments = getSchedulePostComments(schedulePostId);
-        Optional<Like> isLiked = getLike(memberId, schedulePostId);
+        List<CommentReadResponse> comments = getSchedulePostComments(schedulePostId, authentication);
+        Optional<Like> isLiked = getLike(authentication.getId(), schedulePostId);
         return SchedulePostDetailResponse.of(schedulePost, comments, isLiked.isPresent());
     }
 
     @Transactional
-    public void deleteSchedulePost(Long memberId, Long schedulePostId) {
-        nullCheck(memberId, schedulePostId);
-        SchedulePost schedulePost = validateAuthorities(memberId, schedulePostId);
+    public void deleteSchedulePost(JwtAuthentication authentication, Long schedulePostId) {
+        nullCheck(authentication, schedulePostId);
+        SchedulePost schedulePost = validateAuthorities(authentication, schedulePostId);
 
         // 대댓글 -> 댓글 -> 좋아요 순으로 선행 삭제
         List<SchedulePostComment> comments = getCommentsOf(schedulePost);
@@ -133,28 +136,28 @@ public class SchedulePostService {
     }
 
     @Transactional
-    public void modifySchedulePost(Long memberId, Long schedulePostId, SchedulePostCreationRequest request) {
-        SchedulePost schedulePost = validateAuthorities(memberId, schedulePostId);
+    public void modifySchedulePost(JwtAuthentication authentication, Long schedulePostId, SchedulePostCreationRequest request) {
+        SchedulePost schedulePost = validateAuthorities(authentication, schedulePostId);
 
         schedulePost.updateTitle(request.getTitle());
         schedulePost.updateContent(request.getContent());
         schedulePost.updateCity(City.from(request.getCity()));
 
-        Schedule schedule = getSchedule(request.getScheduleId());
+        Schedule schedule = getSchedule(request.getScheduleId(), authentication);
 
-        validateScheduleMember(schedule, memberId);
+        validateScheduleMember(schedule, authentication.getId());
         schedulePost.updateSchedule(schedule);
 
         schedulePostRepository.save(schedulePost);
     }
 
     @Transactional
-    public Long toggleSchedulePostLiked(Long memberId, Long schedulePostId, LikeToggleRequest request) {
-        Optional<Like> likeData = getLike(memberId, schedulePostId);
-        SchedulePost post = getSchedulePostForLikeUpdate(schedulePostId);
+    public Long toggleSchedulePostLiked(JwtAuthentication authentication, Long schedulePostId, LikeToggleRequest request) {
+        Optional<Like> likeData = getLike(authentication.getId(), schedulePostId);
+        SchedulePost post = getSchedulePostForLikeUpdate(schedulePostId, authentication);
 
         if (likeData.isEmpty() && request.getFlag()) {
-            Member member = getMember(memberId);
+            Member member = getMember(authentication);
             Like like = new Like(member, post);
             schedulePostLikeRepository.save(like);
             post.increaseLiked();
@@ -177,10 +180,10 @@ public class SchedulePostService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentReadResponse> getSchedulePostComments(Long schedulePostId) {
-        nullCheck(schedulePostId);
+    public List<CommentReadResponse> getSchedulePostComments(Long schedulePostId, JwtAuthentication authentication) {
+        nullCheck(authentication,schedulePostId);
 
-        SchedulePost schedulePost = getSchedulePost(schedulePostId);
+        SchedulePost schedulePost = getSchedulePost(schedulePostId, authentication);
 
         return getCommentsOf(schedulePost).stream()
                 .map(comment -> CommentReadResponse.of(
@@ -196,14 +199,14 @@ public class SchedulePostService {
 
     @Transactional
     public List<CommentReadResponse> writeSchedulePostComment(
-            Long memberId,
+            JwtAuthentication authentication,
             Long schedulePostId,
             CommentCreationRequest request
     ) {
-        nullCheck(memberId, schedulePostId);
+        nullCheck(authentication, schedulePostId);
 
-        SchedulePost schedulePost = getSchedulePost(schedulePostId);
-        Member member = getMember(memberId);
+        SchedulePost schedulePost = getSchedulePost(schedulePostId, authentication);
+        Member member = getMember(authentication);
 
         SchedulePostComment comment = SchedulePostComment.builder()
                 .member(member)
@@ -213,12 +216,12 @@ public class SchedulePostService {
 
         schedulePostCommentRepository.save(comment);
 
-        return getSchedulePostComments(schedulePostId);
+        return getSchedulePostComments(schedulePostId, authentication);
     }
 
     @Transactional
-    public void deleteSchedulePostComment(Long schedulePostId, Long commentId, Long memberId) {
-        validateCommentOwnership(schedulePostId, commentId, memberId);
+    public void deleteSchedulePostComment(Long schedulePostId, Long commentId, JwtAuthentication authentication) {
+        validateCommentOwnership(schedulePostId, commentId, authentication);
         // 대댓글 선행 삭제
         schedulePostNestedCommentRepository.deleteAllByCommentId(commentId);
         schedulePostCommentRepository.deleteById(commentId);
@@ -228,26 +231,26 @@ public class SchedulePostService {
     public void modifySchedulePostComment(
             Long schedulePostId,
             Long commentId,
-            Long memberId,
+            JwtAuthentication authentication,
             CommentCreationRequest request
     ) {
-        validateCommentOwnership(schedulePostId, commentId, memberId);
-        SchedulePostComment comment = getComment(commentId);
+        validateCommentOwnership(schedulePostId, commentId, authentication);
+        SchedulePostComment comment = getComment(commentId, authentication);
         comment.updateContent(request.getContent());
         schedulePostCommentRepository.save(comment);
     }
 
     @Transactional
     public List<CommentReadResponse> writeNestedCommentToSchedulePostComment(
-            Long memberId,
+            JwtAuthentication authentication,
             Long schedulePostId,
             Long commentId,
             CommentCreationRequest request
     ) {
-        nullCheck(memberId, schedulePostId, commentId);
+        nullCheck(authentication, schedulePostId, commentId);
 
-        SchedulePostComment comment = getComment(commentId);
-        Member member = getMember(memberId);
+        SchedulePostComment comment = getComment(commentId, authentication);
+        Member member = getMember(authentication);
 
         SchedulePostNestedComment nestedComment = SchedulePostNestedComment.builder()
                 .parentComment(comment)
@@ -256,18 +259,18 @@ public class SchedulePostService {
                 .build();
 
         schedulePostNestedCommentRepository.save(nestedComment);
-        return getSchedulePostComments(schedulePostId);
+        return getSchedulePostComments(schedulePostId, authentication);
     }
 
     @Transactional(readOnly = true)
     public List<NestedCommentReadResponse> getSchedulePostNestedComments(
             Long schedulePostId,
             Long commentId,
-            Long memberId
+            JwtAuthentication authentication
     ) {
-        nullCheck(schedulePostId, commentId, memberId);
+        nullCheck(authentication, schedulePostId, commentId);
 
-        SchedulePostComment comment = getComment(commentId);
+        SchedulePostComment comment = getComment(commentId, authentication);
         List<SchedulePostNestedComment> nestedComments = getNestedCommentsOf(comment);
         return nestedComments.stream()
                 .map(NestedCommentReadResponse::from)
@@ -276,85 +279,156 @@ public class SchedulePostService {
 
     @Transactional
     public void modifySchedulePostNestedComment(
-            Long memberId,
+            JwtAuthentication authentication,
             Long schedulePostId,
             Long commentId,
             Long nestedCommentId,
             CommentCreationRequest request
     ) {
-        validateNestedCommentOwnership(memberId, schedulePostId, commentId, nestedCommentId);
-        SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId);
+        validateNestedCommentOwnership(authentication, schedulePostId, commentId, nestedCommentId);
+        SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId, authentication);
         nestedComment.updateContent(request.getContent());
     }
 
     @Transactional
     public void deleteSchedulePostNestedComment(
-            Long memberId,
+            JwtAuthentication authentication,
             Long schedulePostId,
             Long commentId,
             Long nestedCommentId
     ) {
-        validateNestedCommentOwnership(memberId, schedulePostId, commentId, nestedCommentId);
-        SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId);
+        validateNestedCommentOwnership(authentication, schedulePostId, commentId, nestedCommentId);
+        SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId, authentication);
         schedulePostNestedCommentRepository.delete(nestedComment);
     }
 
-    @Transactional(readOnly = true)
-    public List<SchedulePostListViewResponse> getCertainMemberSchedulePostList(Long memberId) {
-        nullCheck(memberId);
+    public List<SchedulePostListViewResponse> getCertainMemberSchedulePostList(JwtAuthentication authentication) {
+        return getCertainMemberSchedulePostList(authentication.getId(), authentication);
+    }
 
-        List<SchedulePost> schedulePosts = getSchedulePostsByMemberId(memberId);
+    @Transactional(readOnly = true)
+    public List<SchedulePostListViewResponse> getCertainMemberSchedulePostList(
+            Long writerId,
+            JwtAuthentication authentication
+    ) {
+        nullCheck(authentication, writerId);
+
+        List<SchedulePost> schedulePosts = getSchedulePostsByMemberId(writerId);
         return convertToSchedulePostResponseList(schedulePosts);
     }
 
     // private methods...
     private void validateNestedCommentOwnership(
-            Long memberId,
+            JwtAuthentication authentication,
             Long schedulePostId,
             Long commentId,
             Long nestedCommentId
     ) {
-        nullCheck(memberId, schedulePostId, commentId, nestedCommentId);
+        nullCheck(authentication, schedulePostId, commentId, nestedCommentId);
 
-        getSchedulePost(schedulePostId);
-        getComment(commentId);
-        SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId);
-        validateOwnership(memberId, nestedComment);
+        getSchedulePost(schedulePostId, authentication);
+        getComment(commentId, authentication);
+        SchedulePostNestedComment nestedComment = getNestedComment(nestedCommentId, authentication);
+        validateOwnership(authentication.getId(), nestedComment);
     }
 
-    private Member getMember(Long memberId) {
+    private Member getMember(JwtAuthentication authentication) {
+        return getMember(authentication.getId(), authentication);
+    }
+
+    private Member getMember(Long memberId, JwtAuthentication authentication) {
         return memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(Member.class, memberId)
+                () -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Member Not Found. " +
+                                        "There does not exist a Member with the given ID : {}" +
+                                        "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                memberId,
+                                authentication.getId(),
+                                authentication.getToken()
+                        )
+                )
         );
     }
 
-    private Schedule getSchedule(Long scheduleId) {
+    private Schedule getSchedule(Long scheduleId, JwtAuthentication authentication) {
         return scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new NotFoundException(Schedule.class, scheduleId)
+                () -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Schedule Not Found. " +
+                                        "There does not exist a Schedule with the given ID : {}" +
+                                        "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                scheduleId,
+                                authentication.getId(),
+                                authentication.getToken()
+                        )
+                )
         );
     }
 
-    private SchedulePost getSchedulePost(Long schedulePostId) {
+    private SchedulePost getSchedulePost(Long schedulePostId, JwtAuthentication authentication) {
         return schedulePostRepository.findById(schedulePostId).orElseThrow(
-                () -> new NotFoundException(SchedulePost.class, schedulePostId)
+                () -> new NotFoundException(
+                            MessageFormat.format(
+                                    "{} :: SchedulePost Not Found. " +
+                                            "There does not exist a SchedulePost with the given ID : {}" +
+                                            "\n\tRequested by a member(ID: {}, Token: {}",
+                                    LocalDateTime.now(),
+                                    schedulePostId,
+                                    authentication.getId(),
+                                    authentication.getToken()
+                            )
+                )
         );
     }
 
-    private SchedulePost getSchedulePostForLikeUpdate(Long schedulePostId) {
+    private SchedulePost getSchedulePostForLikeUpdate(Long schedulePostId, JwtAuthentication authentication) {
         return schedulePostRepository.findByIdForLikedCountUpdate(schedulePostId).orElseThrow(
-                () -> new NotFoundException(SchedulePost.class, schedulePostId)
+                () -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: SchedulePost Not Found. " +
+                                        "There does not exist a SchedulePost with the given ID : {}" +
+                                        "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                schedulePostId,
+                                authentication.getId(),
+                                authentication.getToken()
+                        )
+                )
         );
     }
 
-    private SchedulePostComment getComment(Long commentId) {
+    private SchedulePostComment getComment(Long commentId, JwtAuthentication authentication) {
         return schedulePostCommentRepository.findById(commentId).orElseThrow(
-                () -> new NotFoundException(SchedulePostComment.class, commentId)
+                () -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Comment Not Found. " +
+                                        "There does not exist a Comment with the given ID : {}" +
+                                        "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                commentId,
+                                authentication.getId(),
+                                authentication.getToken()
+                        )
+                )
         );
     }
 
-    private SchedulePostNestedComment getNestedComment(Long nestedCommentId) {
+    private SchedulePostNestedComment getNestedComment(Long nestedCommentId, JwtAuthentication authentication) {
         return schedulePostNestedCommentRepository.findById(nestedCommentId).orElseThrow(
-                () -> new NotFoundException(SchedulePostNestedComment.class, nestedCommentId)
+                () -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: NestedComment Not Found. " +
+                                        "There does not exist a NestedComment with the given ID : {}" +
+                                        "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                 nestedCommentId,
+                                authentication.getId(),
+                                authentication.getToken()
+                        )
+                )
         );
     }
 
@@ -382,9 +456,9 @@ public class SchedulePostService {
         return  schedulePostRepository.findAllByMemberId(memberId);
     }
 
-    private SchedulePost validateAuthorities(Long memberId, Long schedulePostId) {
-        SchedulePost schedulePost = getSchedulePost(schedulePostId);
-        validateOwnership(memberId, schedulePost);
+    private SchedulePost validateAuthorities(JwtAuthentication authentication, Long schedulePostId) {
+        SchedulePost schedulePost = getSchedulePost(schedulePostId, authentication);
+        validateOwnership(authentication.getId(), schedulePost);
         return schedulePost;
     }
 
@@ -403,12 +477,12 @@ public class SchedulePostService {
         throw new ForbiddenException(Schedule.class, schedule.getId(), memberId);
     }
 
-    private void validateCommentOwnership(Long schedulePostId, Long commentId, Long memberId) {
-        nullCheck(schedulePostId, commentId, memberId);
+    private void validateCommentOwnership(Long schedulePostId, Long commentId, JwtAuthentication authentication) {
+        nullCheck(authentication,schedulePostId, commentId);
 
-        SchedulePost schedulePost = getSchedulePost(schedulePostId);
-        SchedulePostComment comment = getComment(commentId);
-        validateOwnership(memberId, comment);
+        getSchedulePost(schedulePostId, authentication);
+        SchedulePostComment comment = getComment(commentId, authentication);
+        validateOwnership(authentication.getId(), comment);
     }
 
     private void validateOwnership(Long memberId, SchedulePost schedulePost) {
@@ -429,12 +503,19 @@ public class SchedulePostService {
         }
     }
 
-    private void nullCheck(Object... args) {
+    private void nullCheck(JwtAuthentication authentication, Object... args) {
         for (Object obj : args) {
             if (obj == null) {
                 throw new IllegalArgumentException(
-                        ExceptionMessageUtils
-                                .getMessage("exception.argument_not_valid"));
+                        MessageFormat.format(
+                                "{} :: Invalid argument detected. " +
+                                        "Argument must not be NULL." +
+                                        "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                authentication.getId(),
+                                authentication.getToken()
+                        )
+                );
             }
         }
     }

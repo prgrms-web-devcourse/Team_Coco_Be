@@ -44,8 +44,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ApiResponse<Void> handleNotFound(NotFoundException exception) {
-        log.warn("{} Not Found. Id : {}", exception.getClazz().getSimpleName(), exception.getId(), exception);
-        return ApiResponse.fail(exception.getMessage(), HttpStatus.NOT_FOUND);
+        log.warn(exception.getMessage());
+        return ApiResponse.fail(ExceptionMessageUtils.getMessage("exception.not_found"), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler

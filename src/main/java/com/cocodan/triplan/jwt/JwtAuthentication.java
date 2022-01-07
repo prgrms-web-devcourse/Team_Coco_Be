@@ -14,7 +14,7 @@ public class JwtAuthentication {
 
     private final Long id;
 
-    JwtAuthentication(String token, Long id) {
+    public JwtAuthentication(String token, Long id) {
         checkArgument(isNotEmpty(token), "token must be provided.");
         checkArgument(id != 0, "id must be provided.");
 

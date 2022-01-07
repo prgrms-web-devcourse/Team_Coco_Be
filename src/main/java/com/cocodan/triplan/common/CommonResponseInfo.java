@@ -11,13 +11,13 @@ public class CommonResponseInfo {
 
     private final String message;
 
-    private final HttpStatus internalHttpStatusCode;
+    private final int internalHttpStatusCode;
 
     private final LocalDateTime serverTime;
 
     public CommonResponseInfo(String message, HttpStatus internalHttpStatusCode) {
         this.message = message;
-        this.internalHttpStatusCode = internalHttpStatusCode;
+        this.internalHttpStatusCode = internalHttpStatusCode.value();
         this.serverTime = LocalDateTime.now();
     }
 }

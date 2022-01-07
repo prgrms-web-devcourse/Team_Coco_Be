@@ -5,6 +5,7 @@ import com.cocodan.triplan.exception.common.NoFriendsException;
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.friend.repository.FriendRepository;
+import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
@@ -23,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -135,7 +138,19 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public ScheduleDetailResponse getSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
-                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
+                .orElseThrow(
+                        () -> new NotFoundException(
+                                MessageFormat.format(
+                                        "{} :: Schedule Not Found. " +
+                                                "There does not exist a Schedule with the given ID : {}",
+                                                // "\n\tRequested by a member(ID: {}, Token: {}",
+                                        LocalDateTime.now(),
+                                        scheduleId
+                                        // authentication.getId(),
+                                        // authentication.getToken()
+                                )
+                        )
+                );
 
         List<Long> scheduleMemberIds = getMemberIds(schedule);
 
@@ -178,7 +193,20 @@ public class ScheduleService {
 
     private Schedule findScheduleById(Long scheduleId) {
         return scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new NotFoundException(Schedule.class, scheduleId));
+                .orElseThrow(
+                        () -> new NotFoundException(
+                                // TODO: [TP-126] Teru - 로깅 양식 통일 -> Controller & Service 전반적인 수정 필요
+                                MessageFormat.format(
+                                        "{} :: Schedule Not Found. " +
+                                                "There does not exist a Schedule with the given ID : {}",
+                                                // "\n\tRequested by a member(ID: {}, Token: {}",
+                                        LocalDateTime.now(),
+                                        scheduleId
+                                        // authentication.getId(),
+                                        // authentication.getToken()
+                                )
+                        )
+                );
     }
 
     private void validateScheduleMember(Long scheduleId, Long memberId) {
@@ -255,12 +283,32 @@ public class ScheduleService {
 
     private Member findMemberById(Long ownerId) {
         return memberRepository.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException(Member.class, ownerId));
+                .orElseThrow(() -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Member Not Found. " +
+                                        "There does not exist a Member with the given ID : {}",
+                                        // "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                ownerId
+                                // authentication.getId(),
+                                // authentication.getToken()
+                        )
+                ));
     }
 
     private Memo findMemoById(Long memoId) {
         return memoRepository.findById(memoId)
-                .orElseThrow(() -> new NotFoundException(Memo.class, memoId));
+                .orElseThrow(() -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Memo Not Found. " +
+                                        "There does not exist a Memo with the given ID : {}",
+                                        // "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                memoId
+                                // authentication.getId(),
+                                // authentication.getToken()
+                        )
+                ));
     }
 
     private void validateScheduleMemo(Long scheduleId, Long memoId) {
@@ -342,7 +390,17 @@ public class ScheduleService {
 
     private Checklist findChecklistById(Long checklistId) {
         return checklistRepository.findById(checklistId)
-                .orElseThrow(() -> new NotFoundException(Checklist.class, checklistId));
+                .orElseThrow(() -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Checklist Not Found. " +
+                                        "There does not exist a Checklist with the given ID : {}",
+                                        // "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                checklistId
+                                // authentication.getId(),
+                                // authentication.getToken()
+                        )
+                ));
     }
 
     private void validateScheduleChecklist(Long scheduleId, Long checklistId) {
@@ -435,7 +493,17 @@ public class ScheduleService {
 
     private Voting findVotingById(Long votingId) {
         return votingRepository.findById(votingId)
-                .orElseThrow(() -> new NotFoundException(Voting.class, votingId));
+                .orElseThrow(() -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Voting Not Found. " +
+                                        "There does not exist a Voting with the given ID : {}",
+                                        // "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                votingId
+                                // authentication.getId(),
+                                // authentication.getToken()
+                        )
+                ));
     }
 
     @Transactional
