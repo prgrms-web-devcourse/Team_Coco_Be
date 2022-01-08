@@ -7,11 +7,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class SchedulePostNestedCommentResponse {
+public class NestedCommentReadResponse {
 
     private Long nestedCommentId;
 
@@ -31,8 +29,8 @@ public class SchedulePostNestedCommentResponse {
 
     private boolean schedulePostWriter; // 게시글의 작성자인지 여부
 
-    public static SchedulePostNestedCommentResponse from(SchedulePostNestedComment nestedComment) {
-        return SchedulePostNestedCommentResponse.builder()
+    public static NestedCommentReadResponse from(SchedulePostNestedComment nestedComment) {
+        return NestedCommentReadResponse.builder()
                 .nestedCommentId(nestedComment.getId())
                 .parentCommentId(nestedComment.getParentComment().getId())
                 .writerId(nestedComment.getMember().getId())
@@ -42,7 +40,10 @@ public class SchedulePostNestedCommentResponse {
                 .content(nestedComment.getContent())
                 .createdAt(nestedComment.getCreatedDate().toString())
                 .schedulePostWriter(
-                        nestedComment.getParentComment().getSchedulePost().getMember().equals(nestedComment.getMember())
+                        nestedComment.getParentComment()
+                                .getSchedulePost()
+                                .getMember()
+                                .equals(nestedComment.getMember())
                 )
                 .build();
     }

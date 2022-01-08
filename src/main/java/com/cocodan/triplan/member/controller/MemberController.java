@@ -1,9 +1,7 @@
 package com.cocodan.triplan.member.controller;
 
-import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.jwt.JwtAuthenticationToken;
-import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.request.MemberCreateRequest;
 import com.cocodan.triplan.member.dto.request.MemberLoginRequest;
 import com.cocodan.triplan.member.dto.request.MemberUpdateRequest;
@@ -45,7 +43,6 @@ public class MemberController {
                 request.getPassword(),
                 GROUP_ID
         );
-
         return ResponseEntity.ok(response);
     }
 
@@ -53,7 +50,6 @@ public class MemberController {
     @GetMapping(value = "/users/{memberId}")
     public ResponseEntity<MemberGetOneResponse> readSingleData(@PathVariable Long memberId, @AuthenticationPrincipal JwtAuthentication authentication) {
         MemberGetOneResponse response = memberService.getOne(memberId);
-
         return ResponseEntity.ok(response);
     }
 
@@ -74,7 +70,6 @@ public class MemberController {
                 request.getNickname(),
                 request.getProfileImage()
         );
-
         return ResponseEntity.ok(response);
     }
 
@@ -82,7 +77,6 @@ public class MemberController {
     @DeleteMapping(value = "/users/{memberId}")
     public ResponseEntity<MemberDeleteResponse> delete(@Valid @PathVariable Long memberId) {
         MemberDeleteResponse response = memberService.delete(memberId);
-
         return ResponseEntity.ok(response);
     }
 
@@ -91,11 +85,8 @@ public class MemberController {
         JwtAuthenticationToken authToken = new JwtAuthenticationToken(request.getEmail(), request.getPassword());
         Authentication resultToken = authenticationManager.authenticate(authToken);
         JwtAuthentication authentication = (JwtAuthentication) resultToken.getPrincipal();
-
         httpServletResponse.setHeader("token", authentication.getToken());
-
         MemberLoginResponse response = new MemberLoginResponse(authentication.getToken(), authentication.getId());
-
         return ResponseEntity.ok(response);
     }
 
@@ -103,12 +94,7 @@ public class MemberController {
     @GetMapping("/profiles")
     public ResponseEntity<MemberGetOneResponse> readProfile(@AuthenticationPrincipal JwtAuthentication authentication) {
         Long memberId = authentication.getId();
-        if (memberId == 0)
-        {
-            throw new NotFoundException(Member.class, memberId);
-        }
         MemberGetOneResponse response = memberService.getOne(memberId);
-
         return ResponseEntity.ok(response);
     }
 }

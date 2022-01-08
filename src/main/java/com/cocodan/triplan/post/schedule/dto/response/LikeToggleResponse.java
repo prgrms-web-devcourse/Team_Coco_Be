@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class SchedulePostLikeResponse {
+public class LikeToggleResponse {
     private long likeCount;
 }

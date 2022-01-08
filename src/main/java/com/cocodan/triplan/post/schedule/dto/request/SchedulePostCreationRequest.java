@@ -16,7 +16,7 @@ import static com.cocodan.triplan.post.schedule.domain.SchedulePost.SCHEDULE_POS
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SchedulePostRequest {
+public class SchedulePostCreationRequest {
 
     @Length(min = SCHEDULE_POST_TITLE_MIN_LENGTH, max = SCHEDULE_POST_TITLE_MAX_LENGTH)
     public String title;

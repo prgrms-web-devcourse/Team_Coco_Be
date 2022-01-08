@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +99,17 @@ public class Voting extends BaseEntity {
         return votingContents.stream()
                 .filter(votingContent -> votingContent.getId().equals(contentId))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException(VotingContent.class, contentId));
+                .orElseThrow(() -> new NotFoundException(
+                        MessageFormat.format(
+                                "{} :: Voting Content Not Found. " +
+                                        "There does not exist a Voting Content with the given ID : {}",
+                                        // "\n\tRequested by a member(ID: {}, Token: {}",
+                                LocalDateTime.now(),
+                                contentId
+                                // authentication.getId(),
+                                // authentication.getToken()
+                        )
+                ));
     }
 
     private void voteByFlag(boolean flag, Long memberId, VotingContent votingContent) {

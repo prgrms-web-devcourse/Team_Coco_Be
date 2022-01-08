@@ -1,6 +1,5 @@
 package com.cocodan.triplan.exception;
 
-import com.cocodan.triplan.exception.common.NotIncludeException;
 import lombok.Getter;
 
 import java.util.Map;

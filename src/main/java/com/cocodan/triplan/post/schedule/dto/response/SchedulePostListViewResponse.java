@@ -7,18 +7,16 @@ import com.cocodan.triplan.post.schedule.vo.Ages;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.ScheduleTheme;
 import com.cocodan.triplan.schedule.domain.vo.Theme;
-import com.cocodan.triplan.spot.domain.vo.City;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class SchedulePostResponse {
+public class SchedulePostListViewResponse {
 
     private long writerId;
 
@@ -42,10 +40,10 @@ public class SchedulePostResponse {
 
     private String endDate;
 
-    public static SchedulePostResponse from(SchedulePost schedulePost) {
+    public static SchedulePostListViewResponse from(SchedulePost schedulePost) {
         Member member = schedulePost.getMember();
         Schedule schedule = schedulePost.getSchedule();
-        return SchedulePostResponse.builder()
+        return SchedulePostListViewResponse.builder()
                 .writerId(member.getId())
                 .profileImageUrl(member.getProfileImage())
                 .nickname(member.getNickname())

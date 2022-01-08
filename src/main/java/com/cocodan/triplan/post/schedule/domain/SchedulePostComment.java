@@ -25,6 +25,7 @@ import javax.persistence.Table;
 public class SchedulePostComment extends BaseEntity {
 
     public static final int COMMENT_MIN_LENGTH = 1;
+
     public static final int COMMENT_MAX_LENGTH = 255;
 
     @Id

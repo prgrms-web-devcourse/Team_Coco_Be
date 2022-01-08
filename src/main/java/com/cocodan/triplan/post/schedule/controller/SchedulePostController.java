@@ -1,15 +1,16 @@
 package com.cocodan.triplan.post.schedule.controller;
 
+import com.cocodan.triplan.common.ApiResponse;
 import com.cocodan.triplan.jwt.JwtAuthentication;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCommentRequest;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostLikeRequest;
-import com.cocodan.triplan.post.schedule.dto.request.SchedulePostRequest;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCommentResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreateResponse;
+import com.cocodan.triplan.post.schedule.dto.request.CommentCreationRequest;
+import com.cocodan.triplan.post.schedule.dto.request.LikeToggleRequest;
+import com.cocodan.triplan.post.schedule.dto.request.SchedulePostCreationRequest;
+import com.cocodan.triplan.post.schedule.dto.response.CommentReadResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostCreationResponse;
 import com.cocodan.triplan.post.schedule.dto.response.SchedulePostDetailResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostLikeResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostNestedCommentResponse;
-import com.cocodan.triplan.post.schedule.dto.response.SchedulePostResponse;
+import com.cocodan.triplan.post.schedule.dto.response.LikeToggleResponse;
+import com.cocodan.triplan.post.schedule.dto.response.NestedCommentReadResponse;
+import com.cocodan.triplan.post.schedule.dto.response.SchedulePostListViewResponse;
 import com.cocodan.triplan.post.schedule.service.SchedulePostSearchService;
 import com.cocodan.triplan.post.schedule.service.SchedulePostService;
 import com.cocodan.triplan.post.schedule.vo.SchedulePostSortingRule;
@@ -17,8 +18,6 @@ import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.vo.City;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,14 +45,17 @@ public class SchedulePostController {
 
     private final SchedulePostSearchService schedulePostSearchService;
 
-    public SchedulePostController(SchedulePostService schedulePostService, SchedulePostSearchService schedulePostSearchService) {
+    public SchedulePostController(
+            SchedulePostService schedulePostService,
+            SchedulePostSearchService schedulePostSearchService
+    ) {
         this.schedulePostService = schedulePostService;
         this.schedulePostSearchService = schedulePostSearchService;
     }
 
     @ApiOperation("여행 일정 공유 게시글 (조건별)목록 조회")
     @GetMapping("/schedules")
-    public ResponseEntity<List<SchedulePostResponse>> schedulePostList(
+    public ApiResponse<List<SchedulePostListViewResponse>> schedulePostList(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "전체") String searchingCity,
             @RequestParam(defaultValue = "ALL") String searchingTheme,
@@ -62,112 +64,128 @@ public class SchedulePostController {
         City city = City.from(searchingCity);
         Theme theme = Theme.from(searchingTheme);
         SchedulePostSortingRule sortRule = SchedulePostSortingRule.of(sorting);
-        List<SchedulePostResponse> schedulePosts = schedulePostSearchService.getSchedulePosts(search, city, theme, sortRule);
+        List<SchedulePostListViewResponse> schedulePosts =
+                schedulePostSearchService.getSchedulePosts(search, city, theme, sortRule);
 
-        return ResponseEntity.ok(schedulePosts);
+        return ApiResponse.ok(schedulePosts);
     }
 
     @ApiOperation("여행 일정 공유 게시글 작성")
     @PostMapping("/schedules")
-    public ResponseEntity<SchedulePostCreateResponse> createSchedulePost(
-            @Valid @RequestBody SchedulePostRequest request,
+    public ApiResponse<SchedulePostCreationResponse> createSchedulePost(
+            @Valid @RequestBody SchedulePostCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long postId = schedulePostService.createSchedulePost(authentication.getId(), request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(SchedulePostCreateResponse.from(postId));
+        Long postId = schedulePostService.createSchedulePost(authentication, request);
+        return ApiResponse.ok(SchedulePostCreationResponse.from(postId));
     }
 
     @ApiOperation("선택 가능한 도시 목록 보내주기")
     @GetMapping("/schedules/cities")
-    public ResponseEntity<List<String>> getAvailableCities() {
+    public ApiResponse<List<String>> getAvailableCities() {
         List<String> cities = schedulePostService.getAvailableCities();
-        return ResponseEntity.ok(cities);
+        return ApiResponse.ok(cities);
     }
 
     @ApiOperation("자신이 작성한 여행 공유 게시글 모아보기")
     @GetMapping("/schedules/me")
-    public ResponseEntity<List<SchedulePostResponse>> getMySchedulePostList(@AuthenticationPrincipal JwtAuthentication authentication) {
-        Long memberId = authentication.getId();
-        List<SchedulePostResponse> schedulePosts = schedulePostService.getCertainMemberSchedulePostList(memberId);
-        return ResponseEntity.ok(schedulePosts);
+    public ApiResponse<List<SchedulePostListViewResponse>> getMySchedulePostList(
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        List<SchedulePostListViewResponse> schedulePosts =
+                schedulePostService.getCertainMemberSchedulePostList(authentication);
+        return ApiResponse.ok(schedulePosts);
     }
 
     @ApiOperation("특정 멤버가 작성한 여행 공유 게시글 모아보기")
     @GetMapping("/schedules/writers/{writerId}")
-    public ResponseEntity<List<SchedulePostResponse>> getCertainMembersSchedulePostList(@PathVariable("writerId") Long writerId) {
-        List<SchedulePostResponse> schedulePosts = schedulePostService.getCertainMemberSchedulePostList(writerId);
-        return ResponseEntity.ok(schedulePosts);
+    public ApiResponse<List<SchedulePostListViewResponse>> getCertainMembersSchedulePostList(
+            @PathVariable("writerId") Long writerId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        List<SchedulePostListViewResponse> schedulePosts =
+                schedulePostService.getCertainMemberSchedulePostList(writerId, authentication);
+        return ApiResponse.ok(schedulePosts);
     }
 
     @ApiOperation("특정 여행 일정 공유 게시글 상세조회")
     @GetMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<SchedulePostDetailResponse> getDetailSchedulePost(
+    public ApiResponse<SchedulePostDetailResponse> getDetailSchedulePost(
             @PathVariable("schedulePostId") Long schedulePostId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        SchedulePostDetailResponse schedulePostDetail = schedulePostService.getSchedulePostDetail(schedulePostId, authentication.getId());
-        return ResponseEntity.ok(schedulePostDetail);
+        SchedulePostDetailResponse schedulePostDetail =
+                schedulePostService.getSchedulePostDetail(schedulePostId, authentication);
+        return ApiResponse.ok(schedulePostDetail);
     }
 
     @ApiOperation("(자신이 작성한)특정 여행 공유 게시글 삭제")
     @DeleteMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<Void> deleteSchedulePost(
+    public ApiResponse<Void> deleteSchedulePost(
             @PathVariable("schedulePostId") Long schedulePostId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        schedulePostService.deleteSchedulePost(authentication.getId(), schedulePostId);
-        return ResponseEntity.ok().build();
+        schedulePostService.deleteSchedulePost(authentication, schedulePostId);
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행 공유 게시글 수정")
     @PutMapping("/schedules/{schedulePostId}")
-    public ResponseEntity<Void> modifySchedulePost(
+    public ApiResponse<Void> modifySchedulePost(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @Valid @RequestBody SchedulePostRequest request,
+            @Valid @RequestBody SchedulePostCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        schedulePostService.modifySchedulePost(authentication.getId(), schedulePostId, request);
-        return ResponseEntity.ok().build();
+        schedulePostService.modifySchedulePost(authentication, schedulePostId, request);
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행 공유 게시글 좋아요 토글")
     @PostMapping("/schedules/{schedulePostId}/liked")
-    public ResponseEntity<SchedulePostLikeResponse> changeLikeFlag(
+    public ApiResponse<LikeToggleResponse> changeLikeFlag(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @Valid @RequestBody SchedulePostLikeRequest request,
+            @Valid @RequestBody LikeToggleRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        Long likeCount = schedulePostService.toggleSchedulePostLiked(authentication.getId(), schedulePostId, request);
-        return ResponseEntity.ok(new SchedulePostLikeResponse(likeCount));
+        Long likeCount =
+                schedulePostService.toggleSchedulePostLiked(authentication, schedulePostId, request);
+        return ApiResponse.ok(new LikeToggleResponse(likeCount));
     }
 
     @ApiOperation("좋아요 누른 게시글만 조회")
     @GetMapping("/schedules/liked")
-    public ResponseEntity<List<SchedulePostResponse>> likedSchedulePostList(@AuthenticationPrincipal JwtAuthentication authentication) {
-        return ResponseEntity.ok(schedulePostService.getLikedSchedulePosts(authentication.getId()));
+    public ApiResponse<List<SchedulePostListViewResponse>> likedSchedulePostList(
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        return ApiResponse.ok(schedulePostService.getLikedSchedulePosts(authentication.getId()));
     }
 
     @ApiOperation("여행 공유 게시글에 작성된 댓글 조회하기")
     @GetMapping("/schedules/{schedulePostId}/comments")
-    public ResponseEntity<List<SchedulePostCommentResponse>> getSchedulePostComments(@PathVariable("schedulePostId") Long schedulePostId) {
-        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.getSchedulePostComments(schedulePostId);
-        return ResponseEntity.ok(schedulePostComments);
+    public ApiResponse<List<CommentReadResponse>> getSchedulePostComments(
+            @PathVariable("schedulePostId") Long schedulePostId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        List<CommentReadResponse> schedulePostComments =
+                schedulePostService.getSchedulePostComments(schedulePostId, authentication);
+        return ApiResponse.ok(schedulePostComments);
     }
 
     @ApiOperation("여행 공유 게시글에 댓글 작성하기")
     @PostMapping("/schedules/{schedulePostId}/comments")
-    public ResponseEntity<List<SchedulePostCommentResponse>> writeSchedulePostComment(
+    public ApiResponse<List<CommentReadResponse>> writeSchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
-            @Valid @RequestBody SchedulePostCommentRequest request,
+            @Valid @RequestBody CommentCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<SchedulePostCommentResponse> schedulePostComments = schedulePostService.writeSchedulePostComment(authentication.getId(), schedulePostId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(schedulePostComments);
+        List<CommentReadResponse> schedulePostComments =
+                schedulePostService.writeSchedulePostComment(authentication, schedulePostId, request);
+        return ApiResponse.created(schedulePostComments);
     }
 
     @ApiOperation("여행 공유 게시글에 작성된 댓글 삭제하기")
     @DeleteMapping("/schedules/{schedulePostId}/comments/{commentId}")
-    public ResponseEntity<Void> deleteSchedulePostComment(
+    public ApiResponse<Void> deleteSchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal JwtAuthentication authentication
@@ -178,83 +196,85 @@ public class SchedulePostController {
         // -> Henry 등의 의견으로 1이 좋을 것이라 생각되나, 삭제 관련 기능에서 오류가 발생합니다. (코멘트가 삭제되기 위해서는 해당 comment의 ID를 FK로 가지는 모든 대댓글이 먼저 삭제되어야 함)
         // 그래서 일단 방법 2 쪽으로 먼저 구현합니다. (게시글 삭제 -> 대댓글, 댓글, 좋아요 순으로 선행 삭제 / 댓글 삭제 -> 대댓글, 댓글 순으로 삭제)
         // -> TODO: 추후 연관관계 관련 문제 해결하고 방법 1로 교체
-        schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, authentication.getId());
-        return ResponseEntity.ok().build();
+        schedulePostService.deleteSchedulePostComment(schedulePostId, commentId, authentication);
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행 공유 게시글에 작성한 댓글 수정하기")
     @PutMapping("/schedules/{schedulePostId}/comments/{commentId}")
-    public ResponseEntity<Void> modifySchedulePostComment(
+    public ApiResponse<Void> modifySchedulePostComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
-            @Valid @RequestBody SchedulePostCommentRequest request,
+            @Valid @RequestBody CommentCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        schedulePostService.modifySchedulePostComment(schedulePostId, commentId, authentication.getId(), request);
-        return ResponseEntity.ok().build();
+        schedulePostService.modifySchedulePostComment(schedulePostId, commentId, authentication, request);
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행 공유 게시글에 작성된 댓글의 대댓글 조회하기")
     @GetMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments")
-    public ResponseEntity<List<SchedulePostNestedCommentResponse>> getSchedulePostNestedComments(
+    public ApiResponse<List<NestedCommentReadResponse>> getSchedulePostNestedComments(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<SchedulePostNestedCommentResponse> schedulePostNestedComments = schedulePostService.getSchedulePostNestedComments(schedulePostId, commentId, authentication.getId());
-        return ResponseEntity.ok(schedulePostNestedComments);
+        List<NestedCommentReadResponse> schedulePostNestedComments =
+                schedulePostService.getSchedulePostNestedComments(schedulePostId, commentId, authentication);
+        return ApiResponse.ok(schedulePostNestedComments);
     }
 
     @ApiOperation("여행 공유 게시글에 작성된 댓글에 대댓글 작성하기 (전체 댓글 반환)")
     @PostMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments")
-    public ResponseEntity<List<SchedulePostCommentResponse>> writeSchedulePostNestedComment(
+    public ApiResponse<List<CommentReadResponse>> writeSchedulePostNestedComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
-            @Valid @RequestBody SchedulePostCommentRequest request,
+            @Valid @RequestBody CommentCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<SchedulePostCommentResponse> schedulePostCommentResponses = schedulePostService.writeNestedCommentToSchedulePostComment(
-                authentication.getId(),
-                schedulePostId,
-                commentId,
-                request
-        );
-        return ResponseEntity.ok(schedulePostCommentResponses);
+        List<CommentReadResponse> commentReadResponses =
+                schedulePostService.writeNestedCommentToSchedulePostComment(
+                        authentication,
+                        schedulePostId,
+                        commentId,
+                        request
+                );
+        return ApiResponse.ok(commentReadResponses);
     }
 
     @ApiOperation("대댓글 수정하기")
     @PutMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments/{nestedCommentId}")
-    public ResponseEntity<Void> modifySchedulePostNestedComment(
+    public ApiResponse<Void> modifySchedulePostNestedComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
             @PathVariable("nestedCommentId") Long nestedCommentId,
-            @Valid @RequestBody SchedulePostCommentRequest request,
+            @Valid @RequestBody CommentCreationRequest request,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         schedulePostService.modifySchedulePostNestedComment(
-                authentication.getId(),
+                authentication,
                 schedulePostId,
                 commentId,
                 nestedCommentId,
                 request
         );
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @ApiOperation("대댓글 삭제하기")
     @DeleteMapping("/schedules/{schedulePostId}/comments/{commentId}/nestedComments/{nestedCommentId}")
-    public ResponseEntity<Void> deleteSchedulePostNestedComment(
+    public ApiResponse<Void> deleteSchedulePostNestedComment(
             @PathVariable("schedulePostId") Long schedulePostId,
             @PathVariable("commentId") Long commentId,
             @PathVariable("nestedCommentId") Long nestedCommentId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         schedulePostService.deleteSchedulePostNestedComment(
-                authentication.getId(),
+                authentication,
                 schedulePostId,
                 commentId,
                 nestedCommentId
         );
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 }
