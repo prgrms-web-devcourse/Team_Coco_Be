@@ -1,6 +1,6 @@
 package com.cocodan.triplan.schedule.controller;
 
-import com.cocodan.triplan.common.dto.ApiResponse;
+import com.cocodan.triplan.common.ApiResponse;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.dto.request.*;
@@ -33,7 +33,7 @@ public class ScheduleController {
     ) {
         Long savedId = scheduleService.saveSchedule(scheduleCreationRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.CREATED.value(), new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("회원이 속한 일정 목록 조회")
@@ -43,7 +43,7 @@ public class ScheduleController {
     ) {
         List<ScheduleResponse> schedules = scheduleService.getSchedules(authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), schedules);
+        return ApiResponse.ok(schedules);
     }
 
     @ApiOperation("일정 상세 조회")
@@ -51,7 +51,7 @@ public class ScheduleController {
     public ApiResponse<ScheduleResponse> getSchedule(@PathVariable Long scheduleId) {
         ScheduleResponse schedule = scheduleService.getSchedule(scheduleId);
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), schedule);
+        return ApiResponse.ok(schedule);
     }
 
     @ApiOperation("일정 수정")
@@ -63,7 +63,7 @@ public class ScheduleController {
     ) {
         scheduleService.modifySchedule(scheduleId, scheduleModificationRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     @ApiOperation("일정 삭제")
@@ -74,7 +74,7 @@ public class ScheduleController {
     ) {
         scheduleService.deleteSchedule(scheduleId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     // 메모
@@ -87,7 +87,7 @@ public class ScheduleController {
     ) {
         Long savedId = scheduleService.saveMemo(scheduleId, memoRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.CREATED.value(), new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 메모 목록 조회")
@@ -98,7 +98,7 @@ public class ScheduleController {
     ) {
         List<MemoResponse> memos = scheduleService.getMemos(scheduleId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), memos);
+        return ApiResponse.ok(memos);
     }
 
     @ApiOperation("메모 상세 조회")
@@ -110,7 +110,7 @@ public class ScheduleController {
     ) {
         MemoResponse memoResponse = scheduleService.getMemo(scheduleId, memoId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), memoResponse);
+        return ApiResponse.ok(memoResponse);
     }
 
     @ApiOperation("메모 수정")
@@ -123,7 +123,7 @@ public class ScheduleController {
     ) {
         scheduleService.modifyMemo(scheduleId, memoId, memoRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     @ApiOperation("메모 삭제")
@@ -135,7 +135,7 @@ public class ScheduleController {
     ) {
         scheduleService.deleteMemo(scheduleId, memoId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     // 체크리스트
@@ -148,7 +148,7 @@ public class ScheduleController {
     ) {
         Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.CREATED.value(), new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 체크리스트 목록 조회")
@@ -159,7 +159,7 @@ public class ScheduleController {
     ) {
         List<ChecklistResponse> checklistResponses = scheduleService.getChecklists(scheduleId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), checklistResponses);
+        return ApiResponse.ok(checklistResponses);
     }
 
     @ApiOperation("체크리스트 선택 및 해제")
@@ -172,7 +172,7 @@ public class ScheduleController {
     ) {
         scheduleService.doCheck(scheduleId, checklistId, authentication.getId(), flag);
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     @ApiOperation("체크리스트 삭제")
@@ -184,7 +184,7 @@ public class ScheduleController {
     ) {
         scheduleService.deleteChecklist(scheduleId, checklistId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     // 투표
@@ -197,7 +197,7 @@ public class ScheduleController {
     ) {
         Long savedId = scheduleService.saveVoting(scheduleId, votingCreationRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.CREATED.value(), new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 투표 목록 조회")
@@ -209,7 +209,7 @@ public class ScheduleController {
         List<VotingResponse> votingSimpleResponses =
                 scheduleService.getVotingList(scheduleId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), votingSimpleResponses);
+        return ApiResponse.ok(votingSimpleResponses);
     }
 
     @ApiOperation("투표 상세 조회")
@@ -222,7 +222,7 @@ public class ScheduleController {
         VotingResponse votingResponse =
                 scheduleService.getVoting(scheduleId, votingId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), votingResponse);
+        return ApiResponse.ok(votingResponse);
     }
 
     @ApiOperation("투표 행사")
@@ -235,7 +235,7 @@ public class ScheduleController {
     ) {
         scheduleService.doVote(scheduleId, votingId, votingRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     @ApiOperation("투표 삭제")
@@ -247,7 +247,7 @@ public class ScheduleController {
     ) {
         scheduleService.deleteVoting(scheduleId, votingId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     // 여행 멤버
@@ -260,7 +260,7 @@ public class ScheduleController {
     ) {
         scheduleService.addScheduleMember(scheduleId, scheduleMemberRequest, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행 멤버 목록 조회")
@@ -272,7 +272,7 @@ public class ScheduleController {
         List<MemberSimpleResponse> memberSimpleResponses =
                 scheduleService.getScheduleMembers(scheduleId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), memberSimpleResponses);
+        return ApiResponse.ok(memberSimpleResponses);
     }
 
     @ApiOperation("여행 멤버 제외")
@@ -284,7 +284,7 @@ public class ScheduleController {
     ) {
         scheduleService.deleteScheduleMember(scheduleId, deletedId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행에서 나가기")
@@ -295,7 +295,6 @@ public class ScheduleController {
     ) {
         scheduleService.exitSchedule(scheduleId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
-
 }

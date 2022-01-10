@@ -1,6 +1,6 @@
 package com.cocodan.triplan.friend.controller;
 
-import com.cocodan.triplan.common.dto.ApiResponse;
+import com.cocodan.triplan.common.ApiResponse;
 import com.cocodan.triplan.friend.dto.request.FriendRequest;
 import com.cocodan.triplan.friend.service.FriendService;
 import com.cocodan.triplan.jwt.JwtAuthentication;
@@ -32,7 +32,7 @@ public class FriendController {
     ) {
         friendService.addFollowing(friendRequest.getMemberId(), authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 
     @ApiOperation("나의 친구 목록")
@@ -40,7 +40,7 @@ public class FriendController {
     public ApiResponse<List<MemberSimpleResponse>> getMyFollowing(@AuthenticationPrincipal JwtAuthentication authentication) {
         List<MemberSimpleResponse> memberSimpleResponses = friendService.getMyFollowing(authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value(), memberSimpleResponses);
+        return ApiResponse.ok(memberSimpleResponses);
     }
 
     @ApiOperation("친구 삭제")
@@ -48,6 +48,6 @@ public class FriendController {
     public ApiResponse<Void> deleteFollowing(@PathVariable Long deletedFriendId, @AuthenticationPrincipal JwtAuthentication authentication) {
         friendService.deleteFollowing(deletedFriendId, authentication.getId());
 
-        return ApiResponse.createApiResponse(HttpStatus.OK.value());
+        return ApiResponse.ok();
     }
 }
