@@ -9,13 +9,13 @@ import lombok.Getter;
 @Builder(access = AccessLevel.PRIVATE)
 public class DailyScheduleSpotResponse {
 
-    private final Long spotId;
+    private Long spotId;
 
-    private final int dateOrder;
+    private int dateOrder;
 
-    private final int spotOrder;
+    private int spotOrder;
 
-    private final String placeName;
+    private String placeName;
 
     public static DailyScheduleSpotResponse from(DailyScheduleSpot dailyScheduleSpot) {
         return DailyScheduleSpotResponse.builder()

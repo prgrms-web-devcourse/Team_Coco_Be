@@ -110,10 +110,13 @@ public class ScheduleService {
 
     private void createScheduleDailySpots(ScheduleCreationRequest scheduleCreationRequest, Schedule schedule) {
         scheduleCreationRequest.getDailyScheduleSpotCreationRequests()
-                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
+                .forEach(request -> createDailyScheduleSpot(schedule, request));
     }
 
-    private void createDailyScheduleSpot(Schedule schedule, DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest) {
+    private void createDailyScheduleSpot(
+            Schedule schedule,
+            DailyScheduleSpotCreationRequest dailyScheduleSpotCreationRequest
+    ) {
         DailyScheduleSpot.builder()
                 .spotId(dailyScheduleSpotCreationRequest.getSpotId())
                 .placeName(dailyScheduleSpotCreationRequest.getPlaceName())
@@ -128,15 +131,15 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ScheduleSimpleResponse> getSchedules(Long memberId) {
+    public List<ScheduleResponse> getSchedules(Long memberId) {
         return scheduleRepository.findByMemberId(memberId)
                 .stream()
-                .map(ScheduleSimpleResponse::from)
+                .map(ScheduleResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public ScheduleDetailResponse getSchedule(Long scheduleId) {
+    public ScheduleResponse getSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findOneWithSpotsById(scheduleId)
                 .orElseThrow(
                         () -> new NotFoundException(
@@ -158,7 +161,7 @@ public class ScheduleService {
 
         List<Spot> spots = spotService.findByIdIn(getSpotIds(schedule));
 
-        return ScheduleDetailResponse.of(schedule, spots, members);
+        return ScheduleResponse.of(schedule, spots, members);
     }
 
     private List<Long> getMemberIds(Schedule schedule) {
@@ -215,9 +218,12 @@ public class ScheduleService {
         }
     }
 
-    private void convertDailyScheduleSpotList(Schedule schedule, ScheduleModificationRequest scheduleModificationRequest) {
+    private void convertDailyScheduleSpotList(
+            Schedule schedule,
+            ScheduleModificationRequest scheduleModificationRequest
+    ) {
         scheduleModificationRequest.getDailyScheduleSpotCreationRequests()
-                .forEach(dailyScheduleSpotCreationRequest -> createDailyScheduleSpot(schedule, dailyScheduleSpotCreationRequest));
+                .forEach(request -> createDailyScheduleSpot(schedule, request));
     }
 
     @Transactional
@@ -257,17 +263,17 @@ public class ScheduleService {
 
 
     @Transactional(readOnly = true)
-    public List<MemoSimpleResponse> getMemos(Long scheduleId, Long memberId) {
+    public List<MemoResponse> getMemos(Long scheduleId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
 
         return memoRepository.findByScheduleId(scheduleId)
                 .stream()
-                .map(MemoSimpleResponse::from)
+                .map(MemoResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public MemoDetailResponse getMemo(Long scheduleId, Long memoId, Long memberId) {
+    public MemoResponse getMemo(Long scheduleId, Long memoId, Long memberId) {
         Memo memo = findMemoById(memoId);
 
         validateScheduleMemo(scheduleId, memoId);
@@ -278,7 +284,7 @@ public class ScheduleService {
 
         Member member = findMemberById(ownerId);
 
-        return MemoDetailResponse.of(memo, member);
+        return MemoResponse.of(memo, member);
     }
 
     private Member findMemberById(Long ownerId) {
@@ -467,17 +473,17 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<VotingSimpleResponse> getVotingList(Long scheduleId, Long memberId) {
+    public List<VotingResponse> getVotingList(Long scheduleId, Long memberId) {
         validateScheduleMember(scheduleId, memberId);
 
         return votingRepository.findByScheduleId(scheduleId)
                 .stream()
-                .map(VotingSimpleResponse::from)
+                .map(VotingResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public VotingDetailResponse getVoting(Long scheduleId, Long votingId, Long memberId) {
+    public VotingResponse getVoting(Long scheduleId, Long votingId, Long memberId) {
         Voting voting = findVotingById(votingId);
 
         validateScheduleVoting(scheduleId, votingId);
@@ -488,7 +494,7 @@ public class ScheduleService {
 
         Member owner = findMemberById(ownerId);
 
-        return VotingDetailResponse.of(voting, owner, memberId);
+        return VotingResponse.of(voting, owner, memberId);
     }
 
     private Voting findVotingById(Long votingId) {
@@ -595,7 +601,11 @@ public class ScheduleService {
         return schedule.getScheduleMembers().stream()
                 .filter(scheduleMember -> scheduleMember.getMemberId().equals(deletedId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(ExceptionMessageUtils.getMessage("exception.bad_request")));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                ExceptionMessageUtils.getMessage("exception.bad_request")
+                        )
+                );
     }
 
     @Transactional

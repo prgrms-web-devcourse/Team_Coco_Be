@@ -104,15 +104,15 @@ class ScheduleServiceTest {
         Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
-        List<ScheduleSimpleResponse> schedules = scheduleService.getSchedules(MEMBER_ID);
-        ScheduleSimpleResponse scheduleSimpleResponse = schedules.get(0);
+        List<ScheduleResponse> schedules = scheduleService.getSchedules(MEMBER_ID);
+        ScheduleResponse scheduleResponse = schedules.get(0);
 
         // Then
-        assertThat(scheduleSimpleResponse.getId()).isEqualTo(scheduleId);
-        assertThat(scheduleSimpleResponse.getTitle()).isEqualTo("title");
-        assertThat(scheduleSimpleResponse.getStartDate()).isEqualTo("2021-12-01");
-        assertThat(scheduleSimpleResponse.getEndDate()).isEqualTo("2021-12-03");
-        assertThat(scheduleSimpleResponse.getThemes()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(scheduleResponse.getId()).isEqualTo(scheduleId);
+        assertThat(scheduleResponse.getTitle()).isEqualTo("title");
+        assertThat(scheduleResponse.getStartDate()).isEqualTo("2021-12-01");
+        assertThat(scheduleResponse.getEndDate()).isEqualTo("2021-12-03");
+        assertThat(scheduleResponse.getThemes()).containsExactlyInAnyOrder(Theme.ACTIVITY, Theme.FOOD);
     }
 
     @Test
@@ -123,13 +123,13 @@ class ScheduleServiceTest {
         Long scheduleId = scheduleService.saveSchedule(scheduleCreationRequest, MEMBER_ID);
 
         // When
-        ScheduleDetailResponse response = scheduleService.getSchedule(scheduleId);
+        ScheduleResponse response = scheduleService.getSchedule(scheduleId);
 
         // Then
-        assertThat(response.getScheduleSimpleResponse().getStartDate()).isEqualTo("2021-12-01");
-        assertThat(response.getScheduleSimpleResponse().getEndDate()).isEqualTo("2021-12-03");
-        assertThat(response.getScheduleSimpleResponse().getTitle()).isEqualTo("title");
-        assertThat(response.getScheduleSimpleResponse().getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
+        assertThat(response.getStartDate()).isEqualTo("2021-12-01");
+        assertThat(response.getEndDate()).isEqualTo("2021-12-03");
+        assertThat(response.getTitle()).isEqualTo("title");
+        assertThat(response.getThemes()).contains(Theme.ACTIVITY, Theme.FOOD);
 
         List<Long> memberIds = response.getMemberSimpleResponses().stream()
                 .map(MemberSimpleResponse::getId)
@@ -226,18 +226,18 @@ class ScheduleServiceTest {
         Long memo3 = scheduleService.saveMemo(schedule, memoRequest3, MEMBER_ID);
 
         // When
-        List<MemoSimpleResponse> memos = scheduleService.getMemos(schedule, MEMBER_ID);
+        List<MemoResponse> memos = scheduleService.getMemos(schedule, MEMBER_ID);
 
         List<String> titles = memos.stream()
-                .map(MemoSimpleResponse::getTitle)
+                .map(MemoResponse::getTitle)
                 .collect(Collectors.toList());
 
         List<String> contents = memos.stream()
-                .map((MemoSimpleResponse::getContent))
+                .map((MemoResponse::getContent))
                 .collect(Collectors.toList());
 
         List<Long> ids = memos.stream()
-                .map((MemoSimpleResponse::getId))
+                .map((MemoResponse::getId))
                 .collect(Collectors.toList());
 
 
@@ -256,7 +256,7 @@ class ScheduleServiceTest {
         Long memo = scheduleService.saveMemo(schedule, memoRequest1, MEMBER_ID);
 
         // When
-        MemoDetailResponse actual = scheduleService.getMemo(schedule, memo, MEMBER_ID);
+        MemoResponse actual = scheduleService.getMemo(schedule, memo, MEMBER_ID);
 
         // Then
         assertThat(actual.getTitle()).isEqualTo("memotitle1");
@@ -380,14 +380,14 @@ class ScheduleServiceTest {
         Long voting2 = scheduleService.saveVoting(schedule, votingCreationRequest2, MEMBER_ID);
 
         // When
-        List<VotingSimpleResponse> votingList = scheduleService.getVotingList(schedule, MEMBER_ID);
+        List<VotingResponse> votingList = scheduleService.getVotingList(schedule, MEMBER_ID);
 
         List<String> titles = votingList.stream()
-                .map(VotingSimpleResponse::getTitle)
+                .map(VotingResponse::getTitle)
                 .collect(Collectors.toList());
 
         List<Integer> counts = votingList.stream()
-                .map(VotingSimpleResponse::getMemberCount)
+                .map(VotingResponse::getNumOfTotalParticipants)
                 .collect(Collectors.toList());
 
         // Then
@@ -405,7 +405,7 @@ class ScheduleServiceTest {
         Long voting = scheduleService.saveVoting(schedule, votingCreationRequest, MEMBER_ID);
 
         // When
-        VotingDetailResponse response = scheduleService.getVoting(schedule, voting, MEMBER_ID);
+        VotingResponse response = scheduleService.getVoting(schedule, voting, MEMBER_ID);
 
         List<String> contents = response.getVotingContentResponses().stream()
                 .map(VotingContentResponse::getContent)

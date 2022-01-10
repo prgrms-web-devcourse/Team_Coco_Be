@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class IdResponse {
 
-    private final Long id;
+    private Long id;
 }

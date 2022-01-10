@@ -3,24 +3,34 @@ package com.cocodan.triplan.schedule.dto.response;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.domain.Memo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class MemoDetailResponse {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class MemoResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final String title;
+    private String title;
 
-    private final String content;
+    private String content;
 
-    private final MemberSimpleResponse memberSimpleResponse;
+    private MemberSimpleResponse memberSimpleResponse;
 
-    public static MemoDetailResponse of(Memo memo, Member member) {
-        return MemoDetailResponse.builder()
+    public static MemoResponse from(Memo memo) {
+        return MemoResponse.builder()
+                .id(memo.getId())
+                .title(memo.getTitle())
+                .content(memo.getContent())
+                .build();
+    }
+
+    public static MemoResponse of(Memo memo, Member member) {
+        return MemoResponse.builder()
                 .id(memo.getId())
                 .title(memo.getTitle())
                 .content(memo.getContent())

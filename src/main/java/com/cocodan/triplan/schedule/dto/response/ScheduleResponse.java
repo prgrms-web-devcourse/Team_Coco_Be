@@ -4,7 +4,10 @@ import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.domain.DailyScheduleSpot;
 import com.cocodan.triplan.schedule.domain.Schedule;
+import com.cocodan.triplan.schedule.domain.ScheduleTheme;
+import com.cocodan.triplan.schedule.domain.vo.Theme;
 import com.cocodan.triplan.spot.domain.Spot;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,20 +17,47 @@ import java.util.stream.Collectors;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class ScheduleDetailResponse {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ScheduleResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final ScheduleSimpleResponse scheduleSimpleResponse;
+    private String title;
 
-    private final List<ScheduleSpotResponse> spotResponseList;
+    private String startDate;
 
-    private final List<MemberSimpleResponse> memberSimpleResponses;
+    private String endDate;
 
-    public static ScheduleDetailResponse of(Schedule schedule, List<Spot> spotList, List<Member> members) {
-        return ScheduleDetailResponse.builder()
+    private List<Theme> themes;
+
+    private List<ScheduleSpotResponse> spotResponseList;
+
+    private List<MemberSimpleResponse> memberSimpleResponses;
+
+    public static ScheduleResponse from(Schedule schedule) {
+        return ScheduleResponse.builder()
                 .id(schedule.getId())
-                .scheduleSimpleResponse(ScheduleSimpleResponse.from(schedule))
+                .title(schedule.getTitle())
+                .startDate(schedule.getStartDate().toString())
+                .endDate(schedule.getEndDate().toString())
+                .themes(getThemes(schedule))
+                .build();
+    }
+
+    public static List<Theme> getThemes(Schedule schedule) {
+        return schedule.getScheduleThemes().stream()
+                .map(ScheduleTheme::getTheme)
+                .collect(Collectors.toList());
+    }
+
+    public static ScheduleResponse of(Schedule schedule, List<Spot> spotList, List<Member> members) {
+        return ScheduleResponse.builder()
+                .id(schedule.getId())
+                .id(schedule.getId())
+                .title(schedule.getTitle())
+                .startDate(schedule.getStartDate().toString())
+                .endDate(schedule.getEndDate().toString())
+                .themes(getThemes(schedule))
                 .spotResponseList(getScheduleSpots(schedule.getDailyScheduleSpots(), spotList))
                 .memberSimpleResponses(getMemberSimpleResponse(members))
                 .build();
@@ -35,7 +65,7 @@ public class ScheduleDetailResponse {
 
     private static List<ScheduleSpotResponse> getScheduleSpots(List<DailyScheduleSpot> dailyScheduleSpots, List<Spot> spots) {
         return dailyScheduleSpots.stream()
-                .sorted(ScheduleDetailResponse::sortByDateAndOrder)
+                .sorted(ScheduleResponse::sortByDateAndOrder)
                 .flatMap(dailyScheduleSpot -> spots.stream()
                         .filter(spot -> spot.getId().equals(dailyScheduleSpot.getSpotId()))
                         .map(spot -> ScheduleSpotResponse.of(spot, dailyScheduleSpot)))
@@ -53,7 +83,7 @@ public class ScheduleDetailResponse {
 
     private static List<MemberSimpleResponse> getMemberSimpleResponse(List<Member> members) {
         return members.stream()
-                .map(ScheduleDetailResponse::getMemberSimpleResponse)
+                .map(ScheduleResponse::getMemberSimpleResponse)
                 .collect(Collectors.toList());
     }
 

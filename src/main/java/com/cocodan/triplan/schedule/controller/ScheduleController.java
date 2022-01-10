@@ -1,5 +1,6 @@
 package com.cocodan.triplan.schedule.controller;
 
+import com.cocodan.triplan.common.ApiResponse;
 import com.cocodan.triplan.jwt.JwtAuthentication;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.schedule.dto.request.*;
@@ -9,7 +10,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,84 +27,95 @@ public class ScheduleController {
     // 일정
     @ApiOperation("일정 생성")
     @PostMapping()
-    public ResponseEntity<IdResponse> createSchedule(@Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ApiResponse<IdResponse> createSchedule(
+            @Valid @RequestBody ScheduleCreationRequest scheduleCreationRequest,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         Long savedId = scheduleService.saveSchedule(scheduleCreationRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("회원이 속한 일정 목록 조회")
     @GetMapping()
-    public ResponseEntity<List<ScheduleSimpleResponse>> getSchedules(@AuthenticationPrincipal JwtAuthentication authentication) {
-        List<ScheduleSimpleResponse> schedules = scheduleService.getSchedules(authentication.getId());
+    public ApiResponse<List<ScheduleResponse>> getSchedules(
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        List<ScheduleResponse> schedules = scheduleService.getSchedules(authentication.getId());
 
-        return ResponseEntity.ok(schedules);
+        return ApiResponse.ok(schedules);
     }
 
     @ApiOperation("일정 상세 조회")
     @GetMapping("/{scheduleId}")
-    public ResponseEntity<ScheduleDetailResponse> getSchedule(@PathVariable Long scheduleId) {
-        ScheduleDetailResponse schedule = scheduleService.getSchedule(scheduleId);
+    public ApiResponse<ScheduleResponse> getSchedule(@PathVariable Long scheduleId) {
+        ScheduleResponse schedule = scheduleService.getSchedule(scheduleId);
 
-        return ResponseEntity.ok(schedule);
+        return ApiResponse.ok(schedule);
     }
 
     @ApiOperation("일정 수정")
     @PutMapping("/{scheduleId}")
-    public ResponseEntity<Void> modifySchedule(
+    public ApiResponse<Void> modifySchedule(
             @PathVariable Long scheduleId,
             @RequestBody @Valid ScheduleModificationRequest scheduleModificationRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         scheduleService.modifySchedule(scheduleId, scheduleModificationRequest, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @ApiOperation("일정 삭제")
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ApiResponse<Void> deleteSchedule(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         scheduleService.deleteSchedule(scheduleId, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     // 메모
     @ApiOperation("메모 생성")
     @PostMapping("/{scheduleId}/memos")
-    public ResponseEntity<IdResponse> createMemo(
+    public ApiResponse<IdResponse> createMemo(
             @PathVariable Long scheduleId,
             @RequestBody @Valid MemoRequest memoRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long savedId = scheduleService.saveMemo(scheduleId, memoRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 메모 목록 조회")
     @GetMapping("/{scheduleId}/memos")
-    public ResponseEntity<List<MemoSimpleResponse>> getMemos(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
-        List<MemoSimpleResponse> memos = scheduleService.getMemos(scheduleId, authentication.getId());
+    public ApiResponse<List<MemoResponse>> getMemos(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        List<MemoResponse> memos = scheduleService.getMemos(scheduleId, authentication.getId());
 
-        return ResponseEntity.ok(memos);
+        return ApiResponse.ok(memos);
     }
 
     @ApiOperation("메모 상세 조회")
     @GetMapping("/{scheduleId}/memos/{memoId}")
-    public ResponseEntity<MemoDetailResponse> getMemo(
+    public ApiResponse<MemoResponse> getMemo(
             @PathVariable Long scheduleId,
             @PathVariable Long memoId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        MemoDetailResponse memoDetailResponse = scheduleService.getMemo(scheduleId, memoId, authentication.getId());
+        MemoResponse memoResponse = scheduleService.getMemo(scheduleId, memoId, authentication.getId());
 
-        return ResponseEntity.ok(memoDetailResponse);
+        return ApiResponse.ok(memoResponse);
     }
 
     @ApiOperation("메모 수정")
     @PutMapping("/{scheduleId}/memos/{memoId}")
-    public ResponseEntity<Void> modifyMemo(
+    public ApiResponse<Void> modifyMemo(
             @PathVariable Long scheduleId,
             @PathVariable Long memoId,
             @RequestBody @Valid MemoRequest memoRequest,
@@ -112,45 +123,48 @@ public class ScheduleController {
     ) {
         scheduleService.modifyMemo(scheduleId, memoId, memoRequest, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @ApiOperation("메모 삭제")
     @DeleteMapping("/{scheduleId}/memos/{memoId}")
-    public ResponseEntity<Void> deleteMemo(
+    public ApiResponse<Void> deleteMemo(
             @PathVariable Long scheduleId,
             @PathVariable Long memoId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         scheduleService.deleteMemo(scheduleId, memoId, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     // 체크리스트
     @ApiOperation("체크리스트 생성")
     @PostMapping("/{scheduleId}/checklists")
-    public ResponseEntity<IdResponse> saveChecklist(
+    public ApiResponse<IdResponse> saveChecklist(
             @PathVariable Long scheduleId,
             @RequestBody @Valid ChecklistCreationRequest checklistCreationRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long savedId = scheduleService.saveChecklist(scheduleId, checklistCreationRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 체크리스트 목록 조회")
     @GetMapping("/{scheduleId}/checklists")
-    public ResponseEntity<List<ChecklistResponse>> getChecklists(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ApiResponse<List<ChecklistResponse>> getChecklists(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         List<ChecklistResponse> checklistResponses = scheduleService.getChecklists(scheduleId, authentication.getId());
 
-        return ResponseEntity.ok(checklistResponses);
+        return ApiResponse.ok(checklistResponses);
     }
 
     @ApiOperation("체크리스트 선택 및 해제")
     @PatchMapping("/{scheduleId}/checklists/{checklistId}")
-    public ResponseEntity<Void> doCheck(
+    public ApiResponse<Void> doCheck(
             @PathVariable Long scheduleId,
             @PathVariable Long checklistId,
             @RequestParam boolean flag,
@@ -158,60 +172,62 @@ public class ScheduleController {
     ) {
         scheduleService.doCheck(scheduleId, checklistId, authentication.getId(), flag);
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @ApiOperation("체크리스트 삭제")
     @DeleteMapping("/{scheduleId}/checklists/{checklistId}")
-    public ResponseEntity<Void> modifyChecklist(
+    public ApiResponse<Void> modifyChecklist(
             @PathVariable Long scheduleId,
             @PathVariable Long checklistId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         scheduleService.deleteChecklist(scheduleId, checklistId, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     // 투표
     @ApiOperation("투표 생성")
     @PostMapping("/{scheduleId}/votings")
-    public ResponseEntity<IdResponse> createVoting(
+    public ApiResponse<IdResponse> createVoting(
             @PathVariable Long scheduleId,
             @RequestBody @Valid VotingCreationRequest votingCreationRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         Long savedId = scheduleService.saveVoting(scheduleId, votingCreationRequest, authentication.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(savedId));
+        return ApiResponse.created(new IdResponse(savedId));
     }
 
     @ApiOperation("일정에 속한 투표 목록 조회")
     @GetMapping("/{scheduleId}/votings")
-    public ResponseEntity<List<VotingSimpleResponse>> getVotingList(
+    public ApiResponse<List<VotingResponse>> getVotingList(
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<VotingSimpleResponse> votingSimpleResponses = scheduleService.getVotingList(scheduleId, authentication.getId());
+        List<VotingResponse> votingSimpleResponses =
+                scheduleService.getVotingList(scheduleId, authentication.getId());
 
-        return ResponseEntity.ok(votingSimpleResponses);
+        return ApiResponse.ok(votingSimpleResponses);
     }
 
     @ApiOperation("투표 상세 조회")
     @GetMapping("/{scheduleId}/votings/{votingId}")
-    public ResponseEntity<VotingDetailResponse> getVoting(
+    public ApiResponse<VotingResponse> getVoting(
             @PathVariable Long scheduleId,
             @PathVariable Long votingId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        VotingDetailResponse votingDetailResponse = scheduleService.getVoting(scheduleId, votingId, authentication.getId());
+        VotingResponse votingResponse =
+                scheduleService.getVoting(scheduleId, votingId, authentication.getId());
 
-        return ResponseEntity.ok(votingDetailResponse);
+        return ApiResponse.ok(votingResponse);
     }
 
     @ApiOperation("투표 행사")
     @PatchMapping("/{scheduleId}/votings/{votingId}")
-    public ResponseEntity<Void> doVote(
+    public ApiResponse<Void> doVote(
             @PathVariable Long scheduleId,
             @PathVariable Long votingId,
             @RequestBody @Valid VotingRequest votingRequest,
@@ -219,63 +235,66 @@ public class ScheduleController {
     ) {
         scheduleService.doVote(scheduleId, votingId, votingRequest, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @ApiOperation("투표 삭제")
     @DeleteMapping("/{scheduleId}/votings/{votingId}")
-    public ResponseEntity<Void> deleteVoting(
+    public ApiResponse<Void> deleteVoting(
             @PathVariable Long scheduleId,
             @PathVariable Long votingId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         scheduleService.deleteVoting(scheduleId, votingId, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     // 여행 멤버
     @ApiOperation("여행 멤버 추가")
     @PostMapping("/{scheduleId}/members")
-    public ResponseEntity<Void> addScheduleMember(
+    public ApiResponse<Void> addScheduleMember(
             @PathVariable Long scheduleId,
             @Valid @RequestBody ScheduleMemberRequest scheduleMemberRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         scheduleService.addScheduleMember(scheduleId, scheduleMemberRequest, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행 멤버 목록 조회")
     @GetMapping("/{scheduleId}/members")
-    public ResponseEntity<List<MemberSimpleResponse>> getScheduleMembers(
+    public ApiResponse<List<MemberSimpleResponse>> getScheduleMembers(
             @PathVariable Long scheduleId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
-        List<MemberSimpleResponse> memberSimpleResponses = scheduleService.getScheduleMembers(scheduleId, authentication.getId());
+        List<MemberSimpleResponse> memberSimpleResponses =
+                scheduleService.getScheduleMembers(scheduleId, authentication.getId());
 
-        return ResponseEntity.ok(memberSimpleResponses);
+        return ApiResponse.ok(memberSimpleResponses);
     }
 
     @ApiOperation("여행 멤버 제외")
     @DeleteMapping("/{scheduleId}/members/{memberId}")
-    public ResponseEntity<Void> deleteScheduleMember(
+    public ApiResponse<Void> deleteScheduleMember(
             @PathVariable Long scheduleId,
             @PathVariable(name = "memberId") Long deletedId,
             @AuthenticationPrincipal JwtAuthentication authentication
     ) {
         scheduleService.deleteScheduleMember(scheduleId, deletedId, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @ApiOperation("여행에서 나가기")
     @DeleteMapping("/{scheduleId}/members/exit")
-    public ResponseEntity<Void> exitSchedule(@PathVariable Long scheduleId, @AuthenticationPrincipal JwtAuthentication authentication) {
+    public ApiResponse<Void> exitSchedule(
+            @PathVariable Long scheduleId,
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
         scheduleService.exitSchedule(scheduleId, authentication.getId());
 
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
-
 }

@@ -9,13 +9,13 @@ import lombok.Getter;
 @Builder(access = AccessLevel.PRIVATE)
 public class VotingContentResponse {
 
-    private final Long id;
+    private Long id;
 
-    private final String content;
+    private String content;
 
-    private final int numOfParticipants;
+    private int numOfParticipants;
 
-    private final boolean participantFlag;
+    private boolean participantFlag;
 
     public static VotingContentResponse convertVotingContentResponse(VotingContent votingContent, Long memberId) {
         return VotingContentResponse.builder()

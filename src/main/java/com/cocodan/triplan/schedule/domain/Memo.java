@@ -60,12 +60,18 @@ public class Memo extends BaseEntity {
 
     public void checkTitle(String title) {
         checkArgument(title != null, "Title is required");
-        checkArgument(Range.closed(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH).contains(title.length()), "Title length is invalid");
+        checkArgument(
+                Range.closed(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH).contains(title.length()),
+                "Title length is invalid"
+        );
     }
 
     private void checkContent(String content) {
         checkArgument(content != null, "Content is required");
-        checkArgument(Range.closed(CONTENT_MIN_LENGTH, CONTENT_MAX_LENGTH).contains(content.length()), "Content length is invalid");
+        checkArgument(
+                Range.closed(CONTENT_MIN_LENGTH, CONTENT_MAX_LENGTH).contains(content.length()),
+                "Content length is invalid"
+        );
     }
 
     public Long getId() {
