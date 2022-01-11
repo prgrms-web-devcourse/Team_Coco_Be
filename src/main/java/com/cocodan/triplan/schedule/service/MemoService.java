@@ -5,6 +5,7 @@ import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.service.MemberService;
+import com.cocodan.triplan.schedule.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.Memo;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.dto.request.MemoRequest;
@@ -29,13 +30,15 @@ public class MemoService {
 
     private final MemberService memberService;
 
+    private final ScheduleConverter converter;
+
     @Transactional
     public Long saveMemo(Long scheduleId, MemoRequest memoRequest, Long memberId) {
         Schedule schedule = scheduleService.findScheduleById(scheduleId);
 
         scheduleService.validateScheduleMember(scheduleId, memberId);
 
-        Memo memo = createMemo(memoRequest, schedule, memberId);
+        Memo memo = converter.createMemo(memoRequest, schedule, memberId);
 
         return memoRepository.save(memo).getId();
     }
@@ -65,14 +68,6 @@ public class MemoService {
         return MemoResponse.of(memo, member);
     }
 
-    private void validateScheduleMemo(Long scheduleId, Long memoId) {
-        boolean notExists = !memoRepository.existsByIdAndScheduleId(memoId, scheduleId);
-
-        if (notExists) {
-            throw new NotIncludeException(Schedule.class, Memo.class, scheduleId, memoId);
-        }
-    }
-
     @Transactional
     public void modifyMemo(Long scheduleId, Long memoId, MemoRequest memoRequest, Long memberId) {
         Memo memo = findMemoById(memoId);
@@ -95,13 +90,12 @@ public class MemoService {
         memoRepository.delete(memo);
     }
 
-    private Memo createMemo(MemoRequest memoRequest, Schedule schedule, Long memberId) {
-        return Memo.builder()
-                .schedule(schedule)
-                .title(memoRequest.getTitle())
-                .content(memoRequest.getContent())
-                .memberId(memberId)
-                .build();
+    private void validateScheduleMemo(Long scheduleId, Long memoId) {
+        boolean notExists = !memoRepository.existsByIdAndScheduleId(memoId, scheduleId);
+
+        if (notExists) {
+            throw new NotIncludeException(Schedule.class, Memo.class, scheduleId, memoId);
+        }
     }
 
     private Memo findMemoById(Long memoId) {

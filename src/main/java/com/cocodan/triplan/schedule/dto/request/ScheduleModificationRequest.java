@@ -23,5 +23,4 @@ public class ScheduleModificationRequest {
 
     @NotNull
     private List<DailyScheduleSpotCreationRequest> dailyScheduleSpotCreationRequests;
-
 }

@@ -5,6 +5,7 @@ import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
 import com.cocodan.triplan.member.domain.Member;
 import com.cocodan.triplan.member.service.MemberService;
+import com.cocodan.triplan.schedule.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.Voting;
 import com.cocodan.triplan.schedule.domain.VotingContent;
@@ -31,15 +32,17 @@ public class VotingService {
 
     private final MemberService memberService;
 
+    private final ScheduleConverter converter;
+
     @Transactional
     public Long saveVoting(Long scheduleId, VotingCreationRequest votingCreationRequest, Long memberId) {
         Schedule schedule = scheduleService.findScheduleById(scheduleId);
 
         scheduleService.validateScheduleMember(scheduleId, memberId);
 
-        Voting voting = createVoting(votingCreationRequest, memberId, schedule);
+        Voting voting = converter.createVoting(votingCreationRequest, memberId, schedule);
 
-        createVotingContents(votingCreationRequest, voting);
+        converter.createVotingContents(votingCreationRequest, voting);
 
         return votingRepository.save(voting).getId();
     }
@@ -89,27 +92,6 @@ public class VotingService {
         validateVotingOwner(voting, memberId);
 
         votingRepository.delete(voting);
-    }
-
-    private Voting createVoting(VotingCreationRequest votingCreationRequest, Long memberId, Schedule schedule) {
-        return Voting.builder()
-                .schedule(schedule)
-                .title(votingCreationRequest.getTitle())
-                .multipleFlag(votingCreationRequest.isMultipleFlag())
-                .memberId(memberId)
-                .build();
-    }
-
-    private void createVotingContents(VotingCreationRequest votingCreationRequest, Voting voting) {
-        votingCreationRequest.getContents()
-                .forEach(content -> createVotingContent(voting, content));
-    }
-
-    private void createVotingContent(Voting voting, String votingContentName) {
-        VotingContent.builder()
-                .voting(voting)
-                .content(votingContentName)
-                .build();
     }
 
     private void validateScheduleVoting(Long scheduleId, Long votingId) {

@@ -4,6 +4,7 @@ import com.cocodan.triplan.exception.common.NoFriendsException;
 import com.cocodan.triplan.friend.repository.FriendRepository;
 import com.cocodan.triplan.member.dto.response.MemberSimpleResponse;
 import com.cocodan.triplan.member.repository.MemberRepository;
+import com.cocodan.triplan.schedule.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.domain.ScheduleMember;
 import com.cocodan.triplan.schedule.dto.request.ScheduleCreationRequest;
@@ -29,6 +30,8 @@ public class ScheduleMemberService {
 
     private final ScheduleService scheduleService;
 
+    private final ScheduleConverter converter;
+
     // 여행 멤버
     @Transactional
     public void addScheduleMember(Long scheduleId, ScheduleMemberRequest scheduleMemberRequest, Long memberId) {
@@ -36,11 +39,9 @@ public class ScheduleMemberService {
 
         scheduleService.validateScheduleMember(scheduleId, memberId);
 
-        long friendId = scheduleMemberRequest.getFriendId();
+        validateFriends(scheduleMemberRequest.getFriendId(), memberId);
 
-        validateFriends(friendId, memberId);
-
-        createScheduleMember(schedule, friendId);
+        converter.createScheduleMember(schedule, scheduleMemberRequest.getFriendId());
     }
 
     @Transactional(readOnly = true)
@@ -88,13 +89,6 @@ public class ScheduleMemberService {
         ScheduleMember deletedMember = findDeletedMember(schedule, memberId);
 
         schedule.deleteScheduleMember(deletedMember);
-    }
-
-    private void createScheduleMember(Schedule schedule, long friendId) {
-        ScheduleMember.builder()
-                .memberId(friendId)
-                .schedule(schedule)
-                .build();
     }
 
     private void validateFriends(long friendId, Long memberId) {

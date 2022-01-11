@@ -39,5 +39,4 @@ public class DailyScheduleSpotCreationRequest {
 
     @Range(min = Schedule.NUM_OF_SPOT_MIN, max = Schedule.NUM_OF_SPOT_MAX)
     private int spotOrder;
-
 }

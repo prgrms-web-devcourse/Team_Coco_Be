@@ -2,6 +2,7 @@ package com.cocodan.triplan.schedule.service;
 
 import com.cocodan.triplan.exception.common.NotFoundException;
 import com.cocodan.triplan.exception.common.NotIncludeException;
+import com.cocodan.triplan.schedule.ScheduleConverter;
 import com.cocodan.triplan.schedule.domain.Checklist;
 import com.cocodan.triplan.schedule.domain.Schedule;
 import com.cocodan.triplan.schedule.dto.request.ChecklistCreationRequest;
@@ -24,13 +25,15 @@ public class ChecklistService {
 
     private final ScheduleService scheduleService;
 
+    private final ScheduleConverter converter;
+
     @Transactional
     public Long saveChecklist(Long scheduleId, ChecklistCreationRequest checklistCreationRequest, Long memberId) {
         Schedule schedule = scheduleService.findScheduleById(scheduleId);
 
         scheduleService.validateScheduleMember(scheduleId, memberId);
 
-        Checklist checklist = createChecklist(checklistCreationRequest, schedule);
+        Checklist checklist = converter.createChecklist(checklistCreationRequest, schedule);
 
         return checklistRepository.save(checklist).getId();
     }
@@ -64,14 +67,6 @@ public class ChecklistService {
         scheduleService.validateScheduleMember(scheduleId, memberId);
 
         checklistRepository.delete(checklist);
-    }
-
-    private Checklist createChecklist(ChecklistCreationRequest checklistCreationRequest, Schedule schedule) {
-        return Checklist.builder()
-                .title(checklistCreationRequest.getTitle())
-                .schedule(schedule)
-                .day(checklistCreationRequest.getDay())
-                .build();
     }
 
     private Checklist findChecklistById(Long checklistId) {
