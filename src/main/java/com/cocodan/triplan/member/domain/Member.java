@@ -1,5 +1,6 @@
 package com.cocodan.triplan.member.domain;
 
+import com.cocodan.triplan.common.BaseTimeEntity;
 import com.cocodan.triplan.member.domain.vo.GenderType;
 import com.cocodan.triplan.common.BaseEntity;
 import lombok.AccessLevel;
@@ -16,7 +17,7 @@ import java.util.Calendar;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 @DynamicUpdate
-public class Member extends BaseEntity {
+public class Member extends BaseTimeEntity {
     private static final int BASIC_AGE = 1;
 
     @Id
